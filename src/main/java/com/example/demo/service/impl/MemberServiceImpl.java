@@ -15,13 +15,13 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder; // need @Bean - config
+    private final PasswordEncoder passwordEncoder; //  @Bean 필요- config
 
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
                 .id(member.getId())
-                .userName(member.getUserName())
-                .name(member.getName())
+                .userName(member.getUserName()) // 실제 id
+                .name(member.getName())         // 이름
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
@@ -35,8 +35,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto createMember(MemberDto memberDto) {
         Member member = Member.builder()
-                .name(memberDto.getName())
-                .userName(memberDto.getUserName())
+                .name(memberDto.getName())          // 이름
+                .userName(memberDto.getUserName())  // 실제 id
                 .email(memberDto.getEmail())
                 .phone(memberDto.getPhone())
                 .password(passwordEncoder.encode(memberDto.getPassword()))
@@ -45,13 +45,13 @@ public class MemberServiceImpl implements MemberService {
         return mapToMemberDto(member);
     }
     @Override
-    public Optional<MemberDto> findByEmail(String email) {
+    public Optional<MemberDto> findByEmail(String email) {  // 이메일 확인
         return memberRepository.findByEmail(email).
                 map(this::mapToMemberDto);
     }
 
     @Override
-    public boolean isUsernameDuplicate(String username) {
+    public boolean isUsernameDuplicate(String username) {   // id 확인
         return memberRepository.existsByUserName(username);
     }
 }

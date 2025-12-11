@@ -10,7 +10,7 @@ public interface MemberService {
 
         MemberDto createMember(MemberDto memberDto);
 
-        Optional<MemberDto> findByEmail(String email);
+        Optional<MemberDto> findByEmail(String email);  // 이메일 확인
 
-        boolean isUsernameDuplicate(String username);
+        boolean isUsernameDuplicate(String username);   // id 확인
     }

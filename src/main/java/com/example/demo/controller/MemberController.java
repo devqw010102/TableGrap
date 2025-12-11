@@ -26,7 +26,7 @@ public class MemberController {
 
     @PostMapping("/register")
     public String postMemberAdd(@ModelAttribute("member") @Valid MemberDto memberDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {    // DTO 검증 결과 확인(@Size, @Pattern 등)
             return "user/register";
         }
         if (!memberDto.getPassword().equals(memberDto.getPasswordConfirm())) {
