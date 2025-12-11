@@ -1,0 +1,37 @@
+### IntelliJ ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.class
+
+### Gradle ###
+.gradle/
+build/
+out/
+bin/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+### Spring Boot ###
+logs/
+*.log
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Environment Files ###
+application*.yml
+application*.yaml
+application*.properties
+
+### Others ###
+*.zip
+*.tmp
