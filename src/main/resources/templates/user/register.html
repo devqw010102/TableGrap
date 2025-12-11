@@ -1,22 +1,51 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="https://www.thymeleaf.org">
+      xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{base-layout::layout(~{::section})}">
 <head>
     <meta charset="UTF-8">
     <title>회원 가입</title>
 </head>
-<body>
-<header th:replace="fragment/common :: header"></header>
-<h1> 회원가입 화면 </h1>
 
+<section class="container">
+    <h1> 회원가입 화면 </h1>
+    <form th:object="${member}" th:action="@{/member/register}" method="post">
+        <div class="mb-3">
+            <label class="form-label">이름</label>
+            <input type="text" class="form-control" th:field="*{name}">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"
+               class="text-danger">Name Error</p>
+        </div>
 
+        <div class="mb-3">
+            <label class="form-label">아이디</label>
+            <input type="text" class="form-control" th:field="*{userName}">
+            <p th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"
+               class="text-danger">Id Error</p>
+        </div>
 
+        <div class="mb-3">
+            <label class="form-label">이메일</label>
+            <input type="text" class="form-control" th:field="*{email}">
+            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+               class="text-danger">Email Error</p>
+        </div>
 
+        <div class="mb-3">
+            <label class="form-label">비밀번호</label>
+            <input type="password" class="form-control" th:field="*{password}">
+            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+               class="text-danger">Password Error</p>
+        </div>
 
+        <div class="mb-3">
+            <label class="form-label">비밀번호 확인</label>
+            <input type="password" class="form-control" th:field="*{passwordConfirm}">
+            <p th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"
+               class="text-danger">Password Confirm Error</p>
+        </div>
 
-<footer>
-    <div th:insert="fragment/common :: footer"></div>
-</footer>
-</body>
-</html>
+        <button type="submit"> 회원 가입 </button>
+    </form>
+</section>
