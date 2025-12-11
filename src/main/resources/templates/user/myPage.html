@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>마이페이지</title>
 </head>
 <body>
-    <!-- 예약 목록, 회원 수정(탭) -->
+<header th:replace="fragment/common :: header"></header>
+<h1> 마이페이지 화면 </h1>
+
+<h2> 예약 목록 </h2>
+
+<h2> 회원 수정(탭으로) </h2>
+
+
+
+
+<footer>
+    <div th:insert="fragment/common :: footer"></div>
+</footer>
 
 </body>
 </html>
