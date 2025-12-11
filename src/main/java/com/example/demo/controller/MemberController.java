@@ -1,8 +1,9 @@
 package com.example.demo.controller;
 
-import ch.qos.logback.core.model.Model;
+//import ch.qos.logback.core.model.Model;
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,15 +19,15 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("user/register")
+    @GetMapping("/register")
     public String getMemberAdd(@ModelAttribute("member")MemberDto memberDto) {
         return "user/register";
     }
 
-    @PostMapping("user/register")
-    public String postMemberAdd(@ModelAttribute("member")MemberDto memberDto, BindingResult bindingResult) {
-        if (memberDto.getPassword() == null || memberDto.getPassword().length() < 8) {
-            bindingResult.rejectValue("password", "NotBlank", "패스워드를 8글자 이상 입력하세요");
+    @PostMapping("/register")
+    public String postMemberAdd(@ModelAttribute("member") @Valid MemberDto memberDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "user/register";
         }
         if (!memberDto.getPassword().equals(memberDto.getPasswordConfirm())) {
             bindingResult.rejectValue("passwordConfirm", "MissMatch", "입력하신 패스워드가 다릅니다.");
