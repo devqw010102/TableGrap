@@ -81,4 +81,5 @@
 | style | 스타일/포맷팅 |
 | test | 테스트 코드 |
 
+<img width="1920" height="1040" alt="Spring Initializr - Chrome 25-12-11 오후 12_13_34" src="https://github.com/user-attachments/assets/2906b98f-c8a2-407b-a2f9-91fe73a381e7" />
 
