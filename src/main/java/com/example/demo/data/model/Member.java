@@ -18,7 +18,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;        // column 번호
     @Column(unique = true)
-    private String userName;    // 아이디
+    private String username;    // 아이디
     private String password;    // 비밀번호
     @Column(unique = true)
     private String email;       // 이메일

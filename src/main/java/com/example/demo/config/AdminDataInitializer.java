@@ -45,7 +45,7 @@ public class AdminDataInitializer implements CommandLineRunner {
             // STEP 1: Member (회원) 정보 저장
             // ---------------------------------------------------
             Member admin = Member.builder()
-                    .userName(adminUsername)
+                    .username(adminUsername)
                     .password(passwordEncoder.encode(adminPassword))
                     .name(adminName)
                     // .role(...) -> 이 부분 삭제됨! Member에는 role 필드가 없을 테니까요.
