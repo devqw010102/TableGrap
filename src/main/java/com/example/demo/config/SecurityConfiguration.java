@@ -24,7 +24,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/").permitAll()                       // 메인화면은 항상 승인됨
                         .requestMatchers("/admin/**").hasRole("ADMIN")           // ADMIN 권한 필요
                         //.requestMatchers("/member/**").hasAuthority("ROLE_MEMBER") // 필요시 활성화
-                        .requestMatchers("/signup").permitAll()                  // 회원가입 허용
+                        .requestMatchers("/register").permitAll()                  // 회원가입 허용
                         .requestMatchers("/h2-console/**").permitAll()           // H2 콘솔 허용
                         .anyRequest().permitAll()
                 )

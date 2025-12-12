@@ -1,11 +1,45 @@
-<!-- Header & Footer -->
+<!-- Header -->
 
-<div th:fragment = "header">
-    <p>TravelGrap</p>
+<div th:fragment="header"
+     xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+    <nav class = "navbar navbar-expand-lg navbar-light bg-light px-3">
+        <a class = "navbar-brand" th:href = "@{/}">TableGrap</a>
 
+        <div class = "collapse navbar-collapse">
+            <ul class = "navbar-nav ms-auto">
+                <!-- Always -->
+                <li class = "nav-item" sec:authorize="isAnonymous()">
+                    <a class = "nav-link" th:href = "@{/}">Home</a>
+                </li>
+                <!-- Not login -->
+                <li class = "nav-item" sec:authorize="isAnonymous()">
+                    <a class = "nav-link" th:href = "@{/login}">Login</a>
+                </li>
+                <li class = "nav-item" sec:authorize="isAnonymous()">
+                    <a class = "nav-link" th:href = "@{/register}">Register</a>
+                </li>
+                <!-- After login -->
+                <li class = "nav-item" sec:authorize = "isAuthenticated()">
+                    <a class = "nav-link" th:href = "@{/mypage}">My Page</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post">
+                        <button class="nav-link btn btn-link">Logout</button>
+                    </form>
+                </li>
+                <li class = "nav-item" sec:authorize="isAuthenticated()">
+                    <a class = "nav-link" th:href = "@{/reservation}">Reservation</a>
+                </li>
+                <!-- Admin -->
+                <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <a class="nav-link" th:href="@{/admin}">Admin Page</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 </div>
 
-
-<div th:fragment = "footer">
-    <p>2025 TableGrap Team Project. All Rights Reserved.</p>
-</div>
+<!-- Footer -->
+<footer th:fragment="footer" class="text-center text-muted py-3">
+    2025 TableGrap Team Project. All Rights Reserved.
+</footer>
