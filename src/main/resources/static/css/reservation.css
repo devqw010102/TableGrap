@@ -1,0 +1,202 @@
+/* =========================================
+   1. 레이아웃 & 공통
+   ========================================= */
+/* 예약 박스 (우측) - 스크롤 따라오기 */
+.reservation-box {
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+    border: 1px solid #e2e2e2;
+}
+
+/* 지도 영역 */
+.map-container #map {
+    height: 400px; /* HTML inline style 이동 */
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+/* 탭 컨텐츠 박스 */
+.tab-content {
+    min-height: 200px; /* HTML inline style 이동 */
+}
+
+/* =========================================
+   2. 달력 (Calendar) 스타일
+   ========================================= */
+/* 요일 헤더 & 날짜 그리드 공통 (7열) */
+.calendar-header,
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.calendar-header {
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.calendar-grid {
+    gap: 2px;
+}
+
+/* 달력 네비게이션 버튼 (< >) */
+.calendar-nav-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 날짜 칸 공통 */
+.day {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 마우스 호버 */
+.day:hover:not(.inactive):not(.selected) {
+    background-color: #f1f3f5;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    margin: 0 auto;
+}
+
+/* 선택된 날짜 (파란색 테마 적용) */
+.day.selected {
+    background-color: #468de3 !important;
+    color: white !important;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    margin: 0 auto;
+    box-shadow: 0 2px 5px rgba(3, 110, 168, 0.3);
+}
+
+.day.selected span {
+    font-weight: 700;
+}
+
+.day.selected .holiday-name,
+.day.selected::after {
+    color: white !important;
+}
+
+/* 오늘 날짜 */
+.day.today span:first-child {
+    color: #cad6e4;
+    font-weight: 800;
+}
+
+.day.today::after {
+    content: '오늘';
+    font-size: 10px;
+    color: #000305;
+    margin-top: 2px;
+    font-weight: 600;
+}
+
+.day.selected::after {
+    display: none;
+}
+
+/* 휴일 색상 */
+.day.sunday span,
+.day.holiday span {
+    color: #ff4d4d;
+}
+
+.holiday-name {
+    font-size: 9px;
+    color: #ff4d4d;
+    margin-top: 2px;
+    white-space: nowrap;
+    letter-spacing: -0.5px;
+}
+
+.day.inactive {
+    color: #ccc;
+    pointer-events: none;
+}
+
+/* =========================================
+   3. 시간 선택 (Time Slots)
+   ========================================= */
+.time-slots-grid .btn {
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 8px 0;
+}
+
+.btn-success {
+    background-color: #468de3 !important;
+    border-color: #468de3 !important;
+    font-weight: 600;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f1f3f5;
+    color: #333;
+    border-color: #ced4da;
+}
+
+/* =========================================
+   4. 인원 선택 & 하단 요약
+   ========================================= */
+/* 인원 조절 버튼 */
+.count-btn {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+.count-btn:hover {
+    color: #468de3;
+}
+
+/* 인원 입력창 */
+#guestCount {
+    background-color: transparent;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    width: 40px;
+}
+
+/* 하단 선택 요약 박스 */
+.selected-info {
+    border: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+
+.selected-info strong {
+    font-weight: 600;
+}
+
+/* 예약하기 버튼 */
+#btnReserve {
+    background-color: #468de3;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+#btnReserve:hover {
+    background-color: #357abd;
+}
