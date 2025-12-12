@@ -37,11 +37,16 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto createMember(MemberDto memberDto) {
+        String phoneNumber = memberDto.getPhone();
+        if (phoneNumber != null && phoneNumber.isEmpty()) {
+            phoneNumber = null;
+        }
+
         Member member = Member.builder()
                 .name(memberDto.getName())          // 이름
                 .username(memberDto.getUsername())  // 실제 id
                 .email(memberDto.getEmail())
-                .phone(memberDto.getPhone())
+                .phone(phoneNumber)
                 .password(passwordEncoder.encode(memberDto.getPassword()))
                 .build();
         memberRepository.save(member);

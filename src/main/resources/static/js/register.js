@@ -42,10 +42,10 @@ function combinePhone() {
     const p3 = document.getElementById('phone3').value;
     const totalPhone = document.getElementById('totalPhone');
 
-    // 모두 입력되었을 때만 합침
-    if (p1.length >= 2 && p2.length >= 3 && p3.length === 4) {
-        totalPhone.value = p1 + '-' + p2 + '-' + p3;
-    } else {
-        totalPhone.value = result;
+    // null도 허용
+    if (p1.length >= 2 && p2.length >=3 && p3.length === 4) {
+        totalPhone.vale= p1 + '-' + p2 + '-' +p3;
+    }else{
+        totalPhone.value="";
     }
 }
