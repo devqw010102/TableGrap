@@ -50,4 +50,14 @@ public class MemberController {
         memberService.createMember(memberDto);
         return "redirect:/";
     }
+//      HomeController 만들기 전 테스트용 추후 삭제 요망
+//    @GetMapping("/login")
+//    public String login() {
+//        return "user/login";
+//    }
+//
+//    @GetMapping("logout")
+//    public String logout() {
+//        return "user/logout";
+//    }
 }
