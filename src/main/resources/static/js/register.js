@@ -43,9 +43,9 @@ function combinePhone() {
     const totalPhone = document.getElementById('totalPhone');
 
     // null도 허용
-    if (p1.length >= 2 && p2.length >=3 && p3.length === 4) {
-        totalPhone.vale= p1 + '-' + p2 + '-' +p3;
-    }else{
-        totalPhone.value="";
+    if (!p1 && !p2 && !p3) {
+        totalPhone.value = "";
+    } else {
+        totalPhone.value = p1 + '-' + p2 + '-' + p3;
     }
 }
