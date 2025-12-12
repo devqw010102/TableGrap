@@ -1,0 +1,15 @@
+CREATE TABLE Member(
+                       id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                       userName VARCHAR(30) NOT NULL UNIQUE,
+                       password VARCHAR(30) NOT NULL,
+                       email VARCHAR(256) NOT NULL UNIQUE,
+                       phone VARCHAR(14),
+                       name VARCHAR(20)
+);
+
+CREATE TABLE Authority(
+                          id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                          authority VARCHAR(256),
+                          member_id INTEGER,
+                          FOREIGN KEY (member_id) REFERENCES Member(id)
+);
