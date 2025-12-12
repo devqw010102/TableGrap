@@ -4,6 +4,7 @@ package com.example.demo.controller;
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.service.MemberService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
     private final MemberService memberService;
+
+    @GetMapping
+    public String viewIndex() {
+        return  "index";
+    }
 
     @GetMapping("/register")
     public String getMemberAdd(@ModelAttribute("member")MemberDto memberDto) {
@@ -35,7 +41,7 @@ public class MemberController {
         if (memberService.findByEmail(memberDto.getEmail()).isPresent()) {
             bindingResult.rejectValue("email", "AlreadyExist", "사용중인 이메일 입니다");
         }
-        if (memberService.isUsernameDuplicate(memberDto.getUserName())) {
+        if (memberService.isUsernameDuplicate(memberDto.getUsername())) {
             bindingResult.rejectValue("userName", "AlreadyExist", "이미 사용중인 아이디 입니다");
         }
         if (bindingResult.hasErrors()) {

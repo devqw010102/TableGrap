@@ -24,7 +24,7 @@ public class MemberDto {
     @NotBlank(message ="아아디를 입력하세요")
     @Size(min = 4, max = 20, message = "아이디는 4~20자 사이여야 합니다")
     @Pattern(regexp = "^[a-z0-9]*$", message = "아이디는 영문 소문자와 숫자만 사용 가능합니다")
-    private String userName;
+    private String username;
 
     @NotBlank(message ="이메일을 입력하세요")
     @Email(message = "유효한 이메일 형식이 아닙니다")

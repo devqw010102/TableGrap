@@ -20,7 +20,7 @@ public class MemberUserDetails implements UserDetails {
     private final Long memberId;        // 회원 번호(column)
 
     public MemberUserDetails(Member member, List<Authority> authorities) {
-        this.userName = member.getUserName();
+        this.userName = member.getUsername();
         this.password = member.getPassword();
         this.displayName = member.getName();
         this.memberId = member.getId();

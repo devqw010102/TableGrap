@@ -20,7 +20,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**").hasRole("ADMIN")                      // 권한에 'ADMIN' 이 포함되어 있을때 만 /admin 실행 가능
 //                        .requestMatchers("/member/**").hasAuthority("ROLE_MEMBER")          권한이 'ROLE_MEMBER' 일때 만 /member 실행 가능(수정, 마이페이지 예정)
                         .requestMatchers("/signup").permitAll()                             // 회원가입은 항상 승인됨
-                        .anyRequest().authenticated())                                        // 이외의 mapping은 로그인상태만 접근 가능
+                        //.anyRequest().authenticated())                                        // 이외의 mapping은 로그인상태만 접근 가능
+                        .anyRequest().permitAll())
                 .httpBasic(withDefaults())
                 .formLogin(form -> form
                         .loginPage("/login")

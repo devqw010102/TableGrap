@@ -20,7 +20,7 @@ public class MemberServiceImpl implements MemberService {
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
                 .id(member.getId())
-                .userName(member.getUserName()) // 실제 id
+                .username(member.getUsername()) // 실제 id
                 .name(member.getName())         // 이름
                 .email(member.getEmail())
                 .phone(member.getPhone())
@@ -36,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberDto createMember(MemberDto memberDto) {
         Member member = Member.builder()
                 .name(memberDto.getName())          // 이름
-                .userName(memberDto.getUserName())  // 실제 id
+                .username(memberDto.getUsername())  // 실제 id
                 .email(memberDto.getEmail())
                 .phone(memberDto.getPhone())
                 .password(passwordEncoder.encode(memberDto.getPassword()))
@@ -52,6 +52,6 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public boolean isUsernameDuplicate(String username) {   // id 확인
-        return memberRepository.existsByUserName(username);
+        return memberRepository.existsByUsername(username);
     }
 }
