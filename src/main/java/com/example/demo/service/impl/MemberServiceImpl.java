@@ -1,7 +1,9 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.MemberDto;
+import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder; //  @Bean 필요- config
+    private final AuthorityRepository authorityRepository;
 
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
@@ -42,6 +45,14 @@ public class MemberServiceImpl implements MemberService {
                 .password(passwordEncoder.encode(memberDto.getPassword()))
                 .build();
         memberRepository.save(member);
+
+        Authority authority = Authority.builder()
+                .authority("ROLE_USER")
+                .member(member)
+                .build();
+
+        authorityRepository.save(authority);
+
         return mapToMemberDto(member);
     }
     @Override
