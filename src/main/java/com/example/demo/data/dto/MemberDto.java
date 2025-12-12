@@ -30,7 +30,7 @@ public class MemberDto {
     @Email(message = "유효한 이메일 형식이 아닙니다")
     private String email;
 
-    @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message="전화번호 형식이 올바르지 않습니다.")
+    @Pattern(regexp = "^$|^\\d{2,3}-\\d{3,4}-\\d{4}$", message="전화번호 형식이 올바르지 않습니다.")
     private String phone;
 
     @NotBlank(message = "비밀번호를 입력하세요")
