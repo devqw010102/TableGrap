@@ -40,7 +40,7 @@ public class GeocodingServiceImpl implements GeocodingService {
 
         try{//한글 주소 깨짐 방지 위해 uri빌더 사용
             URI uri = UriComponentsBuilder
-                    .fromUriString("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode")
+                    .fromUriString("https://maps.apigw.ntruss.com/map-geocode/v2/geocode")
                     .queryParam("query", address)
                     .encode(StandardCharsets.UTF_8) // 한글 주소 깨짐 방지
                     .build()

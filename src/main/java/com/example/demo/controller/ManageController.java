@@ -23,18 +23,15 @@ public class ManageController {
     private final DinerExcelService dinerExcelService;
 
     @PostMapping("/upload")
-    public String createDiner(@RequestParam("file")MultipartFile file, Model model) throws IOException {
+    public String createDiner(@RequestParam("file")MultipartFile file) throws IOException {
         // upload 구현
-
         dinerExcelService.uploadExcel(file);
-        model.addAttribute("list", dinerService.getList());
-
         return "redirect:/admin";
     }
 
     @GetMapping("/upload")
     public String uploadPage(Model model) {
         model.addAttribute("list", dinerService.getList());
-        return "redirect:/admin";
+        return "/admin";
     }
 }

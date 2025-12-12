@@ -1,4 +1,4 @@
-﻿# TableGrap
+﻿﻿# TableGrap
 
 
 ## 사전 토의 결과
@@ -31,7 +31,8 @@
 | reservation | 예약 페이지 |
 
 ##### Entity
-<img width="1168" height="698" alt="erd_diagram" src="https://github.com/user-attachments/assets/a5240b26-efb2-410e-ad98-9fa0222e20f2" />
+<img width="749" height="550" alt="erd_diagram" src="https://github.com/user-attachments/assets/509a5fd8-ba50-4eb2-83a1-a84612a86b0b" />
+
 
 // lucid.app
 
@@ -50,7 +51,87 @@
 
 ---
 
-## Directory Structure
+## 📂 TableGrap Project Structure
+
+```bash
+📁 TableGrap
+├─ 📁 .gradle
+├─ 📁 .idea
+├─ 📁 build
+├─ 📁 gradle
+│   └─ 📁 wrapper
+├─ 📁 src
+│   ├─ 📁 main
+│   │   ├─ 📁 java
+│   │   │   └─ 📁 com
+│   │   │       └─ 📁 example
+│   │   │           └─ 📁 demo
+│   │   │               ├─ 📁 config
+│   │   │               │   ├─ ☕ AdminDataInitializer.java		// admin 권한 부여
+│   │   │               │   └─ ☕ SecurityConfiguration.java	// Security 설정
+│   │   │               ├─ 📁 controller
+│   │   │               │   ├─ ☕ AdminController.java			// 파일(식당) 업로드 
+│   │   │               │   ├─ ☕ HomeController.java			// 페이지 이동
+│   │   │               │   ├─ ☕ ManageController.java			// 관리자 페이지
+│   │   │               │   └─ ☕ MemberController.java			// 회원
+│   │   │               ├─ 📁 data
+│   │   │               │   ├─ 📁 dto
+│   │   │               │   │   ├─ ☕ CoordinateDto.java		// 식당 좌표
+│   │   │               │   │   └─ ☕ MemberDto.java			// 회원가입
+│   │   │               │   ├─ 📁 model
+│   │   │               │   │   ├─ ☕ Authority.java			// 권한 테이블
+│   │   │               │   │   ├─ ☕ Book.java					// 예약 테이블
+│   │   │               │   │   ├─ ☕ Diner.java				// 식당 테이블
+│   │   │               │   │   ├─ ☕ Member.java				// 회원 테이블
+│   │   │               │   │   └─ ☕ MemberUserDetails.java	// 회원 권한 세팅
+│   │   │               │   └─ 📁 repository
+│   │   │               │       ├─ 🟢 AuthorityRepository.java		// 권한
+│   │   │               │       ├─ 🟢 BookRepository.java			// 예약
+│   │   │               │       ├─ 🟢 DinerRepository.java			// 식당
+│   │   │               │       └─ 🟢 MemberRepository.java			// 회원
+│   │   │               ├─ 📁 service
+│   │   │               │   ├─ 🟢 DinerExcelService.java			// 파일(식당) 관련 서비스 Interface
+│   │   │               │   ├─ 🟢 DinerService.java					// 식당 관련 서비스 Interface
+│   │   │               │   ├─ 🟢 GeocodingService.java				// 식당 좌표 api 서비스 Class
+│   │   │               │   ├─ 🟢 MemberService.java				// 회원 관련 서비스 Interface
+│   │   │               │   └─ 📁 impl								// 실제 구현 파일 폴더
+│   │   │               │       ├─ ☕ CustomUserDetailsService.java
+│   │   │               │       ├─ ☕ DinerExcelServiceImpl.java
+│   │   │               │       ├─ ☕ DinerServiceImpl.java
+│   │   │               │       ├─ ☕ GeocodingServiceImpl.java
+│   │   │               │       └─ ☕ MemberServiceImpl.java
+│   │   │
+│   │   └─ 📁 resources
+│   │       ├─ 📁 static
+│   │       │   └─ 📄 register.js				// 회원가입 스크립트
+│   │       ├─ 📁 templates
+│   │       │   ├─ 📁 admin
+│   │       │   │   └─ 🌐 adminPage.html		// 관리자 페이지
+│   │       │   ├─ 📁 fragment
+│   │       │   │   └─ 🌐 common.html			// header, footer 파일
+│   │       │   ├─ 📁 reservation
+│   │       │   │   └─ 🌐 reservation.html		// 예약 페이지
+│   │       │   └─ 📁 user
+│   │       │       ├─ 🌐 login.html			// 로그인 페이지
+│   │       │       ├─ 🌐 logout.html			// 로그아웃 페이지
+│   │       │       ├─ 🌐 myPage.html			// 마이페이지
+│   │       │       ├─ 🌐 ownerPage.html		// 식당주인 페이지
+│   │       │       └─ 🌐 register.html			// 회원가입 페이지
+│   │       │
+│   │       ├─ 🌐 index.html					// 메인 페이지
+│   │       ├─ ⚙️ application.properties		// 설정
+│   │       ├─ 🗄️ schema.sql					// h2 DB 스키마
+│   │       └─ 📊 test_diner.xlsx				// 테스트용 식당 정보 파일
+├─ 📝 README.md
+├─ 📝 HELP.md
+├─ ⚙️ build.gradle
+├─ ⚙️ gradlew
+├─ ⚙️ gradlew.bat
+├─ ⚙️ settings.gradle
+├─ ⚙️ .gitignore
+└─ ⚙️ .gitattributes
+```
+
 <img width="932" height="746" alt="project_structure" src="https://github.com/user-attachments/assets/b2684c04-eb99-4ed4-b834-6df6242192f4" />
 
 //creately.com
