@@ -48,9 +48,9 @@ public class DinerExcelServiceImpl implements DinerExcelService {
             }
 
             //데이터 추출
-            String category = getCellValue(row.getCell(10));
-            String location = getCellValue(row.getCell(5));
-            String dinerName = getCellValue(row.getCell(1));
+            String category = getCellValue(row.getCell(25));
+            String location = getCellValue(row.getCell(19));
+            String dinerName = getCellValue(row.getCell(21));
             String tel = getCellValue(row.getCell(15));
 
             if (location == null || location.isEmpty()) {
