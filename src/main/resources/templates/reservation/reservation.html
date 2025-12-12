@@ -6,9 +6,11 @@
 <head>
     <meta charset="UTF-8">
     <title>예약 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
 </head>
 <body>
-<header th:replace="fragment/common :: header"></header>
+<header th:replace="~{fragment/common :: header}"></header>
 <h1> 예약 페이지 화면 </h1>
 
 <!-- 식당 정보 / 예약 날짜 / 예약 시간 / 예약 인원  보여주고
@@ -22,7 +24,9 @@
 
 
 <footer>
-    <div th:insert="fragment/common :: footer"></div>
+    <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
 </body>
 </html>
