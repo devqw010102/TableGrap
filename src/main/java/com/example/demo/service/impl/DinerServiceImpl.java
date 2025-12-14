@@ -17,4 +17,11 @@ public class DinerServiceImpl implements DinerService {
     public List<Diner> getList() {
         return dinerRepository.findAll();
     }
+
+    @Override
+    public Diner getDinerById(Long id) {
+        // DB에서 ID로 찾고, 없으면 에러
+        return dinerRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 식당이 없습니다. id=" + id));
+    }
 }

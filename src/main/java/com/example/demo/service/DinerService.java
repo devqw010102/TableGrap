@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface DinerService {
     public List<Diner> getList();
+    Diner getDinerById(Long id);
 }
