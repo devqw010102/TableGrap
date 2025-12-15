@@ -44,6 +44,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         Member member = Member.builder()
+                .id(memberDto.getId())
                 .name(memberDto.getName())          // 이름
                 .username(memberDto.getUsername())  // 실제 id
                 .email(memberDto.getEmail())
@@ -75,5 +76,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<Member> getList() {
         return memberRepository.findAll();
+    }
+
+    @Override
+    public Member getMember(String username) {
+        return memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원이 없습니다: " + username));
     }
 }

@@ -16,4 +16,6 @@ public interface MemberService {
         boolean isUsernameDuplicate(String username);   // id 확인
 
         List<Member> getList();
+
+    Member getMember(String username);
     }

@@ -17,6 +17,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**") // H2 콘솔은 CSRF 무시
                 )
+                //.csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin()) // iframe 허용 (H2 콘솔 필요)
                 )

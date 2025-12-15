@@ -15,10 +15,15 @@
 <div class="container mt-5 mb-5">
     <h2 class="page-title mb-4">예약하기</h2>
 
+    <form id="bookingForm" th:action="@{/book/save}" method="post">
+        <input type="hidden" name="memberId" th:value="${member.id}">
+        <input type="hidden" name="diner" th:value="${dinerId}">
+
     <div class="row">
         <div class="col-lg-7 col-md-12 mb-4">
             <div class="map-container">
-                <div id="map"></div>
+                <!--<div id="map"></div>-->
+                <img id="staticMap" alt="식당 위치" style="width:750px; height:500px; border:1px solid #ccc; border-radiu: 5px">
                 <input type="hidden" id="dinerLat" th:value="${diner.dy}">
                 <input type="hidden" id="dinerLng" th:value="${diner.dx}">
             </div>
@@ -88,6 +93,7 @@
             <hr class="my-4">
             <h5 class="fw-bold mb-3">시간 선택</h5>
             <div class="time-slots-grid" id="timeSlotsContainer"></div>
+            <input type="hidden" name="bookingDate" id="combinedBookingDate">
 
             <hr class="my-4">
             <div class="section-header mb-4">
@@ -96,6 +102,7 @@
                     <button class="count-btn" type="button" id="btnMinus">−</button>
                     <input type="text" id="guestCount" value="2" readonly>
                     <button class="count-btn" type="button" id="btnPlus">+</button>
+                    <input type="hidden" name="personnel" id="inputPersonnel">
                 </div>
             </div>
 
@@ -114,11 +121,13 @@
                 </div>
             </div>
 
-            <button id="btnReserve"> 예약하기 </button>
+            <button type="button" id="btnBook"> 예약하기 </button>
         </div>
     </div>
     </div>
+    </form>
 </div>
+
 
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
