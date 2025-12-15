@@ -49,12 +49,15 @@ function loadBooks() {
             location.href = "/login";
         });
 }
+function loadMyInfo() {
+    fetch("/api/myPage/info")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("myUsername").innerText = data.username;
+            document.getElementById("myName").innerText = data.name;
+            document.getElementById("myEmail").innerText = data.email;
+            document.getElementById("myPhone").innerText = data.phone;
+        });
+}
 
-fetch("/api/myPage/info")
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("myUsername").innerText = data.username;
-        document.getElementById("myName").innerText = data.name;
-        document.getElementById("myEmail").innerText = data.email;
-        document.getElementById("myPhone").innerText = data.phone;
-    });
+
