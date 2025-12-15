@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 public class DinerServiceImpl implements DinerService {
 
     private final DinerRepository dinerRepository;
+    // Diner -> DinerListDto 변환 메서드
     private DinerListDto mapToDinerListDto(Diner diner){
         return DinerListDto.builder()
                 .id(diner.getId())
@@ -22,14 +24,27 @@ public class DinerServiceImpl implements DinerService {
                 .build();
     }
 
+    //Diner -> DinerDetailDto 변환 메서드
+    private DinerDetailDto mapToDinerDetailDto(Diner diner){
+        return DinerDetailDto.builder()
+                .id(diner.getId())
+                .dinerName(diner.getDinerName())
+                .category(diner.getCategory())
+                .location(diner.getLocation())
+                .tel(diner.getTel())
+                .dx(diner.getDx())
+                .dy(diner.getDy())
+                .build();
+    }
+
     public List<Diner> getList() {
         return dinerRepository.findAll();
     }
-    //merge pull request 충돌방지용으로 복붙, merge이후 해당 주석 삭제
+
     @Override
-    public Diner getDinerById(Long id) {
-      // DB에서 ID로 찾고, 없으면 에러
-      return dinerRepository.findById(id)
+    public DinerDetailDto getDinerById(Long id) {
+      // DB에서 ID로 찾고 DinerDetailDto로 변환, 없으면 에러
+      return dinerRepository.findById(id).map(this::mapToDinerDetailDto)
               .orElseThrow(() -> new IllegalArgumentException("해당 식당이 없습니다. id=" + id));
     }
     
