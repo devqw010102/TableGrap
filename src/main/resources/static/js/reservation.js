@@ -1,10 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     /* 네이버 지도 연동  */
+    const clientId = "k0np2vmny3"; // API ID
     const latInput = document.getElementById('dinerLat'); // 위도(dy)
     const lngInput = document.getElementById('dinerLng'); // 경도(dx)
 
-    // 네이버 지도 API가 로드되었고, 좌표값이 있을 때만 실행
+    // 좌표값이 있을 때만 실행
+    if(latInput != null && lngInput != null){
+    const lng = parseFloat(lngInput.value);
+    const lat = parseFloat(latInput.value);
+
+    // Static Map URL 생성
+    const staticMapUrl = `https://maps.apigw.ntruss.com/map-static/v2/raster-cors?`
+        + `w=750&h=500`
+        + `&center=${lngInput.value},${latInput.value}`
+        + `&level=16`
+        + `&markers=type:d|size:mid|pos:${lng}%20${lat}|color:Green|label:식당|viewSizeRatio:0.7`
+        + `&scale=2`
+        + `&X-NCP-APIGW-API-KEY-ID=${clientId}`;
+
+    //img 태그에 staticMapURL 설정
+    document.getElementById('staticMap').src = staticMapUrl;
+    } else {
+    //좌표값이 없을 때 에러 처리
+    console.error("위도 또는 경도를 찾을 수 없습니다.");
+    }
+   /* Dynamic Map 활용
+   // 네이버 지도 API가 로드되었고, 좌표값이 있을 때만 실행
     if (typeof naver !== 'undefined' && latInput && lngInput) {
         const lat = parseFloat(latInput.value);
         const lng = parseFloat(lngInput.value);
@@ -30,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 map: map
             });
         }
-    }
+    } */
 
 
     /* 달력 및 예약 기능 */
