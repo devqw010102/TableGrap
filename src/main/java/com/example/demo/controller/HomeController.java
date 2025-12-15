@@ -45,15 +45,8 @@ public class HomeController {
         boolean isOwner = userDetails.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_OWNER"));
 
-    /* boolean isOwner = false;// 테스트용
 
-        System.out.println("테스트 중: isOwner = " + isOwner); */
-
-        if (isOwner) {
-            return "user/ownerPage";
-        } else {
-            return "user/myPage";
-        }
+        return isOwner ? "user/ownerPage" : "user/myPage";
     }
 
     @GetMapping("/admin")   // 권한 끄면 들어가짐.(현재 login 페이지로)

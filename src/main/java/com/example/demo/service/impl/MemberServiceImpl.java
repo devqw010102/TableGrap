@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.MemberDto;
+import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.AuthorityRepository;
@@ -75,5 +76,18 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<Member> getList() {
         return memberRepository.findAll();
+    }
+
+    @Override
+    public MemberInfoResponseDto findMyInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+
+        return new MemberInfoResponseDto(
+                member.getUsername(),
+                member.getName(),
+                member.getEmail(),
+                member.getPhone()
+        );
     }
 }
