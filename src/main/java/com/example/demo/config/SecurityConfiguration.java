@@ -21,11 +21,11 @@ public class SecurityConfiguration {
                         .frameOptions(frame -> frame.sameOrigin()) // iframe 허용 (H2 콘솔 필요)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/").permitAll()                       // 메인화면은 항상 승인됨
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()                       // 메인화면은 항상 승인됨
                         .requestMatchers("/admin/**").hasRole("ADMIN")           // ADMIN 권한 필요
-                        //.requestMatchers("/member/**").hasAuthority("ROLE_MEMBER") // 필요시 활성화
-                        .requestMatchers("/register").permitAll()                  // 회원가입 허용
                         .requestMatchers("/h2-console/**").permitAll()           // H2 콘솔 허용
+                        .requestMatchers("/api/myPage/**", "/mypage").authenticated()
+                        //.requestMatchers("/member/**").hasAuthority("ROLE_MEMBER") // 필요시 활성화
                         .anyRequest().permitAll()
                 )
                 .httpBasic(withDefaults())
