@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.data.dto.DinerDetailDto;
+import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.service.DinerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,8 @@ public class ReservationController {
         if (id == null) {
             id = 1L;
         }
-        // DB에서 식당 정보 가져오기
-        Diner diner = dinerService.getDinerById(id);
+        // DinerDetailDto에서 식당 정보 가져오기
+        DinerDetailDto diner = dinerService.getDinerById(id);
 
         // HTML로 데이터 보내기
         model.addAttribute("diner", diner);

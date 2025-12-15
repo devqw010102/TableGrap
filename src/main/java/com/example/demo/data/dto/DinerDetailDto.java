@@ -1,17 +1,15 @@
 package com.example.demo.data.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class DinerDetailDto {
   private Long id;
   private String dinerName;
+  private String category;
   private String tel;
   private String location;
   private Double dx;
