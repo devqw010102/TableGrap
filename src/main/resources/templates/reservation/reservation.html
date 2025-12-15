@@ -16,8 +16,8 @@
     <h2 class="page-title mb-4">예약하기</h2>
 
     <form id="bookingForm" th:action="@{/book/save}" method="post">
-        <input type="hidden" name="memberId" th:value="${member.id}">
         <input type="hidden" name="diner" th:value="${dinerId}">
+        <input type="hidden" name="memberId" th:value="${member.username}">
 
     <div class="row">
         <div class="col-lg-7 col-md-12 mb-4">

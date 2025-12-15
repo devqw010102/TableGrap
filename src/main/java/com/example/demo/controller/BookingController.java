@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -61,12 +62,24 @@ public class BookingController {
 
     @PostMapping("/book/save")
     public String saveBooking(
-            @RequestParam  Long dinerId,
-            @AuthenticationPrincipal MemberUserDetails userDetails
-    )
-    {
-        Long memberId = userDetails.getMemberId();
-        bookingService.createBooking(dinerId, memberId, BookDto bookDto);
-        return"redirect:/myPage";
+            @ModelAttribute BookDto bookDto,
+            Principal principal
+    ) {
+        // 3. 로그인 정보가 있는지 확인하고 아이디(Username)를 DTO에 넣어줌
+        if (principal != null) {
+            String username = principal.getName();
+            bookDto.setMemberId(username);
+        }
+
+        System.out.println("컨트롤러로 들어온 데이터: " + bookDto);
+
+        try{
+
+        bookingService.createBooking(bookDto);
+        return "redirect:/myPage";
+    } catch(Exception e){
+        e.printStackTrace();
+        return "redirect:/reservation?error=true";
+        }
     }
 }
