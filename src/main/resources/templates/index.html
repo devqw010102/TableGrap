@@ -11,10 +11,16 @@
 <body>
 <header th:insert="~{fragment/common :: header}"></header>
 <h1> Home 화면 </h1>
-
-
-
-
+  <a th:href="@{diner/list(category='한식/분식')}">한식/분식</a>
+  <a th:href="@{diner/list(category='일식')}">일식</a>
+  <a th:href="@{diner/list(category='중식')}">중식</a>
+  <a th:href="@{diner/list(category='아시안')}">아시안</a>
+  <a th:href="@{diner/list(category='횟집/해산물')}">횟집/해산물</a>
+  <a th:href="@{diner/list(category='양식')}">양식</a>
+  <a th:href="@{diner/list(category='고기/구이')}">고기/구이</a>
+  <a th:href="@{diner/list(category='카페/디저트')}">카페/디저트</a>
+  <a th:href="@{diner/list(category='술집/바')}">술집/바</a>
+  <a th:href="@{diner/list(category='기타')}">기타</a>
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>

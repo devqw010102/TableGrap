@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.model.Diner;
 import java.util.List;
 
