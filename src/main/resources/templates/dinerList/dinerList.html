@@ -22,7 +22,7 @@
       <tbody>
         <!-- 해당 카테고리의 맛집이 존재하는 경우 출력하기, th:unless: 반복문안에서 특정 조건에 따라 렌더링 제어,(조건이 거짓일 경우 렌더링) -->
         <tr th:each="diner :${dinerList}" th:unless="${#lists.isEmpty(dinerList)}">
-          <td><a th:text="${diner.dinerName}" th:href="@{/reservation/reservation(id=${diner.id})}">식당이름</a></td>
+          <td><a th:text="${diner.dinerName}" th:href="@{/reservation(no=${diner.id})}">식당이름</a></td>
           <td th:text="${diner.category}">카테고리</td>
         </tr>
         <!-- 해당 카테고리의 식당이 존재하지 않는 경우 -->
