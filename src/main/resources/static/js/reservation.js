@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const displayDate = document.getElementById("displayDate");
     const displayTime = document.getElementById("displayTime");
-    const displayPersonnel = document.getElementById("displaypersonnel");
+    const displayPersonnel = document.getElementById("displayPersonnel");
 
     /* 요일 헤더(일~토) 자동 생성 */
     const calendarHeader = document.getElementById("calendarHeader");
