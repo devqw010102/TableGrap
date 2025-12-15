@@ -63,8 +63,16 @@ public class HomeController {
         return "admin/adminPage";
     }
 
+    /* 충돌남ㅜ
     @GetMapping("/reservation")
     public String getReservation(){
         return "reservation/reservation";
+    }
+
+     */
+    // 테스트용 로그인한 일반회원이 예약하기 버튼을 누르면 mypage로 가게 수정하기
+    @GetMapping("/myPage")
+    public String simpleMyPage() {
+        return "user/myPage";
     }
 }
