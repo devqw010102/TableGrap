@@ -132,10 +132,6 @@
 └─ ⚙️ .gitattributes
 ```
 
-<img width="932" height="746" alt="project_structure" src="https://github.com/user-attachments/assets/b2684c04-eb99-4ed4-b834-6df6242192f4" />
-
-//creately.com
-
 ---
 
 #### FLOW
