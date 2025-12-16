@@ -90,6 +90,9 @@ public class MemberServiceImpl implements MemberService {
                 member.getEmail(),
                 member.getPhone()
         );
+    }
+
+    @Override
     public Member getMember(String username) {
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원이 없습니다: " + username));

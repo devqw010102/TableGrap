@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 public class BookResponseDto {
 
     private String dinerName;
-    private LocalDate bookingDate;
+    private LocalDateTime bookingDate;
     private Integer personnel;
     private String memberName;
     private Boolean success;
