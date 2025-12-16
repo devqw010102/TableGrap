@@ -1,0 +1,26 @@
+package com.example.demo.data.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@Entity
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class Diner {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;            // column 번호
+    private String dinerName;   // 식당 이름
+    private String category;    // 카테고리
+    private String location;    // 위치(~동)
+    private String tel;         // 전화번호
+    private Double dx;          // x좌표
+    private Double dy;          // y좌표
+}

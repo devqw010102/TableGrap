@@ -31,6 +31,7 @@ Thumbs.db
 application*.yml
 application*.yaml
 application*.properties
+application-secret.properties
 
 ### Others ###
 *.zip
