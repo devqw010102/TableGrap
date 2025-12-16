@@ -15,7 +15,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**") // H2 콘솔은 CSRF 무시
+                        .ignoringRequestMatchers("/h2-console/**", "/api/adminPage/**") // H2 콘솔은 CSRF 무시, adminPage 에서 처리한 작업 마찬가지로 무시
                 )
                 //.csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
@@ -23,7 +23,7 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()                       // 메인화면은 항상 승인됨
-                        .requestMatchers("/admin/**").hasRole("ADMIN")           // ADMIN 권한 필요
+                        .requestMatchers("/admin/**", "/api/adminPage/**").hasRole("ADMIN")           // ADMIN 권한 필요
                         .requestMatchers("/h2-console/**").permitAll()           // H2 콘솔 허용
                         .requestMatchers("/api/myPage/**", "/mypage").authenticated()
                         //.requestMatchers("/member/**").hasAuthority("ROLE_MEMBER") // 필요시 활성화

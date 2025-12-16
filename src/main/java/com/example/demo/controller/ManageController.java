@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.model.Diner;
 import com.example.demo.service.DinerExcelService;
 import com.example.demo.service.DinerService;
 import lombok.RequiredArgsConstructor;
