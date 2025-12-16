@@ -23,7 +23,7 @@ public class DinerListController {
 
   //카테고리별로 일일이 매핑하는 것은 비효율적이므로 쿼리 파라미터 사용
   @GetMapping("/list")
-  public String getKoreanDiner(@RequestParam("category") String category, Model model){
+  public String getDiner(@RequestParam("category") String category, Model model){
     List<DinerListDto>dinerList = dinerService.getListByCat(category);
     model.addAttribute("dinerList", dinerList);
     model.addAttribute("categoryName", category);

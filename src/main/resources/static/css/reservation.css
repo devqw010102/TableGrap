@@ -270,7 +270,7 @@
 }
 
 /* 예약하기 버튼 */
-#btnReserve {
+#btnBook {
     background-color: #468de3;
     border: none;
     transition: background-color 0.2s;
@@ -281,6 +281,6 @@
     font-size: 1.25rem;
 }
 
-#btnReserve:hover {
+#btnBook:hover {
     background-color: #357abd;
 }
