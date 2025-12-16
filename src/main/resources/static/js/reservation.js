@@ -254,27 +254,47 @@ document.addEventListener('DOMContentLoaded', function() {
     // 초기 실행
     renderCalendar();
 
-    /* 예약하기 버튼 클릭 */
-    const btnReserve = document.getElementById("btnReserve");
+    /* 예약하기 버튼 클릭 이벤트 수정 */
+    const btnBook = document.getElementById("btnBook");
 
-    btnReserve.addEventListener("click", function() {
-        // 날짜가 있는지 확인
-        const selectedDate = document.querySelector(".day.selected");
-        if (!selectedDate) {
+    btnBook.addEventListener("click", function() {
+        //  날짜 선택 확인
+        const selectedDateElem = document.querySelector(".day.selected");
+        if (!selectedDateElem) {
             alert("📅 날짜를 먼저 선택해주세요.");
             return;
         }
-        // 시간이 있는지 확인
-        const selectedTime = document.querySelector(".time-slots-grid .btn-success");
-        if (!selectedTime) {
+
+        // 시간 선택 확인
+        const selectedTimeElem = document.querySelector(".time-slots-grid .btn-success");
+        if (!selectedTimeElem) {
             alert("⏰ 방문하실 시간을 선택해주세요.");
             return;
         }
-        // 모든 선택이 완료되었으면 알림 띄우기
-        alert("🎉 예약이 완료되었습니다!");
 
-        //  확인 누르면 마이페이지로
-        location.href = "/myPage";
+        // 날짜 조합
+        const day = selectedDateElem.getAttribute("data-day");
+        const time = selectedTimeElem.innerText;
+
+        const formattedMonth = String(currMonth + 1).padStart(2, '0');
+        const formattedDay = String(day).padStart(2, '0');
+
+        const finalDateTime = `${currYear}-${formattedMonth}-${formattedDay} ${time}`;
+
+        // 인원수 가져오기
+        const guestCount = document.getElementById("guestCount").value;
+
+        // hidden input에 값 넣기
+        document.getElementById("combinedBookingDate").value = finalDateTime;
+        document.getElementById("inputPersonnel").value = guestCount;
+
+        // 폼 전송
+        const form = document.getElementById("bookingForm");
+
+        // 유효성 검사 후 전송
+        if(confirm(`${finalDateTime}에 ${guestCount}명으로 예약하시겠습니까?`)) {
+            form.submit(); // Controller의 @PostMapping으로 데이터가 날아갑니다.
+        }
     });
 
 });
