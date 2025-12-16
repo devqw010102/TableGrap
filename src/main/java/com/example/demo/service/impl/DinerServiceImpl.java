@@ -6,6 +6,8 @@ import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,8 +51,7 @@ public class DinerServiceImpl implements DinerService {
     }
     
     @Override
-    public List<DinerListDto> getListByCat(String category){
-      return dinerRepository.findByCategory(category).stream().map(this::mapToDinerListDto).toList();
+    public Page<DinerListDto> getListByCat(Pageable pageable, String category){
+      return dinerRepository.findByCategory(pageable, category).map(this::mapToDinerListDto);
     }
-
 }
