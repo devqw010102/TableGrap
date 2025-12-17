@@ -23,8 +23,7 @@ public class MemberEditController {
     @PostMapping("/update")
     public void updateMember(
             @AuthenticationPrincipal MemberUserDetails userDetails,
-            @RequestBody MemberUpdateDto memberUpdateDto)
-    {
+            @RequestBody MemberUpdateDto memberUpdateDto) {
         memberService.updateMember(userDetails.getMemberId(), memberUpdateDto);
 
     }
@@ -34,16 +33,8 @@ public class MemberEditController {
     public void deleteMember(
             @AuthenticationPrincipal MemberUserDetails userDetails,
             @RequestBody Map<String, String> request) {
-
-
         String password = request.get("password");
 
         boolean isSuccess = memberService.deleteMember(userDetails.getMemberId(), password);
-
-        if (isSuccess) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
     }
-
-
-}

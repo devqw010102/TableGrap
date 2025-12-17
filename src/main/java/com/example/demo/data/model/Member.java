@@ -1,10 +1,7 @@
 package com.example.demo.data.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
@@ -28,5 +25,6 @@ public class Member {
     private String phone;       // 전화번호
     private String name;        // 이름
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Authority> authorities = new ArrayList<>();
 }
