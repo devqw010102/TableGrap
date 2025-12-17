@@ -25,6 +25,10 @@
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#stats">회원 목록</a>
     </li>
+    <!-- tab4 -->
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#ownerList">권한 신청 목록</a>
+    </li>
 </ul>
 
 <!-- Tab-content -->
@@ -62,17 +66,7 @@
                     <th>Y 좌표</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="item : ${diner}">
-                    <td th:text="${item.id}"></td>
-                    <td th:text="${item.category}"></td>
-                    <td th:text="${item.dinerName}"></td>
-                    <td th:text="${item.location}"></td>
-                    <td th:text="${item.tel}"></td>
-                    <td th:text="${item.dx}"></td>
-                    <td th:text="${item.dy}"></td>
-                </tr>
-                </tbody>
+                <tbody id="dinerTable"></tbody>
             </table>
         </div>
     </div>
@@ -91,15 +85,27 @@
                     <th>이메일</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="item : ${member}">
-                    <td th:text="${item.id}"></td>
-                    <td th:text="${item.name}"></td>
-                    <td th:text="${item.username}"></td>
-                    <td th:text="${item.phone}"></td>
-                    <td th:text="${item.email}"></td>
+                <tbody id="memberTable"></tbody>
+            </table>
+        </div>
+    </div>
+    <!-- tab4-content -->
+    <div id="ownerList" class="tab-pane fade">
+        <!-- 권한 신청 목록 -->
+        <div class = "container mt-4">
+            <h2>권한 신청 목록</h2>
+            <table class = "table table-boarded">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Member</th>
+                    <th>Diner</th>
+                    <th>Status</th>
+                    <th>CreateAt</th>
+                    <th>Action</th>
                 </tr>
-                </tbody>
+                </thead>
+                <tbody id="ownerRequestTable"></tbody>
             </table>
         </div>
     </div>
@@ -119,12 +125,10 @@
 
 <!--<h3>최근 예약 목록</h3>-->
 
-
-
-
 <footer>
-    <div th:insert="fragment/common :: footer"></div>
+    <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src = "/js/adminPage.js" type="text/javascript"></script>
 </body>
 </html>

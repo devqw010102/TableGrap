@@ -53,8 +53,6 @@ public class HomeController {
 */
     @GetMapping("/admin")   // 권한 끄면 들어가짐.(현재 login 페이지로)
     public String getAdmin(Model model) {
-        model.addAttribute("diner", dinerService.getList());
-        model.addAttribute("member", memberService.getList());
         return "admin/adminPage";
     }
 

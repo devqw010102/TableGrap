@@ -6,7 +6,7 @@ import com.example.demo.data.model.Diner;
 import java.util.List;
 
 public interface DinerService {
-    public List<Diner> getList();
+    public List<DinerDetailDto> getList();
     DinerDetailDto getDinerById(Long id);
     public List<DinerListDto> getListByCat(String category);
 }

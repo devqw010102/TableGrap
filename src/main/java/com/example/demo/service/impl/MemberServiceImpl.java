@@ -1,8 +1,10 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.model.Authority;
+import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
@@ -27,6 +29,16 @@ public class MemberServiceImpl implements MemberService {
                 .id(member.getId())
                 .username(member.getUsername()) // 실제 id
                 .name(member.getName())         // 이름
+                .email(member.getEmail())
+                .phone(member.getPhone())
+                .build();
+    }
+    // Convert method : Member -> MemberInfoResponseDto
+    private MemberInfoResponseDto mapToMemberInfoDto(Member member) {
+        return MemberInfoResponseDto.builder()
+                .id(member.getId())
+                .username(member.getUsername())
+                .name(member.getName())
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
@@ -75,8 +87,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public List<Member> getList() {
-        return memberRepository.findAll();
+    public List<MemberInfoResponseDto> getList() {
+        return memberRepository.findAll().stream().map(this::mapToMemberInfoDto).toList();
     }
 
     @Override
@@ -85,6 +97,7 @@ public class MemberServiceImpl implements MemberService {
 
 
         return new MemberInfoResponseDto(
+                member.getId(),
                 member.getUsername(),
                 member.getName(),
                 member.getEmail(),

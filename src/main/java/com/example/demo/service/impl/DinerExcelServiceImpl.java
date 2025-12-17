@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.CoordinateDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerExcelService;
@@ -92,6 +93,7 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                             .tel(tel.isEmpty() ? null : tel)
                             .dx(coords.getDx())
                             .dy(coords.getDy())
+                            .status(DinerStatus.PUBLIC)
                             .build();
 
                     dinerList.add(diner);

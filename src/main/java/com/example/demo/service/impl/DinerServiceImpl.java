@@ -37,8 +37,8 @@ public class DinerServiceImpl implements DinerService {
                 .build();
     }
 
-    public List<Diner> getList() {
-        return dinerRepository.findAll();
+    public List<DinerDetailDto> getList() {
+        return dinerRepository.findAll().stream().map(this::mapToDinerDetailDto).toList();
     }
 
     @Override
