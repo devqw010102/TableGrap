@@ -32,13 +32,24 @@ function loadBooks() {
             }
 
             data.forEach(book => {
+
+                console.log("데이터 확인:", book);
+                let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
+                const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`; // each member/book
+
                 tbody.innerHTML += `
                     <tr>
-                        <td>${book.dinerName}</td>
-                        <td>${book.bookingDate}</td>
+                     <td><a href="${myBookingLink}" style="text-decoration: underline; color: blue; cursor: pointer;">
+            ${book.dinerName}</a> </td>
+                        
+                        <td>${modifyDate}</td>
                         <td>${book.personnel}</td>
                         <td>${book.memberName}</td>
                         <td>${book.success ? "확정" : "대기"}</td>
+                        <td>
+                        <button class="btn btn-danger btn-sm ms-2" 
+                        onclick="cancelBooking(${book.bookId})">취소</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -58,6 +69,29 @@ function loadMyInfo() {
             document.getElementById("myEmail").innerText = data.email;
             document.getElementById("myPhone").innerText = data.phone;
         });
+}
+
+    // 예약 취소 함수
+    function cancelBooking(bookId) {
+        if (!confirm("정말로 예약을 취소하시겠습니까? 복구할 수 없습니다.")) {
+            return;
+        }
+
+        fetch(`/api/myPage/book/delete/${bookId}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("삭제가 왼료되었습니다");
+                    loadBooks();
+                }else{
+                    alert("삭제에 실패했습니다.")
+                }
+            })
+            . catch(error => {
+                alert("서버와 통신 중 오류가 발생했습니다.")
+            })
+
 }
 
 

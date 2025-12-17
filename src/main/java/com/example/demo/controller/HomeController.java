@@ -35,6 +35,8 @@ public class HomeController {
         return "user/register";
     }
 
+    // myPage controller랑 충돌남
+    /*
     @GetMapping("/mypage")
     public String getMypage(@AuthenticationPrincipal UserDetails userDetails) {
         // 로그인 안했으면 로그인으로
@@ -46,9 +48,9 @@ public class HomeController {
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_OWNER"));
 
 
-        return isOwner ? "user/ownerPage" : "user/myPage";
+         return isOwner ? "user/ownerPage" : "user/myPage";
     }
-
+*/
     @GetMapping("/admin")   // 권한 끄면 들어가짐.(현재 login 페이지로)
     public String getAdmin(Model model) {
         model.addAttribute("diner", dinerService.getList());
@@ -56,16 +58,4 @@ public class HomeController {
         return "admin/adminPage";
     }
 
-    /* 충돌남ㅜ
-    @GetMapping("/reservation")
-    public String getReservation(){
-        return "reservation/reservation";
-    }
-
-     */
-    // 테스트용 로그인한 일반회원이 예약하기 버튼을 누르면 mypage로 가게 수정하기
-    @GetMapping("/myPage")
-    public String simpleMyPage() {
-        return "user/myPage";
-    }
 }

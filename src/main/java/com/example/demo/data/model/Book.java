@@ -28,6 +28,7 @@ public class Book {
     private Integer personnel;      // 예약 인원
     private Boolean success;      // 예약 성공여부
     @ManyToOne(fetch = FetchType.LAZY)
+
     @JoinColumn(name = "diner_id")
     private Diner diner;        // 식당이름
     @ManyToOne(fetch = FetchType.LAZY)
