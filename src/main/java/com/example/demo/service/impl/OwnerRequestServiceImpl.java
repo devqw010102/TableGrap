@@ -29,21 +29,23 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
     private final AuthorityRepository authorityRepository;
 
     @Override
-    public void requestOwner(Long memberId, Long dinerId) {
-        if(ownerRequestRepository.existsByMemberIdAndDinerIdAndStatus(memberId, dinerId, RequestStatus.PENDING)) {
-            throw new IllegalStateException("이미 신청한 식당입니다.");
+    public void requestOwner(Long memberId, List<Long> dinerIds) {
+        for(Long dinerId : dinerIds){
+            if(ownerRequestRepository.existsByMemberIdAndDinerIdAndStatus(memberId, dinerId, RequestStatus.PENDING)) {
+                throw new IllegalStateException("이미 신청한 식당입니다.");
+            }
+
+            Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("not found member"));
+            Diner diner = dinerRepository.findById(dinerId).orElseThrow(() -> new IllegalArgumentException("not found diner"));
+
+            OwnerRequest request = OwnerRequest.builder()
+                    .member(member)
+                    .diner(diner)
+                    .status(RequestStatus.PENDING)
+                    .build();
+
+            ownerRequestRepository.save(request);
         }
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("not found member"));
-        Diner diner = dinerRepository.findById(dinerId).orElseThrow(() -> new IllegalArgumentException("not found diner"));
-
-        OwnerRequest request = OwnerRequest.builder()
-                .member(member)
-                .diner(diner)
-                .status(RequestStatus.PENDING)
-                .build();
-
-        ownerRequestRepository.save(request);
     }
 
     @Override

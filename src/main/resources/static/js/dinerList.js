@@ -31,109 +31,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 선택한 식당 신청
     //async와 await는 한 몸이다.(async가 없으면 69행 실행x)
-    getOwnerBtn.addEventListener("click", async () => {
-        // 1. 체크된 박스 가져오기
-        const checkedBoxes = document.querySelectorAll('input[name="selectDiner"]:checked');
-
-        if (checkedBoxes.length === 0) {
-            alert("선택된 식당이 없습니다.");
-            return;
-        }
-
-        if (!confirm(`${checkedBoxes.length}개의 식당의 사장님이신가요?`)) {
-            return;
-        }
-
-        // 2. 체크된 박스에서 value(dinerId)만 뽑아서 배열로 만듦
-        const selectedDinerIds = Array.from(checkedBoxes).map(cb => cb.value);
-
-        // 3. 서버 전송 (Fetch API)
-        //async fetch메소드 선언
-        async function ownerRequest(){
-
-        try{
-        //await서버가 응답하면 다음 단계로 이동
-         const res = await fetch("/diner/ownerRequest", {
-                     method: "POST",
-                     headers: {
-                         "Content-Type": "application/json"
-                     },
-                     body: JSON.stringify({ dinerIds: selectedDinerIds })
-          });
-         // 신청 성공할 경우
-         if(res.status === 200){
-          alert("신청이 완료되었습니다.");
-          return;
-         }
-         // 신청과정에서 오류 발생
-         //에러 메세지를 읽어올 때까지 대기, 메시지를 가져오면 switch문 실행
-         const errorMsg = await res.text();
-         //에러 처리
-         switch (res.status){
-          case 401:
-            alert("로그인이 필요한 서비스입니다.");
-            location.href="/login";
-          break;
-          //중복 신청 할 경우
-          case 409:
-            alert("이미 신청하셨습니다." + errorMsg);
-          break;
-          //잘 못된 데이터
-          case 400:
-            alert("잘 못된 요청입니다." + errorMsg);
-          break;
-          case 500:
-            alert("서버에 오류가 발생했습니다.")
-          break;
-          default: alert(errorMsg);
-        }
-        }catch(error){
-          console.log(error);
-          }
-        };
-    });
+    getOwnerBtn.addEventListener("click", async () => {await ownerRequest()});
 });
 
-      /*
-       fetch("/diner/ownerRequest", {
+// 3. 서버 전송 (Fetch API)
+//async fetch메소드 선언
+async function ownerRequest(){
+
+    // 1. 체크된 박스 가져오기
+    const checkedBoxes = document.querySelectorAll( 'input[name="selectDiner"]:checked');
+
+    if (checkedBoxes.length === 0) {
+        alert("선택된 식당이 없습니다.");
+        return;
+    }
+
+    if (!confirm(`${checkedBoxes.length}개의 식당의 사장님이신가요?`)) {
+        return;
+    }
+    const selectedDinerIds = Array.from(checkedBoxes).map(cb => cb.value);
+
+    try{
+        //await서버가 응답하면 다음 단계로 이동
+        const res = await fetch("/api/diner/ownerRequest", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ dinerIds: selectedDinerIds })
-        })
-        //화살표 함수라서 async...?
-        .then(async res => {
-            //신청 성공
-            if (res.status === 200) {
-              alert("신청이 완료되었습니다.");
-              return;
-            }
-        })
-
-        //2 오류 처리
-        const errorMsg = await res.text();//서버의 에러메세지
-        Switch (res.status){
-          //로그인하지 않았을 경우
-          case 401:
-            alert("로그인이 필요한 서비스입니다.");
-            location.href="/login";
-          break;
-          //중복 신청 할 경우
-          case 409:
-            alert("이미 신청하셨습니다." + errorMsg);
-          break;
-          //잘 못된 데이터
-          case 400:
-            alert("잘 못된 요청입니다." + errorMsg);
-          break;
-          case 500:
-            alert("서버에 오류가 발생했습니다.")
-          break;
-
-          default: alert(errorMsg);
+        });
+        // 신청 성공할 경우
+        if(res.status === 200){
+            alert("신청이 완료되었습니다.");
+            return;
         }
-        .catch(error => {
-            console.error("신청 실패:", error);
-        });*/
-
+        // 신청과정에서 오류 발생
+        //에러 메세지를 읽어올 때까지 대기, 메시지를 가져오면 switch문 실행
+        const errorMsg = await res.text();
+        //에러 처리
+        switch (res.status){
+            case 401:
+                alert("로그인이 필요한 서비스입니다.");
+                location.href="/login";
+                break;
+            //중복 신청 할 경우
+            case 409:
+                alert("이미 신청하셨습니다." + errorMsg);
+                break;
+            //잘 못된 데이터
+            case 400:
+                alert("잘 못된 요청입니다." + errorMsg);
+                break;
+            case 500:
+                alert("서버에 오류가 발생했습니다.")
+                break;
+            default: alert(errorMsg);
+        }
+    }catch(error){
+        console.log(error);
+    }
+}

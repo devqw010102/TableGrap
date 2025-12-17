@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface OwnerRequestService {
 
-    void requestOwner(Long memberId, Long dinerId);
+    void requestOwner(Long memberId, List<Long> dinerIds);
 
     List<OwnerRequestDto> findAll();
 
