@@ -64,10 +64,10 @@ function loadMyInfo() {
     fetch("/api/myPage/info")
         .then(res => res.json())
         .then(data => {
-            document.getElementById("myUsername").innerText = data.username;
-            document.getElementById("myName").innerText = data.name;
-            document.getElementById("myEmail").innerText = data.email;
-            document.getElementById("myPhone").innerText = data.phone;
+            document.getElementById("myUsername").value = data.username;
+            document.getElementById("myName").value = data.name;
+            document.getElementById("myEmail").value = data.email;
+            document.getElementById("myPhone").value = data.phone;
         });
 }
 

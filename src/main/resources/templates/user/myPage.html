@@ -51,26 +51,81 @@
         <!-- 여기서 회원 수정, 삭제 이뤄질 예정 -->
         <div class = "container mt-4">
             <h2>내 정보</h2>
-            <table class="table table-bordered align-middle">
-                <tbody id="myInfoTableBody">
-                <tr>
-                    <th class="bg-light text-center" style="width: 25%">아이디</th>
-                    <td id="myUsername"></td>
-                </tr>
-                <tr>
-                    <th class="bg-light text-center">이름</th>
-                    <td id="myName"></td>
-                </tr>
-                <tr>
-                    <th class="bg-light text-center">이메일</th>
-                    <td id="myEmail"></td>
-                </tr>
-                <tr>
-                    <th class="bg-light text-center">전화번호</th>
-                    <td id="myPhone"></td>
-                </tr>
-                </tbody>
-            </table>
+
+            <form id="myInfoForm">
+                <table class="table table-bordered align-middle">
+                    <tbody>
+                    <tr>
+                        <th class="bg-light text-center" style="width: 25%">아이디</th>
+                        <td>
+                        <label for="myUsername"><input type="text" id="myUsername" class="form-control-plaintext" readonly></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light text-center">이름</th>
+                        <td>
+                        <input type="text" id="myName" class="form-control-plaintext" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light text-center">이메일</th>
+                        <td>
+                        <input type="email" id="myEmail" name="email" class="form-control-plaintext" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light text-center">전화번호</th>
+                        <td>
+                        <input type="text" id="myPhone" name="phone" class="form-control-plaintext" readonly/>
+                        </td>
+                    </tr>
+
+                    <tr class="edit-mode-row" style="display:none;">
+                        <th class="bg-light text-center">새 비밀번호</th>
+                        <td>
+                            <input type="password" id="newPassword" name="password" class="form-control" placeholder="변경 시에만 입력"/>
+                        </td>
+                    </tr>
+                    <tr class="edit-mode-row" style="display:none;">
+                        <th class="bg-light text-center">비밀번호 확인</th>
+                        <td>
+                            <input type="password" id="confirmPassword" name="passwordConfirm" class="form-control"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" id="btnEdit" class="btn btn-primary" onclick="toggleEditMode(true)">수정하기</button>
+
+                    <button type="button" id="btnCancel" class="btn btn-secondary" style="display:none;" onclick="toggleEditMode(false)">취소</button>
+                    <button type="button" id="btnSave" class="btn btn-success" style="display:none;" onclick="saveMember()">저장</button>
+
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">탈퇴</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">회원 탈퇴</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger fw-bold">정말로 탈퇴하시겠습니까?</p>
+                <div class="mb-3">
+                    <label for="deletePassword" class="form-label">비밀번호 확인</label>
+                    <input type="password" class="form-control" id="deletePassword">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-danger" onclick="deleteMember()">탈퇴하기</button>
+            </div>
         </div>
     </div>
 </div>

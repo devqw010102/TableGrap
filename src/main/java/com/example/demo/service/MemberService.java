@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
+import com.example.demo.data.dto.MemberUpdateDto;
 import com.example.demo.data.model.Member;
 
 import java.util.List;
@@ -21,4 +22,7 @@ public interface MemberService {
     MemberInfoResponseDto findMyInfo(Long memberId);
 
     Member getMember(String username);
+
+    MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto); // update
+    boolean deleteMember(Long memberId, String checkPassword);
 }
