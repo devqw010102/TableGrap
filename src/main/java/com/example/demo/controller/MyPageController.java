@@ -22,8 +22,7 @@ public class MyPageController {
     public String myPage(Model model, @AuthenticationPrincipal MemberUserDetails userDetails) {
         if (userDetails != null) {
             Long memberId = userDetails.getMemberId();
-
-            List<BookResponseDto> myBookingList = bookService.findMyBooks(userDetails.getMemberId());
+            List<BookResponseDto> myBookingList = bookService.findMyBooks(memberId);
             model.addAttribute("list", myBookingList);
         }
         return "user/myPage";
