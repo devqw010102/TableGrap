@@ -30,10 +30,10 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public Book createBooking(BookDto dto) {
         try {
-            Diner diner = dinerRepository.findById(dto.getDiner())
+            Diner diner = dinerRepository.findById(dto.getDinerId())
                     .orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
 
-            Member member = memberRepository.findByUsername(dto.getMemberId())
+            Member member = memberRepository.findById(dto.getMemberId())
                     .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
             Book book= Book.builder()

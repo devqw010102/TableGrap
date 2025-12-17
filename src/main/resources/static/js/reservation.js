@@ -1,174 +1,178 @@
 document.addEventListener('DOMContentLoaded', function() {
+// api & 중복 수정
+    const NAVER_CLIENT_ID = "k0np2vmny3";
+    const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
+    const TIME_SLOTS = [
+        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00",
+        "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"
+    ];
+    const HOLIDAYS = {
+        '1-1': '새해',
+        '3-1': '삼일절',
+        '5-5': '어린이날',
+        '12-25': '성탄절'
+    };
 
-    /* 네이버 지도 연동  */
-    const clientId = "k0np2vmny3"; // API ID
-    const latInput = document.getElementById('dinerLat'); // 위도(dy)
-    const lngInput = document.getElementById('dinerLng'); // 경도(dx)
+    // DOM 요소
+    // 지도
+    const latInput = document.getElementById('dinerLat');
+    const lngInput = document.getElementById('dinerLng');
+    const staticMapImg = document.getElementById('staticMap');
 
-    // 좌표값이 있을 때만 실행
-    if(latInput != null && lngInput != null){
-    const lng = parseFloat(lngInput.value);
-    const lat = parseFloat(latInput.value);
+    // 달력 UI
+    const currentDateElem = document.querySelector("#currentYearMonth");
+    const daysContainer = document.querySelector("#calendar-days");
+    const calendarHeader = document.getElementById("calendarHeader");
+    const prevNextIcons = document.querySelectorAll("#prevMonth, #nextMonth");
 
-    // Static Map URL 생성
-    const staticMapUrl = `https://maps.apigw.ntruss.com/map-static/v2/raster-cors?`
-        + `w=750&h=500`
-        + `&center=${lngInput.value},${latInput.value}`
-        + `&level=16`
-        + `&markers=type:d|size:mid|pos:${lng}%20${lat}|color:Green|label:식당|viewSizeRatio:0.7`
-        + `&scale=2`
-        + `&X-NCP-APIGW-API-KEY-ID=${clientId}`;
+    // 시간 및 인원 UI
+    const timeContainer = document.getElementById("timeSlotsContainer");
+    const guestInput = document.getElementById("guestCount");
+    const btnMinus = document.getElementById("btnMinus");
+    const btnPlus = document.getElementById("btnPlus");
 
-    //img 태그에 staticMapURL 설정
-    document.getElementById('staticMap').src = staticMapUrl;
-    } else {
-    //좌표값이 없을 때 에러 처리
-    console.error("위도 또는 경도를 찾을 수 없습니다.");
-    }
-   /* Dynamic Map 활용
-   // 네이버 지도 API가 로드되었고, 좌표값이 있을 때만 실행
-    if (typeof naver !== 'undefined' && latInput && lngInput) {
-        const lat = parseFloat(latInput.value);
-        const lng = parseFloat(lngInput.value);
+    // 하단 요약 정보
+    const summaryDate = document.getElementById("displayDate");
+    const summaryTime = document.getElementById("displayTime");
+    const summaryPersonnel = document.getElementById("displayPersonnel");
 
-        // 좌표값 확인
-        if (!isNaN(lat) && !isNaN(lng)) {
-            const mapOptions = {
-                center: new naver.maps.LatLng(lat, lng), // DB 좌표를 지도의 중심으로
-                zoom: 16, // 확대 레벨 (1~14, 숫자가 클수록 확대)
-                scaleControl: false,
-                logoControl: false,
-                mapDataControl: false,
-                zoomControl: true,
-                minZoom: 6
-            };
+    // 예약 폼
+    const btnBook = document.getElementById("btnBook");
+    const bookingForm = document.getElementById("bookingForm");
+    const inputCombinedDate = document.getElementById("combinedBookingDate");
+    const inputPersonnel = document.getElementById("inputPersonnel");
 
-            // 지도 생성
-            const map = new naver.maps.Map('map', mapOptions);
-
-            // 빨간색 핀(마커) 찍기
-            new naver.maps.Marker({
-                position: new naver.maps.LatLng(lat, lng),
-                map: map
-            });
-        }
-    } */
-
-
-    /* 달력 및 예약 기능 */
-    // [설정] 현재 날짜 기준
+    // 상태 변수
     let date = new Date();
     let currYear = date.getFullYear();
     let currMonth = date.getMonth();
 
-    // DOM 요소
-    const currentDate = document.querySelector("#currentYearMonth");
-    const daysTag = document.querySelector("#calendar-days");
-    const prevNextIcon = document.querySelectorAll("#prevMonth, #nextMonth");
+    // 초기화
+    /* 네이버 지도 (Static Map) 로드 */
+    if (latInput && lngInput && staticMapImg) {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
 
-    const displayDate = document.getElementById("displayDate");
-    const displayTime = document.getElementById("displayTime");
-    const displayPersonnel = document.getElementById("displayPersonnel");
+        if (!isNaN(lat) && !isNaN(lng)) {
+            const staticMapUrl = `https://maps.apigw.ntruss.com/map-static/v2/raster-cors?`
+                + `w=750&h=500`
+                + `&center=${lng},${lat}`
+                + `&level=16`
+                + `&markers=type:d|size:mid|pos:${lng}%20${lat}|color:Green|label:식당|viewSizeRatio:0.7`
+                + `&scale=2`
+                + `&X-NCP-APIGW-API-KEY-ID=${NAVER_CLIENT_ID}`;
 
-    /* 요일 헤더(일~토) 자동 생성 */
-    const calendarHeader = document.getElementById("calendarHeader");
-    const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-    let headerHtml = "";
-
-    dayNames.forEach((day, index) => {
-        let colorClass = "";
-
-        // 일요일(0)은 빨간색, 토요일(6)은 파란색 클래스 추가
-        if (index === 0) colorClass = "text-danger";
-        else if (index === 6) colorClass = "text-primary";
-
-        headerHtml += `<span class="${colorClass}">${day}</span>`;
-    });
-
-    if (calendarHeader) {
-        calendarHeader.innerHTML = headerHtml;
+            staticMapImg.src = staticMapUrl;
+        } else {
+            console.error("유효하지 않은 위도/경도 값입니다.");
+        }
+    } else {
+        console.error("지도 표시를 위한 필수 요소가 누락되었습니다.");
     }
 
-    // 달력
+    /* 달력 요일 헤더 */
+    if (calendarHeader) {
+        calendarHeader.innerHTML = DAY_NAMES.map((day, index) => {
+            let colorClass = "";
+            if (index === 0) colorClass = "text-danger"; // 일요일
+            else if (index === 6) colorClass = "text-primary"; // 토요일
+            return `<span class="${colorClass}">${day}</span>`;
+        }).join("");
+    }
+
+    /* 시간 버튼 생성 */
+    if (timeContainer) {
+        timeContainer.innerHTML = TIME_SLOTS.map(time =>
+            `<button type="button" class="btn btn-outline-secondary btn-sm">${time}</button>`
+        ).join("");
+    }
+
+    // 주요 함수
+    /* 달력 렌더링 함수 */
     const renderCalendar = () => {
-        let firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
-        let lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
+        const firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
+        const lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
         let liTag = "";
 
-        const holidays = {
-            '1-1': '새해',
-            '3-1': '삼일절',
-            '5-5': '어린이날',
-            '12-25': '성탄절'
-        };
-
-        // 빈 날짜 채우기
+        // 지난달 빈 날짜 채우기
         for (let i = firstDayofMonth; i > 0; i--) {
             liTag += `<div class="day inactive"></div>`;
         }
 
         // 이번 달 날짜 채우기
+        const todayObj = new Date();
+        todayObj.setHours(0, 0, 0, 0); // 시간 초기화
+
         for (let i = 1; i <= lastDateofMonth; i++) {
+            const checkDateObj = new Date(currYear, currMonth, i);
+            const checkDateStr = `${currMonth + 1}-${i}`;
+            const checkDay = checkDateObj.getDay();
 
-            let checkDateObj = new Date(currYear, currMonth, i);
-            let todayObj = new Date();
-            todayObj.setHours(0, 0, 0, 0);
+            // today, holiday
+            let statusClass = "";
+            if (checkDateObj.getTime() === todayObj.getTime()) statusClass = "today";
+            else if (checkDateObj < todayObj) statusClass = "inactive";
 
-            let isToday = "";
-            let isPast = "";
+            let holidayClass = HOLIDAYS[checkDateStr] ? "holiday" : "";
+            let sundayClass = (checkDay === 0) ? "sunday" : "";
 
-            if (checkDateObj.getTime() === todayObj.getTime()) {
-                isToday = "today";
-            } else if (checkDateObj < todayObj) {
-                isPast = "inactive";
-            }
+            // 휴일 텍스트
+            const holidayText = HOLIDAYS[checkDateStr]
+                ? `<span class="holiday-name">${HOLIDAYS[checkDateStr]}</span>`
+                : '';
 
-            let checkDateStr = `${currMonth + 1}-${i}`;
-            let holidayText = holidays[checkDateStr] ? `<span class="holiday-name">${holidays[checkDateStr]}</span>` : '';
-            let isHoliday = holidays[checkDateStr] ? "holiday" : "";
-
-            let checkDay = new Date(currYear, currMonth, i).getDay();
-            let isSunday = (checkDay === 0) ? "sunday" : "";
-
-            liTag += `<div class="day ${isToday} ${isPast} ${isHoliday} ${isSunday}" data-day="${i}">
-                <span>${i}</span>
-                ${holidayText}
-              </div>`;
+            liTag += `<div class="day ${statusClass} ${holidayClass} ${sundayClass}" data-day="${i}">
+                        <span>${i}</span>
+                        ${holidayText}
+                      </div>`;
         }
 
-        currentDate.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}`;
-        daysTag.innerHTML = liTag;
+        currentDateElem.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}`;
+        daysContainer.innerHTML = liTag;
 
-        addDateClickEvent();
-    }
+        attachDateClickEvents(); // 렌더링 후 클릭 이벤트 재연결
+    };
 
-    // 날짜 클릭 이벤트
-    const addDateClickEvent = () => {
+    /* 날짜 클릭 이벤트 연결 (렌더링 될 때마다 호출) */
+    const attachDateClickEvents = () => {
         const days = document.querySelectorAll(".day");
         days.forEach(day => {
-            if(day.classList.contains("inactive")) return;
+            if (day.classList.contains("inactive")) return;
 
             day.addEventListener("click", () => {
+                // 기존 선택 제거
                 document.querySelector(".day.selected")?.classList.remove("selected");
+                // 새 선택 추가
                 day.classList.add("selected");
 
                 const selectedDay = day.getAttribute("data-day");
                 const dayOfWeek = new Date(currYear, currMonth, selectedDay).getDay();
-                const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
-                // 하단 요약 정보 업데이트
-                displayDate.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(selectedDay).padStart(2, '0')} (${dayNames[dayOfWeek]})`;
-                displayDate.classList.add("text-primary-custom");
+                // 하단 요약 업데이트
+                if (summaryDate) {
+                    summaryDate.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(selectedDay).padStart(2, '0')} (${DAY_NAMES[dayOfWeek]})`;
+                    summaryDate.classList.add("text-primary-custom");
+                }
             });
         });
-    }
+    };
 
-    // 달력 이전/다음 버튼
-    prevNextIcon.forEach(icon => {
+    /* 인원수 요약 업데이트 함수 */
+    const updateGuestSummary = (count) => {
+        if (summaryPersonnel) {
+            summaryPersonnel.innerText = `${count}명`;
+            summaryPersonnel.classList.add("text-primary-custom");
+        }
+    };
+
+    // 이벤트 리스너
+
+    /* 달력 이전/다음 버튼 */
+    prevNextIcons.forEach(icon => {
         icon.addEventListener("click", () => {
             currMonth = icon.id === "prevMonth" ? currMonth - 1 : currMonth + 1;
 
-            if(currMonth < 0 || currMonth > 11) {
+            if (currMonth < 0 || currMonth > 11) {
                 date = new Date(currYear, currMonth, new Date().getDate());
                 currYear = date.getFullYear();
                 currMonth = date.getMonth();
@@ -179,122 +183,121 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    /* 시간 버튼 생성 및 클릭 이벤트 */
-    const timeContainer = document.getElementById("timeSlotsContainer");
-
-    // 시간대 목록
-    const times = [
-        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00",
-        "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"
-    ];
-
-    // 버튼 HTML 자동 생성
-    let timeHtml = "";
-    times.forEach(time => {
-        timeHtml += `<button type="button" class="btn btn-outline-secondary btn-sm">${time}</button>`;
-    });
-
-    // HTML에 넣기
-    if (timeContainer) {
-        timeContainer.innerHTML = timeHtml;
-    }
-
-    // 버튼 클릭 이벤트 연결 (버튼이 생성된 후에)
+    /* 시간 버튼 클릭 */     // 이벤트 위임??
     const timeButtons = document.querySelectorAll(".time-slots-grid .btn");
-
     timeButtons.forEach(btn => {
         btn.addEventListener("click", function() {
-            // 이미 선택된 버튼들 초기화
+            // 초기화
             timeButtons.forEach(b => {
                 b.classList.remove("btn-success", "text-white");
                 b.classList.add("btn-outline-secondary");
             });
-
-            // 클릭한 버튼만 활성화
+            // 활성화
             this.classList.remove("btn-outline-secondary");
             this.classList.add("btn-success", "text-white");
 
-            // 하단 요약 정보 업데이트
-            if(displayTime) {
-                displayTime.innerText = this.innerText;
-                displayTime.classList.add("text-primary-custom");
+            // 요약 업데이트
+            if (summaryTime) {
+                summaryTime.innerText = this.innerText;
+                summaryTime.classList.add("text-primary-custom");
             }
         });
     });
 
-    // 인원수 버튼 (+,-)
-    const guestInput = document.getElementById("guestCount");
+    /* 인원수 조절 버튼 */
+    if (btnMinus && btnPlus && guestInput) {
+        btnMinus.addEventListener("click", () => {
+            let val = parseInt(guestInput.value);
+            if (val > 1) {
+                guestInput.value = --val;
+                updateGuestSummary(val);
+            }
+        });
 
-    // 인원수 변경 시 하단 요약 업데이트
-    const updateGuestSummary = (count) => {
-        if(displayPersonnel) {
-            displayPersonnel.innerText = `${count}명`;
-            displayPersonnel.classList.add("text-primary-custom");
-        }
-    };
+        btnPlus.addEventListener("click", () => {
+            let val = parseInt(guestInput.value);
+            if (val < 20) {
+                guestInput.value = ++val;
+                updateGuestSummary(val);
+            }
+        });
 
-    document.getElementById("btnMinus").addEventListener("click", () => {
-        let val = parseInt(guestInput.value);
-        if(val > 1) {
-            guestInput.value = val - 1;
-            updateGuestSummary(val - 1);
-        }
-    });
-    document.getElementById("btnPlus").addEventListener("click", () => {
-        let val = parseInt(guestInput.value);
-        if(val < 20) {
-            guestInput.value = val + 1;
-            updateGuestSummary(val + 1);
-        }
-    });
+        // 초기 로드시 반영
+        updateGuestSummary(guestInput.value);
+    }
 
-    // 페이지 로드 시 인원수 초기값 반영
-    updateGuestSummary(guestInput.value);
+    /* 예약하기 버튼 (폼 전송) */
+    if (btnBook) {
+        btnBook.addEventListener("click", function() {
+            // 유효성 검사
+            const selectedDateElem = document.querySelector(".day.selected");
+            const selectedTimeElem = document.querySelector(".time-slots-grid .btn-success");
 
-    // 초기 실행
+            if (!selectedDateElem) {
+                alert("📅 날짜를 먼저 선택해주세요.");
+                return;
+            }
+            if (!selectedTimeElem) {
+                alert("⏰ 방문하실 시간을 선택해주세요.");
+                return;
+            }
+
+            // 데이터 취합
+            const day = selectedDateElem.getAttribute("data-day");
+            const time = selectedTimeElem.innerText;
+            const guestCount = guestInput.value;
+
+            const formattedMonth = String(currMonth + 1).padStart(2, '0');
+            const formattedDay = String(day).padStart(2, '0');
+            const finalDateTime = `${currYear}-${formattedMonth}-${formattedDay} ${time}`;
+
+            // 폼 데이터 세팅
+            if (inputCombinedDate) inputCombinedDate.value = finalDateTime;
+            if (inputPersonnel) inputPersonnel.value = guestCount;
+
+            // 최종 확인 및 전송
+            if (confirm(`${finalDateTime}에 ${guestCount}명으로 예약하시겠습니까?`)) {
+                bookingForm.submit();
+            }
+        });
+    }
+
+    // 초기 달력 렌더링 실행
     renderCalendar();
 
-    /* 예약하기 버튼 클릭 이벤트 수정 */
-    const btnBook = document.getElementById("btnBook");
+    // 예약 수정
+        const bookIdInput = document.querySelector('input[name="bookId"]');
+        const oldDateInput = document.getElementById('oldDate');
+        const oldPersonnelInput = document.getElementById('oldPersonnel');
 
-    btnBook.addEventListener("click", function() {
-        //  날짜 선택 확인
-        const selectedDateElem = document.querySelector(".day.selected");
-        if (!selectedDateElem) {
-            alert("📅 날짜를 먼저 선택해주세요.");
-            return;
+        if(bookIdInput && bookIdInput.value) {
+
+            if (oldPersonnelInput) {
+                const count = oldPersonnelInput.value;
+                if (guestInput) guestInput.value = count;
+                if (inputPersonnel) inputPersonnel.value = count;
+                updateGuestSummary(count);
+            }
+            if (oldDateInput) {
+                const rawDate = oldDateInput.value;
+                if (inputCombinedDate) inputCombinedDate.value = rawDate;
+
+                const dateParts = rawDate.split('T');
+                const datePart = dateParts[0];
+                const timePart = dateParts[1].substring(0, 5);
+
+                if (summaryDate) {
+                    summaryDate.innerText = datePart;
+                    summaryDate.classList.add("text-primary-custom")
+                }
+                if (summaryTime) {
+                    summaryTime.innerText = timePart;
+                    summaryTime.classList.add("text-primary-custom")
+                }
+            }
+
+            if (btnBook) {
+                btnBook.innerText = "수정하기";
+            }
         }
-
-        // 시간 선택 확인
-        const selectedTimeElem = document.querySelector(".time-slots-grid .btn-success");
-        if (!selectedTimeElem) {
-            alert("⏰ 방문하실 시간을 선택해주세요.");
-            return;
-        }
-
-        // 날짜 조합
-        const day = selectedDateElem.getAttribute("data-day");
-        const time = selectedTimeElem.innerText;
-
-        const formattedMonth = String(currMonth + 1).padStart(2, '0');
-        const formattedDay = String(day).padStart(2, '0');
-
-        const finalDateTime = `${currYear}-${formattedMonth}-${formattedDay} ${time}`;
-
-        // 인원수 가져오기
-        const guestCount = document.getElementById("guestCount").value;
-
-        // hidden input에 값 넣기
-        document.getElementById("combinedBookingDate").value = finalDateTime;
-        document.getElementById("inputPersonnel").value = guestCount;
-
-        // 폼 전송
-        const form = document.getElementById("bookingForm");
-
-        // 유효성 검사 후 전송
-        if(confirm(`${finalDateTime}에 ${guestCount}명으로 예약하시겠습니까?`)) {
-            form.submit(); // Controller의 @PostMapping으로 데이터가 날아갑니다.
-        }
-    });
-
 });
