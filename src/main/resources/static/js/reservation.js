@@ -266,38 +266,62 @@ document.addEventListener('DOMContentLoaded', function() {
     renderCalendar();
 
     // 예약 수정
-        const bookIdInput = document.querySelector('input[name="bookId"]');
-        const oldDateInput = document.getElementById('oldDate');
-        const oldPersonnelInput = document.getElementById('oldPersonnel');
+    const bookIdInput = document.querySelector('input[name="bookId"]');
+    const oldDateInput = document.getElementById('oldDate');
+    const oldPersonnelInput = document.getElementById('oldPersonnel');
 
-        if(bookIdInput && bookIdInput.value) {
+    if(bookIdInput && bookIdInput.value) {
 
-            if (oldPersonnelInput) {
-                const count = oldPersonnelInput.value;
-                if (guestInput) guestInput.value = count;
-                if (inputPersonnel) inputPersonnel.value = count;
-                updateGuestSummary(count);
+        if (oldPersonnelInput) {
+            const count = oldPersonnelInput.value;
+            if (guestInput) guestInput.value = count;
+            if (inputPersonnel) inputPersonnel.value = count;
+            updateGuestSummary(count);
+        }
+        if (oldDateInput) {
+            const rawDate = oldDateInput.value;
+            if (inputCombinedDate) inputCombinedDate.value = rawDate;
+
+            const dateParts = rawDate.split('T');
+            const datePart = dateParts[0];
+            const timePart = dateParts[1].substring(0, 5);
+
+            if (summaryDate) {
+                summaryDate.innerText = datePart;
+                summaryDate.classList.add("text-primary-custom")
             }
-            if (oldDateInput) {
-                const rawDate = oldDateInput.value;
-                if (inputCombinedDate) inputCombinedDate.value = rawDate;
-
-                const dateParts = rawDate.split('T');
-                const datePart = dateParts[0];
-                const timePart = dateParts[1].substring(0, 5);
-
-                if (summaryDate) {
-                    summaryDate.innerText = datePart;
-                    summaryDate.classList.add("text-primary-custom")
-                }
-                if (summaryTime) {
-                    summaryTime.innerText = timePart;
-                    summaryTime.classList.add("text-primary-custom")
-                }
+            if (summaryTime) {
+                summaryTime.innerText = timePart;
+                summaryTime.classList.add("text-primary-custom")
             }
+        }
 
             if (btnBook) {
                 btnBook.innerText = "수정하기";
             }
         }
+
+    //리뷰를 불러오자 fetch api활용
+    document.getElementById("review-tab").addEventListener("click", () => {
+    loadReviews()});
+
+    //async 리뷰 불러오기 함수
+    async function loadReviews() {
+    //reservation.html에 review를 표시할 <table>을 만들어야 한다.
+     try{
+      const res = await fetch("/api/review/list");
+      if(!res.ok){
+        console.error("리뷰를 불러오지 못했습니다.");
+        return;
+      }
+      const data = await res.json();
+      if(!data || data.length ===0){
+        console.log("리뷰가 없습니다.");
+        return;
+      }
+      console.log(data);
+      }catch(e){
+      console.error("오류가 발생했습니다" + e);
+     }
+    }
 });
