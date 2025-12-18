@@ -1,11 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.data.dto.BookDto;
+import com.example.demo.data.dto.BookOwnerResponseDto;
 import com.example.demo.data.dto.BookResponseDto;
-import com.example.demo.data.dto.MemberInfoResponseDto;
-import com.example.demo.data.model.Book;
-import com.example.demo.data.model.Member;
+import org.springframework.data.domain.Page;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BookService {
@@ -15,5 +15,12 @@ public interface BookService {
 
     void deleteBooking(Long bookId);
 
-    // owner 가 예약 확정 할 메소드
+    void createBooking(BookDto bookDto);
+
+    // owner 관련 메소드
+    Page<BookOwnerResponseDto> getBookings(Long ownerId, Long dinerId, Boolean pending, LocalDate date, int page, int size);
+
+    void approveBooking(Long bookId);
+
+    void rejectBooking(Long bookId);
 }

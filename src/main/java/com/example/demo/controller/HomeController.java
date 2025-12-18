@@ -35,24 +35,11 @@ public class HomeController {
         return "user/register";
     }
 
-    // myPage controller랑 충돌남
-    /*
-    @GetMapping("/mypage")
-    public String getMypage(@AuthenticationPrincipal UserDetails userDetails) {
-        // 로그인 안했으면 로그인으로
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        // 권한 확인( 일반 사용자: 마이페이지 / 가게 오너: 오너 페이지)
-        boolean isOwner = userDetails.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_OWNER"));
+    @GetMapping("/ownerPage")
+    public String getOwnerPage() { return "user/ownerPage"; }
 
-
-         return isOwner ? "user/ownerPage" : "user/myPage";
-    }
-*/
     @GetMapping("/admin")   // 권한 끄면 들어가짐.(현재 login 페이지로)
-    public String getAdmin(Model model) {
+    public String getAdmin() {
         return "admin/adminPage";
     }
 
