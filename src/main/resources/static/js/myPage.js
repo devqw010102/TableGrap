@@ -50,6 +50,10 @@ function loadBooks() {
                         <button class="btn btn-danger btn-sm ms-2" 
                         onclick="cancelBooking(${book.bookId})">취소</button>
                         </td>
+                        <td>
+                          <button class="btn btn-success btn-sm"
+                          onclick="testReviewSave(${book.dinerId})">후기 테스트</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -93,5 +97,30 @@ function loadMyInfo() {
             })
 
 }
+       function testReviewSave(dinerId) {
+           if (!confirm("이 식당에 대한 테스트 후기를 등록하시겠습니까?")) return;
 
+           // 테스트용 더미 데이터
+           const reviewData = {
+               dinerId: dinerId,
+               rating: 5,
+               comment: "자바스크립트로 보낸 테스트 후기입니다!"
+           };
+
+           fetch("/api/mypage/review", {
+               method: "POST",
+               headers: {
+                   "Content-Type": "application/json"
+               },
+               body: JSON.stringify(reviewData)
+           })
+           .then(res => {
+               if (res.ok) {
+                   alert("후기가 DB에 성공적으로 저장되었습니다.");
+               } else {
+                   alert("후기 저장 실패!");
+               }
+           })
+           .catch(err => console.error("에러 발생:", err));
+       }
 

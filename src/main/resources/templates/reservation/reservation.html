@@ -88,14 +88,24 @@
                     <div class="tab-pane fade" id="review" role="tabpanel">
                         <div class="text-center py-4 text-muted">
                           <table class="table">
-                              <tr th:each="review : ${reviews}" th:unless="${#lists.isEmpty(reviews)}">
+                            <thead>
+                              <tr>
+                                <th scope="col">별점</th>
+                                <th scope="col">리뷰 내용</th>
+                              </tr>
+                            </thead>
+                            <tbody id="review-tbody">
+                              <tr th:each="review: ${reviews}" th:unless="${#lists.isEmpty(reviews)}">
+                                <!-- 후기가 있을 경우 -->
                                 <!-- 별점 5점 만점(| <- 리터럴 대체 문자(타임리프)) -->
                                 <td th:text="|${review.rating}/5|">별점</td>
-                                <td th:text="${review.comment}">리뷰 내용</td>
+                                <td th:text="${review.comment}" class="text-start">리뷰 내용</td>
                               </tr>
                               <tr th:if="${#lists.isEmpty(reviews)}">
-                                  <td>등록된 후기가 없습니다.</td>
+                                <!-- 후기가 없을 경우 -->
+                                <td colspan="2" class="comment-none">작성한 후기가 없습니다.</td>
                               </tr>
+                            </tbody>
                           </table>
                         </div>
                     </div>

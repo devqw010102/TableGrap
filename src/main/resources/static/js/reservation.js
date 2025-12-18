@@ -307,21 +307,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //async 리뷰 불러오기 함수
     async function loadReviews() {
-    //reservation.html에 review를 표시할 <table>을 만들어야 한다.
-     try{
-      const res = await fetch("/api/review/list");
-      if(!res.ok){
-        console.error("리뷰를 불러오지 못했습니다.");
-        return;
-      }
-      const data = await res.json();
-      if(!data || data.length ===0){
-        console.log("리뷰가 없습니다.");
-        return;
-      }
-      console.log(data);
-      }catch(e){
-      console.error("오류가 발생했습니다" + e);
-     }
+        // HTML의 hidden input에서 dinerId를 가져오기
+        const dinerIdInput = document.querySelector('input[name="dinerId"]');
+        const dinerId = dinerIdInput ? dinerIdInput.value : null;
+
+        if (!dinerId) {
+            console.error("식당 ID를 찾을 수 없습니다.");
+            return;
+        }
+
+        const url = `/api/review/list?dinerId=${dinerId}`;
+
+        try {
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                console.log("받아온 데이터:", data);
+                renderReviews(data);
+            } else {
+                console.error("리뷰 로드 실패 (400/500 에러)");
+            }
+        } catch (e) {
+            console.error("통신 중 오류 발생:", e);
+        }
+    }
+
+    function renderReviews(data) {
+        const tbody = document.getElementById("review-tbody");
+        if (!tbody) return;
+
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center">작성한 후기가 없습니다.</td></tr>';
+            return;
+        }
+
+        // 데이터를 반복하며 테이블 행(tr) 생성
+        data.forEach(review => {
+            const row = `
+                <tr>
+                    <td>${review.rating}/5</td>
+                    <td class="text-start">${review.comment}</td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
     }
 });

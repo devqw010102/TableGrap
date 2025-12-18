@@ -15,7 +15,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**", "/api/myPage/book/delete/**", "/api/adminPage/**", "/api/diner/**") // H2 콘솔은 CSRF 무시
+                        .ignoringRequestMatchers("/h2-console/**",  "/api/**") // H2 콘솔은 CSRF 무시
                 )
                 //.csrf(csrf -> csrf.disable())
                 .headers(headers -> headers

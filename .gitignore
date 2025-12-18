@@ -36,3 +36,9 @@ application-secret.properties
 ### Others ###
 *.zip
 *.tmp
+
+### reviewTest ###
+ReviewController_test.java
+ReviewService_test.java
+ReviewServiceImpl_test.java
+mypage_test.js
