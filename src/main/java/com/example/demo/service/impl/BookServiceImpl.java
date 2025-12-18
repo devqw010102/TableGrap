@@ -70,6 +70,7 @@ public class BookServiceImpl implements BookService {
         //update
         book.setBookingDate(dto.getBookingDate());
         book.setPersonnel(dto.getPersonnel());
+        book.setSuccess(false);
     }
 
     @Override
