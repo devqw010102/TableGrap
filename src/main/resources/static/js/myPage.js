@@ -8,33 +8,176 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnEdit = document.getElementById("btnEdit");
     const btnSave = document.getElementById("btnSave");
     const btnCancel = document.getElementById("btnCancel");
+    const btnDeleteMember = document.getElementById("btnDeleteMember");
 
-    // 수정 버튼 클릭 시 수정 모드
-    if (btnEdit) {
-        btnEdit.addEventListener("click", () => toggleEditMode(true));
-    }
-
-    // 저장 버튼 클릭 시 저장 로직
-    if (btnSave) {
-        btnSave.addEventListener("click", saveMember);
-    }
-
-    // 취소 버튼 클릭 시 수정 모드 x
+    if (btnEdit) btnEdit.addEventListener("click", () => toggleEditMode(true));
+    if (btnSave) btnSave.addEventListener("click", saveMember);
     if (btnCancel) {
         btnCancel.addEventListener("click", () => {
             toggleEditMode(false);
-            loadMyInfo(); // 취소하면 원래 데이터로 원복
+            loadMyInfo();
         });
     }
-
-    // 회원 탈퇴 버튼 이벤트 연결 <button id="btnDeleteMember
-    const btnDeleteMember = document.getElementById("btnDeleteMember");
-    if (btnDeleteMember) {
-        btnDeleteMember.addEventListener("click", deleteMember);
-    }
-    // 초기 화면 로드
+    if (btnDeleteMember) btnDeleteMember.addEventListener("click", deleteMember);
     loadBooks();
 });
+
+// 중복 체크
+let emailTimer;
+function checkEmail(dbcheck){
+    const email = dbcheck.value;
+    const resultShow = document.getElementById("emailResult");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    clearTimeout(emailTimer);
+
+    if (!emailRegex.test(email)) {
+        resultShow.innerHTML = "올바른 이메일 형식을 입력해주세요.";
+        dbcheck.classList.remove("is-valid");
+        return;
+    }
+
+    emailTimer = setTimeout(() => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `/api/myPage/check-email?email=${encodeURIComponent(email)}`)
+    xhr.onreadystatechange = function () {
+        if(xhr.readyState === 4 && xhr.status === 200) {
+            resultShow.innerHTML = xhr.responseText;
+            if (xhr.responseText.includes("가능")) {
+                dbcheck.classList.add("is-valid");
+                dbcheck.classList.remove("is-invalid");
+            } else {
+                dbcheck.classList.add("is-invalid");
+            }
+        }
+    };
+        xhr.send();
+    }, 500); // 사용자가 입력을 멈추고 0.5초 뒤에 실행
+}
+
+
+function  checkPhone(dbcheck){
+    const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
+    const resultShow = document.getElementById("phoneResult")
+
+    if(regPhone.test(dbcheck.value)) {
+        dbcheck.classList.replace("is-invalid", "is-valid");
+    }else{
+        dbcheck.classList.add("is-invalid");
+    }
+}
+
+function checkPwd(dbcheck){
+    const pwd = dbcheck.value;
+    const resultShow = document.getElementById("pwdResult")
+
+    if(!pwd) {
+        resultShow.innerHTML = "";
+        dbcheck.classList.remove("is-valid", "is-invalid");
+        return;
+    }
+
+    if(pwd.length < 8) {
+        resultShow.innerHTML = "8자 이상 입력해주세요.";
+        dbcheck.classList.add("is-invalid");
+    }else{
+        dbcheck.classList.replace("is-invalid", "is-valid");
+    }
+    checkPwdConfirm();
+}
+
+function checkPwdConfirm() {
+    const pwd = document.getElementById("newPassword").value;
+    const pwdConfirmEl = document.getElementById("pwdConfirm"); // HTML ID와 일치!
+    const resultShow = document.getElementById("pwdConfirmResult");
+
+    if (!pwdConfirmEl || !resultShow) return;
+
+    const pwdConfirm = pwdConfirmEl.value;
+
+    if (!pwdConfirmEl.value) {
+        resultShow.innerHTML = "";
+        pwdConfirmEl.classList.remove("is-valid", "is-invalid");
+        return;
+    }
+
+    if (pwd === pwdConfirmEl.value) {
+        resultShow.innerHTML = "비밀번호가 일치합니다.";
+        pwdConfirmEl.classList.replace("is-invalid", "is-valid");
+    } else {
+        resultShow.innerHTML = "비밀번호가 일치하지 않습니다.";
+        pwdConfirmEl.classList.add("is-invalid");
+    }
+}
+
+// 수정 모드 토글
+function toggleEditMode(isMemberEdit) {
+    const fields = ['myEmail', 'myPhone', 'newPassword', 'pwdConfirm'];
+
+    fields.forEach(id=> {
+        const editValue = document.getElementById(id);
+        if (!editValue) return;
+
+        if (isMemberEdit) {
+            editValue.readOnly = false;
+            editValue.className = "form-control";
+        } else {
+            editValue.readOnly = true;
+            editValue.className = "form-control-plaintext";
+
+            editValue.classList.remove("is-valid", "is-invalid");
+        }
+    });
+
+    if(!isMemberEdit){
+        document.querySelectorAll(".small").forEach(div => {
+            div.innerHTML="";
+        });
+    }
+    document.querySelectorAll(".edit-mode-row").forEach(row => {
+        row.style.display = isMemberEdit ? "table-row" : "none";
+    });
+
+    document.getElementById("btnEdit").style.display = isMemberEdit ? "none" : "inline-block";
+    document.getElementById("btnSave").style.display = isMemberEdit ? "inline-block": "none"
+    document.getElementById("btnCancel").style.display = isMemberEdit ? "inline-block" : "none";
+}
+
+
+
+// 회원 정보 저장
+function saveMember() {
+    const pwd = document.getElementById("newPassword").value;
+    const pwdConfirm = document.getElementById("pwdConfirm").value;
+
+    if(pwd && pwd !== pwdConfirm) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    const data = {
+        email: document.getElementById("myEmail").value,
+        phone: document.getElementById("myPhone").value,
+        password: pwd,
+        passwordConfirm: pwdConfirm
+    };
+
+    fetch("/api/myPage/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (res.ok) {
+                alert("수정되었습니다.");
+                loadMyInfo(); // 저장 성공 시 최신 정보 다시 로드
+            } else {
+                alert("수정 실패: 입력 정보를 확인해주세요.");
+            }
+        })
+        .catch(err => console.error("Update Error:", err));
+}
+
 
 // 예약 내역 불러오기
 function loadBooks() {
@@ -89,76 +232,6 @@ function loadMyInfo() {
         .catch(err => console.error("회원정보 로드 실패:", err));
 }
 
-// 수정 모드 토글
-function toggleEditMode(isMemberEdit) {
-    const inputs = ['myEmail', 'myPhone'];
-    inputs.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-
-        if (isMemberEdit) {
-            el.removeAttribute("readonly");
-            el.classList.replace("form-control-plaintext", "form-control");
-        } else {
-            el.setAttribute("readonly", true);
-            el.classList.replace("form-control", "form-control-plaintext");
-        }
-    });
-
-    document.querySelectorAll(".edit-mode-row").forEach(row => {
-        row.style.display = isMemberEdit ? "table-row" : "none";
-    });
-
-    const btnEdit = document.getElementById("btnEdit");
-    const btnSave = document.getElementById("btnSave");
-    const btnCancel = document.getElementById("btnCancel");
-
-    if (btnEdit) btnEdit.style.display = isMemberEdit ? "none" : "inline-block";
-    if (btnSave) btnSave.style.display = isMemberEdit ? "inline-block" : "none";
-    if (btnCancel) btnCancel.style.display = isMemberEdit ? "inline-block" : "none";
-
-    // 수정 취소 혹은 완료 시 비밀번호 필드 초기화
-    if (!isMemberEdit) {
-        const newPw = document.getElementById("newPassword");
-        const confPw = document.getElementById("confirmPassword");
-        if(newPw) newPw.value = "";
-        if(confPw) confPw.value = "";
-    }
-}
-
-// 회원 정보 저장
-function saveMember() {
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    const data = {
-        email: document.getElementById("myEmail").value,
-        phone: document.getElementById("myPhone").value,
-        password: newPassword,
-        passwordConfirm: confirmPassword
-    };
-
-    if (newPassword && newPassword !== confirmPassword) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
-    }
-
-    fetch("/api/myPage/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-        .then(res => {
-            if (res.ok) {
-                alert("수정되었습니다.");
-                loadMyInfo(); // 저장 성공 시 최신 정보 다시 로드
-            } else {
-                alert("수정 실패: 입력 정보를 확인해주세요.");
-            }
-        })
-        .catch(err => console.error("Update Error:", err));
-}
-
 // 회원 탈퇴
 function deleteMember() {
     const passwordInput = document.getElementById("deletePassword");
@@ -179,7 +252,7 @@ function deleteMember() {
         .then(res => {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
-                location.href = "/logout";
+                  location.reload();
             } else {
                 alert("비밀번호가 일치하지 않거나 오류가 발생했습니다.");
             }

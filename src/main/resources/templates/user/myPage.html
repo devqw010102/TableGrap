@@ -14,19 +14,24 @@
 
 <div class="container mt-5">
     <h1> MyPage </h1>
-
+    <!-- Tab-head -->
     <ul class="nav nav-tabs" id="myPageTab" role="tablist">
+        <!-- tab1 -->
         <li class="nav-item" role="presentation">
             <a class="nav-link active" id="books-tab" data-bs-toggle="tab" href="#books" role="tab" aria-controls="books" aria-selected="true">예약 목록</a>
         </li>
+        <!-- tab2 -->
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="info-tab" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">내 정보</a>
         </li>
     </ul>
 
+    <!-- Tab-content -->
     <div class="tab-content mt-3" id="myPageTabContent">
-
+        <!-- tab1-content -->
         <div class="tab-pane fade show active" id="books" role="tabpanel" aria-labelledby="books-tab">
+
+            <!-- 예약 목록(book) 출력할 table -->
             <div class="container mt-4">
                 <h2>예약 목록</h2>
                 <table class="table table-bordered table-hover">
@@ -46,11 +51,13 @@
             </div>
         </div>
 
+        <!-- tab2-content -->
         <div class="tab-pane fade" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <!-- 회원 정보(member) 출력할 table -->
             <div class="container mt-4">
                 <h2>내 정보</h2>
 
-                <form id="myInfoEditForm">
+                <form id="myInfoEditForm" method="post">
                     <table class="table table-bordered align-middle">
                         <tbody>
                         <tr>
@@ -63,20 +70,36 @@
                         </tr>
                         <tr>
                             <th class="bg-light text-center">이메일</th>
-                            <td><input type="email" id="myEmail" name="email" class="form-control-plaintext" readonly/></td>
+                            <td>
+                                <input type="email" id="myEmail" name="email"  class="form-control" readonly autocomplete="email" onkeyup="checkEmail(this)">
+                                <div id="emailResult" class="small"></div>
+                            </td>
                         </tr>
                         <tr>
                             <th class="bg-light text-center">전화번호</th>
-                            <td><input type="text" id="myPhone" name="phone" class="form-control-plaintext" readonly/></td>
+                            <td>
+                                <input type="phone" id="myPhone" name="phone" class="form-control" readonly autocomplete="phone" onkeyup = "checkPhone(this)">
+                                <div id="phoneResult" class="small"></div>
+
+                            </td>
                         </tr>
 
                         <tr class="edit-mode-row" style="display:none;">
                             <th class="bg-light text-center">새 비밀번호</th>
-                            <td><input type="password" id="newPassword" name="password" class="form-control" placeholder="변경 시에만 입력"/></td>
+                            <td>
+                                <input type="password" id="newPassword" name="password"  class="form-control" readonly autocomplete="new-password" onkeyup = "checkPwd(this)">
+                                <div id="pwdResult" class="small"></div>
+
+                            </td>
                         </tr>
                         <tr class="edit-mode-row" style="display:none;">
                             <th class="bg-light text-center">비밀번호 확인</th>
-                            <td><input type="password" id="confirmPassword" name="passwordConfirm" class="form-control"/></td>
+                            <td>
+                                <input type="password" id="pwdConfirm" name="passwordConfirm"  class="form-control" readonly onkeyup= "checkPwdConfirm()">
+                                <div id="pwdConfirmResult" class="small"></div>
+
+
+                            </td>
                         </tr>
                         </tbody>
                     </table>

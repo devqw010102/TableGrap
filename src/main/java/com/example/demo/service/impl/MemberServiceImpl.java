@@ -33,6 +33,7 @@ public class MemberServiceImpl implements MemberService {
                 .phone(member.getPhone())
                 .build();
     }
+
     // Convert method : Member -> MemberInfoResponseDto
     private MemberInfoResponseDto mapToMemberInfoDto(Member member) {
         return MemberInfoResponseDto.builder()
@@ -75,6 +76,7 @@ public class MemberServiceImpl implements MemberService {
 
         return mapToMemberDto(member);
     }
+
     @Override
     public Optional<MemberDto> findByEmail(String email) {  // 이메일 확인
         return memberRepository.findByEmail(email).
@@ -114,24 +116,25 @@ public class MemberServiceImpl implements MemberService {
     // update
     @Override
     @Transactional
-    public MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto){
+    public MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto) {
         // id(순번)을 가져와서 dto에 필요한 정보만 수정 (이메일, 전화, 비밀번호(확인도)
         Member member = memberRepository.findById(memberId).
                 orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다, 다시 확인 해주세요."));
 
-                member.setEmail(dto.getEmail());
-                member.setPhone(dto.getPhone());
-                if(dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-                    member.setPassword(passwordEncoder.encode(dto.getPassword()));
-                }
+        member.setEmail(dto.getEmail());
+        member.setPhone(dto.getPhone());
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
 
-                return MemberUpdateDto.builder()
-                        .email(member.getEmail())
-                        .phone(member.getPhone())
-                        .build();
+        return MemberUpdateDto.builder()
+                .email(member.getEmail())
+                .phone(member.getPhone())
+                .build();
     }
 
     // delete
+    /*
     @Override
     @Transactional
     public boolean deleteMember(Long memberId, String checkPassword) {
@@ -148,5 +151,21 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
     }
+    */
 
+
+    @Override
+    @Transactional
+    public boolean deleteMember(Long memberId, String checkPassword) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(checkPassword, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        memberRepository.delete(member);
+        return true;
+    }
 }
