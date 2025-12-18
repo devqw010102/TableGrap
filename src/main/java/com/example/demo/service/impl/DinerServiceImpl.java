@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
+import com.example.demo.data.dto.OwnerDinerDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerService;
@@ -54,5 +55,10 @@ public class DinerServiceImpl implements DinerService {
     //Pagination활용하기 위해 Page타입으로 변경
     public Page<DinerListDto> getListByCat(Pageable pageable, String category){
       return dinerRepository.findByCategory(pageable, category).map(this::mapToDinerListDto);
+    }
+
+    @Override
+    public List<OwnerDinerDto> getOwnerDiners(Long ownerId) {
+        return dinerRepository.findByOwnerId(ownerId);
     }
 }

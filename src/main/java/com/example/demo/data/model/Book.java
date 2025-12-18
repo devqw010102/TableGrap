@@ -26,7 +26,7 @@ public class Book {
     private LocalDateTime addDate;           // 예약한 시점의 날짜
     private LocalDateTime bookingDate;       // 실제 예약된 날짜
     private Integer personnel;      // 예약 인원
-    private Boolean success;      // 예약 성공여부
+    private Boolean success = false;      // 예약 성공여부
     @ManyToOne(fetch = FetchType.LAZY)
 
     @JoinColumn(name = "diner_id")
