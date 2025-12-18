@@ -1,17 +1,21 @@
 package com.example.demo.controller;
 
-//import ch.qos.logback.core.model.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import com.example.demo.data.dto.MemberDto;
+import com.example.demo.data.dto.MemberInfoResponseDto;
+import com.example.demo.data.dto.MemberUpdateDto;
+import com.example.demo.data.model.MemberUserDetails;
 import com.example.demo.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/member")
@@ -50,4 +54,56 @@ public class MemberController {
         memberService.createMember(memberDto);
         return "redirect:/";
     }
+
+    /*
+    // update
+    @GetMapping("/update")
+    public String updateForm(@AuthenticationPrincipal MemberUserDetails memberUserDetails, Model model) {
+        MemberInfoResponseDto myInfo = memberService.findMyInfo(memberUserDetails.getMemberId());
+
+        MemberUpdateDto updateMemberDto = MemberUpdateDto.builder()
+                .email(myInfo.getEmail())
+                .phone(myInfo.getPhone())
+                .build();
+
+        model.addAttribute("memberUpdateDto", updateMemberDto);
+        return "user/myPage";
+    }
+
+    @PostMapping("/update")
+    public String updateMember(
+            @AuthenticationPrincipal MemberUserDetails userDetails,
+            @ModelAttribute("memberUpdateDto") MemberUpdateDto memberUpdateDto,
+            BindingResult bindingResult
+    ) {
+        // 비밀번호 수정 시, 비밀번호 확인 일치 여부 검사
+        if (memberUpdateDto.getPassword() != null && !memberUpdateDto.getPassword().isEmpty()) {
+            if (!memberUpdateDto.getPassword().equals(memberUpdateDto.getPasswordConfirm())) {
+                bindingResult.rejectValue("passwordConfirm", "MissMatch", "비밀번호가 일치하지 않습니다.");
+                return "/user/myPage";
+            }
+        }
+        memberService.updateMember(userDetails.getMemberId(), memberUpdateDto);
+
+        return "redirect:/user/myPage";
+    }
+
+    // delete
+    @PostMapping("/delete")
+    public String deleteMember(
+            @AuthenticationPrincipal MemberUserDetails userDetails,
+            @RequestParam("password") String password,
+            RedirectAttributes redirectAttributes
+    )
+    {
+        boolean isSuccess = memberService.deleteMember(userDetails.getMemberId(), password);
+
+        if (isSuccess) {
+            return "redirect:/logout";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않아 탈퇴에 실패했습니다.");
+            return "redirect:/member/myPage";
+        }
+    }
+    */
 }

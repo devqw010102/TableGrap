@@ -1,14 +1,14 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
+import com.example.demo.data.dto.MemberUpdateDto;
 import com.example.demo.data.model.Authority;
-import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.service.MemberService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +33,7 @@ public class MemberServiceImpl implements MemberService {
                 .phone(member.getPhone())
                 .build();
     }
+
     // Convert method : Member -> MemberInfoResponseDto
     private MemberInfoResponseDto mapToMemberInfoDto(Member member) {
         return MemberInfoResponseDto.builder()
@@ -50,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberDto createMember(MemberDto memberDto) {
+    public MemberDto createMember(MemberDto memberDto) {    // insert
         String phoneNumber = memberDto.getPhone();
         if (phoneNumber != null && phoneNumber.isEmpty()) {
             phoneNumber = null;
@@ -75,6 +76,7 @@ public class MemberServiceImpl implements MemberService {
 
         return mapToMemberDto(member);
     }
+
     @Override
     public Optional<MemberDto> findByEmail(String email) {  // 이메일 확인
         return memberRepository.findByEmail(email).
@@ -109,5 +111,61 @@ public class MemberServiceImpl implements MemberService {
     public Member getMember(String username) {
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원이 없습니다: " + username));
+    }
+
+    // update
+    @Override
+    @Transactional
+    public MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto) {
+        // id(순번)을 가져와서 dto에 필요한 정보만 수정 (이메일, 전화, 비밀번호(확인도)
+        Member member = memberRepository.findById(memberId).
+                orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다, 다시 확인 해주세요."));
+
+        member.setEmail(dto.getEmail());
+        member.setPhone(dto.getPhone());
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+
+        return MemberUpdateDto.builder()
+                .email(member.getEmail())
+                .phone(member.getPhone())
+                .build();
+    }
+
+    // delete
+    /*
+    @Override
+    @Transactional
+    public boolean deleteMember(Long memberId, String checkPassword) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다, 다시 확인해주세요."));
+
+        String realPassword = member.getPassword();
+        boolean matches = passwordEncoder.matches(checkPassword, realPassword);
+
+        if(matches) {
+            memberRepository.delete(member);
+            return true;
+        }else{
+            return false;
+        }
+    }
+    */
+
+
+    @Override
+    @Transactional
+    public boolean deleteMember(Long memberId, String checkPassword) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(checkPassword, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        memberRepository.delete(member);
+        return true;
     }
 }

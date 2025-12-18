@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDto {
-    private Long bookId;    // 예약수정
-    private Long dinerId;
+    private Long bookId;    // update
+    private Long dinerId;   // update
     private Long memberId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
