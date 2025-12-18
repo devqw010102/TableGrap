@@ -6,7 +6,6 @@ import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.model.MemberUserDetails;
 import com.example.demo.service.BookService;
-import com.example.demo.service.BookingService;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.security.Principal;
 public class BookingController {
     private final DinerService dinerService;
     private final MemberService memberService;
-    private final BookingService bookingService;
     private final BookService bookService;
 
     // api
@@ -86,7 +84,7 @@ public class BookingController {
         System.out.println("컨트롤러로 들어온 데이터: " + bookDto);
 
         try {
-            bookingService.createBooking(bookDto);
+            bookService.createBooking(bookDto);
             return "redirect:/mypage";
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +103,7 @@ public class BookingController {
         System.out.println("변경할 인원: " + bookDto.getPersonnel());
 
         if (userDetails != null) {
-            bookDto.setMemberId(userDetails.getMemberId());
+            bookDto.setMemberId(userDetails.getMember().getId());
         }
 
 

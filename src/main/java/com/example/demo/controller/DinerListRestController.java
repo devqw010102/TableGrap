@@ -33,7 +33,7 @@ public class DinerListRestController {
         try {
             List<Long> dinerIds = payload.get("dinerIds");
             //memberId 가져오기
-            ownerRequestService.requestOwner(user.getMemberId(), dinerIds);
+            ownerRequestService.requestOwner(user.getMember().getId(), dinerIds);
             //신청이 정상적으로 진행되면 접수
             return ResponseEntity.ok("신청이 접수되었습니다.");
         } catch(IllegalStateException e){

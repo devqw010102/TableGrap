@@ -1,10 +1,15 @@
 package com.example.demo.data.repository;
 
 import com.example.demo.data.enums.RequestStatus;
+import com.example.demo.data.model.Diner;
+import com.example.demo.data.model.Member;
 import com.example.demo.data.model.OwnerRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface OwnerRequestRepository extends JpaRepository<OwnerRequest, Long> {
 
-    boolean existsByMemberIdAndDinerIdAndStatus(Long memberId, Long dinerId, RequestStatus status);
+    boolean existsByMemberAndDinerAndStatus(Member member, Diner diner, RequestStatus status);
+
 }

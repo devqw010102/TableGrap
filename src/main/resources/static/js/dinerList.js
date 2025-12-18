@@ -36,23 +36,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 3. 서버 전송 (Fetch API)
 //async fetch메소드 선언
-async function ownerRequest(){
+async function ownerRequest() {
 
-    // 1. 체크된 박스 가져오기
-    const checkedBoxes = document.querySelectorAll( 'input[name="selectDiner"]:checked');
+    // 체크된 식당 리스트 select
+    const checkedBoxes = document.querySelectorAll('input[name="selectDiner"]:checked');
 
     if (checkedBoxes.length === 0) {
         alert("선택된 식당이 없습니다.");
         return;
     }
 
-    if (!confirm(`${checkedBoxes.length}개의 식당의 사장님이신가요?`)) {
+    if (!confirm(`${checkedBoxes.length}개의 식당에 대해 사장 권한을 신청하시겠습니까?`)) {
         return;
     }
-    const selectedDinerIds = Array.from(checkedBoxes).map(cb => cb.value);
 
-    try{
-        //await서버가 응답하면 다음 단계로 이동
+    const selectedDinerIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
+
+    // fetch
+    try {
         const res = await fetch("/api/diner/ownerRequest", {
             method: "POST",
             headers: {
@@ -60,34 +61,44 @@ async function ownerRequest(){
             },
             body: JSON.stringify({ dinerIds: selectedDinerIds })
         });
-        // 신청 성공할 경우
-        if(res.status === 200){
-            alert("신청이 완료되었습니다.");
+
+        // 성공 (200, 201[create] 모두 허용)
+        if (res.ok) {
+            alert("사장 권한 신청이 접수되었습니다.");
+
+            // 신청한 식당 체크 해제 (UX)
+            checkedBoxes.forEach(cb => cb.checked = false);
             return;
         }
-        // 신청과정에서 오류 발생
-        //에러 메세지를 읽어올 때까지 대기, 메시지를 가져오면 switch문 실행
+
         const errorMsg = await res.text();
-        //에러 처리
-        switch (res.status){
+
+        switch (res.status) {
             case 401:
                 alert("로그인이 필요한 서비스입니다.");
-                location.href="/login";
+                location.href = "/login";
                 break;
-            //중복 신청 할 경우
+            case 403:
+                alert("접근 권한이 없습니다.");
+                break;
             case 409:
-                alert("이미 신청하셨습니다." + errorMsg);
+                // 중복 신청 / 이미 owner 존재 / 승인 대기
+                // Service에서 처리
+                alert(errorMsg);
                 break;
-            //잘 못된 데이터
             case 400:
-                alert("잘 못된 요청입니다." + errorMsg);
+                alert("잘못된 요청입니다.\n" + errorMsg);
                 break;
             case 500:
-                alert("서버에 오류가 발생했습니다.")
+                alert("서버 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.");
                 break;
-            default: alert(errorMsg);
+
+            default:
+                alert(errorMsg || "알 수 없는 오류가 발생했습니다.");
         }
-    }catch(error){
-        console.log(error);
+
+    } catch (error) {
+        console.error(error);
+        alert("네트워크 오류가 발생했습니다.");
     }
 }
