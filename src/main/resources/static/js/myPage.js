@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const bookLink = document.querySelector('a[href="#books"]');
     const infoLink = document.querySelector('a[href="#info"]');
+    const reviewLink = document.querySelector('a[href="#review"]');
     if (bookLink) bookLink.addEventListener('click', loadBooks);
     if (infoLink) infoLink.addEventListener('click', loadMyInfo);
+    if (reviewLink) infoLink.addEventListener('click', loadMyReview);
 
     // 회원정보 수정/저장/취소 버튼 이벤트 연결
     const btnEdit = document.getElementById("btnEdit");
@@ -38,19 +40,19 @@ function checkEmail(dbcheck){
     }
 
     emailTimer = setTimeout(() => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", `/api/myPage/check-email?email=${encodeURIComponent(email)}`)
-    xhr.onreadystatechange = function () {
-        if(xhr.readyState === 4 && xhr.status === 200) {
-            resultShow.innerHTML = xhr.responseText;
-            if (xhr.responseText.includes("가능")) {
-                dbcheck.classList.add("is-valid");
-                dbcheck.classList.remove("is-invalid");
-            } else {
-                dbcheck.classList.add("is-invalid");
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/api/myPage/check-email?email=${encodeURIComponent(email)}`)
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                resultShow.innerHTML = xhr.responseText;
+                if (xhr.responseText.includes("가능")) {
+                    dbcheck.classList.add("is-valid");
+                    dbcheck.classList.remove("is-invalid");
+                } else {
+                    dbcheck.classList.add("is-invalid");
+                }
             }
-        }
-    };
+        };
         xhr.send();
     }, 500); // 사용자가 입력을 멈추고 0.5초 뒤에 실행
 }
@@ -194,7 +196,10 @@ function loadBooks() {
             data.forEach(book => {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
-
+                //예약 확정 상태에 따라 리뷰버튼 활성화 여부 결정
+                const reviewBtn = book.success
+                    ? `<button class="btn btn-success btn-sm btn-review" data-diner-id="${book.dinerId}">후기 작성</button>`
+                    : `<span class="text-muted">-</span>`;
                 tbody.innerHTML += `
                     <tr>
                         <td><a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a></td>
@@ -203,9 +208,18 @@ function loadBooks() {
                         <td>${book.memberName}</td>
                         <td>${book.success ? "확정" : "대기"}</td>
                         <td><button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">취소</button></td>
+                        <td>${reviewBtn}</td>
                     </tr>
                 `;
             });
+            // 리뷰작성 이벤트 리스너
+            document.querySelectorAll(".btn-review").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const dinerId = e.target.getAttribute("data-diner-id");
+                    openModal(dinerId);
+                })
+            })
+
 
             // 이벤트 리스너 다시 걸기
             document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
@@ -252,7 +266,7 @@ function deleteMember() {
         .then(res => {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
-                  location.reload();
+                location.reload();
             } else {
                 alert("비밀번호가 일치하지 않거나 오류가 발생했습니다.");
             }
@@ -276,6 +290,66 @@ function cancelBooking(bookId) {
         .catch(() => alert("서버 통신 오류"));
 }
 
+// 후기 불러오기
+function loadMyReview(){
+    fetch("api/review/list")
+        .then(res => res.json())
+        .then(data => {
+            const reviewTable = document.getElementById("reviewTable");
+            if(!data || data.length === 0){
+                reviewTable.innerHTML = '<tr><td colspan="2" class="text-center">작성한 후기가 없습니다.</td></tr>';
+                return;
+            }
+            reviewTable.innerHTML=``;
+            data.forEach(review => {
+                reviewTable.innerHTML = `
+                    <tr>
+                        <td>${review.rating}</td>
+                        <td>${review.comment}</td>
+                    </tr>`
+            });
+        });
+}
+
+//모달 출력함수
+function openModal(dinerId) {
+    //dinerId 저장
+    document.getElementById("modalDinerId").value = dinerId;
+    //모달 띄우기
+    const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    reviewModal.show();
+}
+
+//리뷰 작성 메소드
+function createReview(dinerId) {
+    const reviewDinerId = document.getElementById("modalDinerId").value;
+    const rating = document.getElementById("modalRating").value;
+    const comment = document.getElementById("modalComment").value;
+
+    // 후기 모달 데이터
+    const reviewData = {
+        dinerId: parseInt(reviewDinerId),
+        rating: parseInt(rating),
+        comment: comment
+    };
+
+    fetch("/api/mypage/review/create", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(reviewData)
+    })
+        .then(res => {
+            if (res.ok) {
+                alert("후기가 DB에 성공적으로 저장되었습니다.");
+            } else {
+                alert("후기 저장 실패!");
+            }
+        })
+        .catch(err => console.error("에러 발생:", err));
+}
+
 // 빈 테이블 렌더링
 function renderEmptyRow(tbody, colSpan, message) {
     tbody.innerHTML = `
@@ -284,5 +358,5 @@ function renderEmptyRow(tbody, colSpan, message) {
                 ${message}
             </td>
         </tr>
-    `;
-}
+    `}
+
