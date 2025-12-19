@@ -3,9 +3,11 @@ package com.example.demo.service.impl;
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.dto.OwnerDinerDto;
+import com.example.demo.data.dto.admin.AdminOwnerDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,5 +62,21 @@ public class DinerServiceImpl implements DinerService {
     @Override
     public List<OwnerDinerDto> getOwnerDiners(Long ownerId) {
         return dinerRepository.findByOwnerId(ownerId);
+    }
+
+    @Transactional
+    @Override
+    public List<AdminOwnerDto> getAll() {
+        return dinerRepository.findOwnerDiners().stream().map(d -> AdminOwnerDto.builder()
+                .memberId(d.getOwner().getId())
+                .ownerName(d.getOwner().getName())
+                .email(d.getOwner().getEmail())
+                .phone(d.getOwner().getPhone())
+                .dinerId(d.getId())
+                .dinerName(d.getDinerName())
+                .category(d.getCategory())
+                .status(d.getStatus().toString())
+                .build())
+                .toList();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.ReviewDto;
+import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.model.Review;
 import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.ReviewService;
@@ -75,5 +76,11 @@ public class ReviewServiceImpl implements ReviewService {
                 .comment(review.getComment())
                 .createTime(review.getCreateTime())
                 .build();
+    }
+
+    @Transactional
+    @Override
+    public List<AdminReviewDto> getAll() {
+        return reviewRepository.findAllForAdmin();
     }
 }

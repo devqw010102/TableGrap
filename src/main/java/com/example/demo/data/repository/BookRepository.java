@@ -45,4 +45,15 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             @Param("end") LocalDateTime end,
             Pageable pageable
     );
+
+    @Query("""
+    select count(b)
+    from Book b
+    where b.addDate >= :start
+      and b.addDate < :end
+""")
+    long countTodayBookings(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }

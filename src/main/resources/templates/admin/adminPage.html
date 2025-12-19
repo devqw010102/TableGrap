@@ -19,7 +19,7 @@
     </li>
     <!-- tab2 -->
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#list">데이터(식당) 목록</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#list">식당 목록</a>
     </li>
     <!-- tab3 -->
     <li class="nav-item">
@@ -27,7 +27,19 @@
     </li>
     <!-- tab4 -->
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#ownerList">권한 신청 목록</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#ownerRequestList">권한 신청 목록</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#reservationList">전체 예약 목록</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#ownerList">식당 주인 목록</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#reviewList">리뷰 목록</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#dashboard">대시 보드</a>
     </li>
 </ul>
 
@@ -74,7 +86,7 @@
     <div id="stats" class="tab-pane fade">
         <!-- 회원 목록 -->
         <div class = "container mt-4">
-            <h2>식당 목록</h2>
+            <h2>회원 목록</h2>
             <table class = "table table-boarded">
                 <thead>
                 <tr>
@@ -90,7 +102,7 @@
         </div>
     </div>
     <!-- tab4-content -->
-    <div id="ownerList" class="tab-pane fade">
+    <div id="ownerRequestList" class="tab-pane fade">
         <!-- 권한 신청 목록 -->
         <div class = "container mt-4">
             <h2>권한 신청 목록</h2>
@@ -109,22 +121,150 @@
             </table>
         </div>
     </div>
+
+    <div id="reservationList" class="tab-pane fade">
+        <!-- 전체 예약 목록 -->
+        <div class = "container mt-4">
+            <h2>전체 예약 목록</h2>
+            <table class = "table table-boarded">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>신청 시간</th>
+                    <th>식당 이름</th>
+                    <th>예약 시간</th>
+                    <th>예약 인원</th>
+                    <th>예약자 명</th>
+                    <th>예약 확정</th>
+                </tr>
+                </thead>
+                <tbody id="reservationTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="ownerList" class="tab-pane fade">
+        <!-- 식당 사장 목록 -->
+        <div class = "container mt-4">
+            <h2>식당 사장 목록</h2>
+            <table class = "table table-boarded">
+                <thead>
+                <tr>
+                    <th>사장 이름</th>
+                    <th>이메일</th>
+                    <th>전화번호</th>
+                    <th>식당 이름</th>
+                    <th>카테고리</th>
+                    <th>영업 여부</th>
+                </tr>
+                </thead>
+                <tbody id="ownerListTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="reviewList" class="tab-pane fade">
+        <!-- 리뷰 목록 -->
+        <div class = "container mt-4">
+            <h2>리뷰 목록</h2>
+            <table class = "table table-boarded">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>회원 이름</th>
+                    <th>식당 이름 </th>
+                    <th>평점</th>
+                    <th>내용</th>
+                    <th>작성 일자</th>
+                </tr>
+                </thead>
+                <tbody id="reviewListTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="dashboard" class="tab-pane fade">
+        <!-- 대시보드 -->
+        <div class="container mt-4">
+            <h2 class="mb-4">대시보드</h2>
+
+            <!-- 요약 카드 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <h5>식당 수</h5>
+                            <h3 id="dashboardDinerCount">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <h5>오늘 예약</h5>
+                            <h3 id="dashboardTodayBooking">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body">
+                            <h5>총 회원 수</h5>
+                            <h3 id="dashboardMemberCount">-</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 권한별 회원 -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5>권한별 회원 수</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    USER
+                                    <span id="dashboardUserCount">-</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    OWNER
+                                    <span id="dashboardOwnerCount">-</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오늘의 리뷰 -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>오늘의 리뷰</h5>
+
+                    <table class="table table-hover mt-3">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>작성자</th>
+                            <th>식당</th>
+                            <th>평점</th>
+                            <th>내용</th>
+                            <th>작성일</th>
+                        </tr>
+                        </thead>
+                        <tbody id="dashboardReviewTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
 </div>
-<!-- 통계, 예약 현황...etc-->
-
-<div class = "mb-3"></div>
-
-
-
-
-<!--<h3>사이트 현황 대시보드</h3>-->
-
-<!--<h3>오늘의 예약</h3>-->
-
-<!--<h3>총 회원 수</h3>-->
-
-<!--<h3>최근 예약 목록</h3>-->
-
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>

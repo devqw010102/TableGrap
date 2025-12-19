@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.data.dto.admin.AdminBookDto;
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookOwnerResponseDto;
 import com.example.demo.data.dto.BookResponseDto;
@@ -137,5 +138,19 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
         bookRepository.delete(book);
+    }
+
+    @Override
+    public List<AdminBookDto> getAll() {
+        return bookRepository.findAll().stream().map(book -> AdminBookDto.builder()
+                        .id(book.getBookId())
+                        .createDate(book.getAddDate())
+                        .dinerName(book.getDiner().getDinerName())
+                        .bookingDate(book.getBookingDate())
+                        .personnel(book.getPersonnel())
+                        .memberName(book.getMember().getName())
+                        .success(book.getSuccess())
+                        .build())
+                        .toList();
     }
 }

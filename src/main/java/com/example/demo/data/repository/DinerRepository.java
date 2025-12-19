@@ -25,4 +25,16 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
         where d.owner.id = :ownerId
     """)
     List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId);
+
+    @Query("""
+        select d
+        from Diner d
+        join fetch d.owner m
+        join fetch m.authorities a
+        where a.authority = 'ROLE_OWNER'
+    """)
+    List<Diner> findOwnerDiners();
+
+    @Query("select count(d) from Diner d")
+    Long countAllDiners();
 }

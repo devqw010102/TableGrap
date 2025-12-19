@@ -1,8 +1,12 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.model.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +17,43 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findTop5ByDinerIdOrderByCreateTimeDesc(Long dinerId);
     //리뷰 수정 위해 추가
     Optional<Review> findByBookId(Long bookId);
+
+
+    List<Review> findTop5ByDinerIdAndMemberId(Long dinerId, Long memberId);
+
+    @Query("""
+        select new com.example.demo.data.dto.admin.AdminReviewDto(
+            r.reviewId,
+            m.username,
+            d.dinerName,
+            r.rating,
+            r.comment,
+            r.createTime
+        )
+        from Review r
+        join Member m on r.memberId = m.id
+        join Diner d on r.dinerId = d.id
+    """)
+    List<AdminReviewDto> findAllForAdmin();
+
+    @Query("""
+    select new com.example.demo.data.dto.admin.AdminReviewDto(
+        r.reviewId,
+        m.username,
+        d.dinerName,
+        r.rating,
+        r.comment,
+        r.createTime
+    )
+    from Review r
+    join Member m on r.memberId = m.id
+    join Diner d on r.dinerId = d.id
+    where r.createTime >= :start
+      and r.createTime < :end
+    order by r.createTime desc
+""")
+    List<AdminReviewDto> findTodayReviews(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }

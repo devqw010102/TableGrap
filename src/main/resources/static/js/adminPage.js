@@ -1,6 +1,10 @@
 document.querySelector('a[href="#list"]').addEventListener('click', loadDiners);
 document.querySelector('a[href="#stats"]').addEventListener('click', loadMembers);
-document.querySelector('a[href="#ownerList"]').addEventListener('click', loadOwnerRequests);
+document.querySelector('a[href="#ownerRequestList"]').addEventListener('click', loadOwnerRequests);
+document.querySelector('a[href="#reservationList"]').addEventListener('click', loadReservations);
+document.querySelector('a[href="#ownerList"]').addEventListener('click', loadOwners);
+document.querySelector('a[href="#reviewList"]').addEventListener('click', loadReviews);
+document.querySelector('a[href="#dashboard"]').addEventListener('click', loadDashboard);
 
 // async function 으로 수정한 이유(아래 모든 메소드와 동일 사유)
 // answer) 실패에 대한 반응이 없음, 이를 추가하기위해 status 기반 분기 가능
@@ -125,6 +129,187 @@ async function loadOwnerRequests() {
     }
 }
 
+// 예약 목록 fetch
+async function loadReservations() {
+    const tbody = document.getElementById('reservationTable');
+
+    try {
+        const res = await fetch("/api/adminPage/books")
+        if(!res.ok) {
+            const errorMsg = await res.text();
+            renderEmptyRow(tbody, 7, errorMsg || "예약 목록을 불러오지 못했습니다.");
+            return
+        }
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            renderEmptyRow(tbody, 7, "예약 목록이 없습니다.");
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(b => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${b.id}</td>
+                    <td>${formatDate(b.createDate)}</td>
+                    <td>${b.dinerName}</td>
+                    <td>${formatDate(b.bookingDate)}</td>
+                    <td>${b.personnel}</td>
+                    <td>${b.memberName}</td>
+                    <td>${b.success}</td>
+                </tr>
+            `;
+        })
+    }
+    catch (e) {
+        console.error(e);
+        renderEmptyRow(tbody, 7, "네트워크 오류가 발생했습니다.");
+    }
+}
+
+// 식당 사장 fetch
+async function loadOwners() {
+    const tbody = document.getElementById('ownerListTable');
+
+    try {
+        const res = await fetch("/api/adminPage/owners")
+        if(!res.ok) {
+            const errorMsg = await res.text();
+            renderEmptyRow(tbody, 6, errorMsg || "사장 목록을 불러오지 못했습니다.");
+            return;
+        }
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            renderEmptyRow(tbody, 6, "사장 목록이 없습니다.");
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(o => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${o.ownerName}</td>
+                    <td>${o.email}</td>
+                    <td>${o.phone}</td>
+                    <td>${o.dinerName}</td>
+                    <td>${o.category}</td>
+                    <td>${o.status}</td>
+                </tr>
+            `;
+        })
+    }
+    catch(e) {
+        console.error(e);
+        renderEmptyRow(tbody, 6, "네트워크 오류가 발생했습니다.");
+    }
+}
+
+// 리뷰 fetch
+async function loadReviewsCommon({ url, tbodyId, emptyMessage }) {
+
+    const tbody = document.getElementById(tbodyId);
+
+    try {
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            const errorMsg = await res.text();
+            renderEmptyRow(tbody, 6, errorMsg || emptyMessage);
+            return;
+        }
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            renderEmptyRow(tbody, 6, emptyMessage);
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.forEach(r => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${r.reviewId}</td>
+                    <td>${r.memberUsername}</td>
+                    <td>${r.dinerName}</td>
+                    <td>${r.rating}</td>
+                    <td>${r.comment}</td>
+                    <td>${formatDate(r.createTime)}</td>
+                </tr>
+            `;
+        });
+
+    } catch (e) {
+        console.error(e);
+        renderEmptyRow(tbody, 6, "네트워크 오류가 발생했습니다.");
+    }
+}
+
+async function loadReviews() {
+    await loadReviewsCommon({
+        url: "/api/adminPage/reviews",
+        tbodyId: "reviewListTable",
+        emptyMessage: "리뷰 목록이 없습니다."
+    });
+}
+async function loadTodayReviews() {
+    await loadReviewsCommon({
+        url: "/api/adminPage/dashboard",
+        tbodyId: "dashboardReviewTable",
+        emptyMessage: "오늘 작성된 리뷰가 없습니다."
+    });
+}
+
+
+// Dashboard fetch
+async function loadDashboard() {
+    await Promise.all([
+        loadDashboardSummary(),
+        loadTodayReviews()
+    ]);
+}
+
+async function loadDashboardSummary() {
+    try {
+        const res = await fetch("/api/adminPage/dashboard");
+
+        if(!res.ok) {
+            console.error("대시보드 요약 실패");
+            return;
+        }
+
+        const data = await res.json();
+
+        document.getElementById("dashboardDinerCount").innerText = data.dinerCount;
+        document.getElementById("dashboardTodayBooking").innerText = data.todayBookingCount;
+        document.getElementById("dashboardMemberCount").innerText = data.totalMemberCount;
+        document.getElementById("dashboardUserCount").innerText = data.userCount;
+        document.getElementById("dashboardOwnerCount").innerText = data.ownerCount;
+    }
+    catch(e) {
+        console.error("대시보드 요약 오류");
+    }
+}
+
+async function loadDashboardReviews() {
+    const tbody = document.getElementById('dashboardReviewTable');
+
+    try {
+        const res = await fetch("/api/adminPage/dashboard/reviews");
+        if(!res.ok) {
+            const errorMsg = await res.text();
+            renderEmptyRow(tbody, 6, errorMsg ||  "리뷰 목록을 불러오지 못했습니다.");
+            return;s
+        }
+    }
+    catch(e) {
+        console.error(e);
+        renderEmptyRow(tbody, 6, "네트워크 오류가 발생했습니다.");
+    }
+}
+
 // 현재 신청 상태 column design
 function statusBadge(status) {
     if (status === "PENDING") {
@@ -136,7 +321,7 @@ function statusBadge(status) {
     return `<span class="badge bg-secondary">반려</span>`;
 }
 
-// load 시키는 3개의 메소드에서 만약 fetch 과정에서 문제가 있거나 데이터가 없을경우 실행
+// load 시키는 메소드에서 만약 fetch 과정에서 문제가 있거나 데이터가 없을경우 실행
 function renderEmptyRow(tbody, colSpan, message) {
     if(!tbody) return;
 
@@ -191,4 +376,8 @@ async function approveRequest(id) {
 async function rejectRequest(id) {
     if (!confirm("반려하시겠습니까?")) return;
     await processOwnerRequest({url: `/api/adminPage/owner-requests/${id}/reject`, successMessage: "반려 처리 완료"});
+}
+
+function formatDate(dt) {
+    return dt.replace("T", " ").substring(0, 16);
 }
