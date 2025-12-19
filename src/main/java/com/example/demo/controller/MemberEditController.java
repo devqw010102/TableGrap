@@ -36,7 +36,7 @@ public class MemberEditController {
     public void updateMember(
             @AuthenticationPrincipal MemberUserDetails userDetails,
             @RequestBody MemberUpdateDto memberUpdateDto) {
-        memberService.updateMember(userDetails.getMemberId(), memberUpdateDto);
+        memberService.updateMember(userDetails.getMember().getId(), memberUpdateDto);
 
     }
 
@@ -51,7 +51,7 @@ public class MemberEditController {
         String password = request.get("password");
 
         try {
-            memberService.deleteMember(userDetails.getMemberId(), password);
+            memberService.deleteMember(userDetails.getMember().getId(), password);
 
             // 2. DB 삭제 성공 시에만 세션 및 보안 컨텍스트 초기화 (로그아웃)
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
