@@ -21,133 +21,65 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     if (btnDeleteMember) btnDeleteMember.addEventListener("click", deleteMember);
-    loadBooks();
+    loadMyInfo();
 });
-
-// 중복 체크
-let emailTimer;
-function checkEmail(dbcheck){
-    const email = dbcheck.value;
-    const resultShow = document.getElementById("emailResult");
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    clearTimeout(emailTimer);
-
-    if (!emailRegex.test(email)) {
-        resultShow.innerHTML = "올바른 이메일 형식을 입력해주세요.";
-        dbcheck.classList.remove("is-valid");
-        return;
-    }
-
-    emailTimer = setTimeout(() => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", `/api/myPage/check-email?email=${encodeURIComponent(email)}`)
-        xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4 && xhr.status === 200) {
-                resultShow.innerHTML = xhr.responseText;
-                if (xhr.responseText.includes("가능")) {
-                    dbcheck.classList.add("is-valid");
-                    dbcheck.classList.remove("is-invalid");
-                } else {
-                    dbcheck.classList.add("is-invalid");
-                }
-            }
-        };
-        xhr.send();
-    }, 500); // 사용자가 입력을 멈추고 0.5초 뒤에 실행
-}
-
-
-function  checkPhone(dbcheck){
-    const regPhone = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/;
-    const resultShow = document.getElementById("phoneResult")
-
-    if(regPhone.test(dbcheck.value)) {
-        dbcheck.classList.replace("is-invalid", "is-valid");
-    }else{
-        dbcheck.classList.add("is-invalid");
-    }
-}
-
-function checkPwd(dbcheck){
-    const pwd = dbcheck.value;
-    const resultShow = document.getElementById("pwdResult")
-
-    if(!pwd) {
-        resultShow.innerHTML = "";
-        dbcheck.classList.remove("is-valid", "is-invalid");
-        return;
-    }
-
-    if(pwd.length < 8) {
-        resultShow.innerHTML = "8자 이상 입력해주세요.";
-        dbcheck.classList.add("is-invalid");
-    }else{
-        dbcheck.classList.replace("is-invalid", "is-valid");
-    }
-    checkPwdConfirm();
-}
-
-function checkPwdConfirm() {
-    const pwd = document.getElementById("newPassword").value;
-    const pwdConfirmEl = document.getElementById("pwdConfirm"); // HTML ID와 일치!
-    const resultShow = document.getElementById("pwdConfirmResult");
-
-    if (!pwdConfirmEl || !resultShow) return;
-
-    const pwdConfirm = pwdConfirmEl.value;
-
-    if (!pwdConfirmEl.value) {
-        resultShow.innerHTML = "";
-        pwdConfirmEl.classList.remove("is-valid", "is-invalid");
-        return;
-    }
-
-    if (pwd === pwdConfirmEl.value) {
-        resultShow.innerHTML = "비밀번호가 일치합니다.";
-        pwdConfirmEl.classList.replace("is-invalid", "is-valid");
-    } else {
-        resultShow.innerHTML = "비밀번호가 일치하지 않습니다.";
-        pwdConfirmEl.classList.add("is-invalid");
-    }
-}
 
 // 수정 모드 토글
 function toggleEditMode(isMemberEdit) {
-    const fields = ['myEmail', 'myPhone', 'newPassword', 'pwdConfirm'];
+    // 이 부분만 on/off - 이름, 아이디는 x
+    const emailDisplay = document.getElementById("emailDisplay");
+    const emailEditGroup = document.getElementById("emailEditGroup");
+    const phoneDisplay = document.getElementById("phoneDisplay");
+    const phoneEditGroup = document.getElementById("phoneEditGroup");
 
-    fields.forEach(id=> {
+    const otherFields = ['newPassword', 'pwdConfirm','myPhone', 'emailId', 'emailDomainInput'];
+    const emailSelect = document.getElementById("emailDomainSelect");
+
+    if (isMemberEdit) {
+        if (emailDisplay) emailDisplay.style.display = "none";
+        if (emailEditGroup) emailEditGroup.style.display = "flex";
+        if (phoneDisplay) phoneDisplay.style.display = "none";
+        if (phoneEditGroup) phoneEditGroup.style.display = "flex";
+
+    otherFields.forEach(id => {
         const editValue = document.getElementById(id);
-        if (!editValue) return;
-
         if (isMemberEdit) {
             editValue.readOnly = false;
             editValue.className = "form-control";
-        } else {
+        }
+    });
+    if (emailSelect) emailSelect.disabled = false;
+
+    } else{
+    if (emailDisplay) emailDisplay.style.display = "block";
+    if (emailEditGroup) emailEditGroup.style.display = "none";
+    if (phoneDisplay) phoneDisplay.style.display = "block";
+    if (phoneEditGroup) phoneEditGroup.style.display = "none";
+
+    otherFields.forEach(id => {
+        const editValue = document.getElementById(id);
+        if(editValue){
             editValue.readOnly = true;
             editValue.className = "form-control-plaintext";
-
             editValue.classList.remove("is-valid", "is-invalid");
         }
     });
+    if(emailSelect) emailSelect.disabled = true;
 
-    if(!isMemberEdit){
-        document.querySelectorAll(".small").forEach(div => {
-            div.innerHTML="";
-        });
-    }
-    document.querySelectorAll(".edit-mode-row").forEach(row => {
-        row.style.display = isMemberEdit ? "table-row" : "none";
-    });
+    document.querySelectorAll(".small").forEach(div => div.innerHTML = "");
+}
+document.querySelectorAll(".edit-mode-row").forEach(row=> {
+    row.style.display = isMemberEdit ? "table-row" : "none";
+});
 
     document.getElementById("btnEdit").style.display = isMemberEdit ? "none" : "inline-block";
     document.getElementById("btnSave").style.display = isMemberEdit ? "inline-block": "none"
     document.getElementById("btnCancel").style.display = isMemberEdit ? "inline-block" : "none";
-}
+};
 
 
 
-// 회원 정보 저장
+// 회원 정보 저장 - /api/member/update
 function saveMember() {
     const pwd = document.getElementById("newPassword").value;
     const pwdConfirm = document.getElementById("pwdConfirm").value;
@@ -157,14 +89,28 @@ function saveMember() {
         return;
     }
 
+    const emailId = document.getElementById("emailId").value.trim();
+    const domain = document.getElementById("emailDomainInput").value.trim();
+    let fullEmail = "";
+
+    if (emailId !== "" && domain !== "") {
+        fullEmail = emailId + "@" + domain;
+    } else if (emailId === "" && domain === "") {
+        fullEmail = "";
+    } else {
+        alert("이메일 주소를 정확히 입력해주세요.");
+        return;
+    }
+    const phoneValue = document.getElementById("myPhone").value;
+
     const data = {
-        email: document.getElementById("myEmail").value,
-        phone: document.getElementById("myPhone").value,
-        password: pwd,
-        passwordConfirm: pwdConfirm
+        email:fullEmail,
+        phone: phoneValue,
+        password: document.getElementById("newPassword").value,
+        passwordConfirm: document.getElementById("pwdConfirm").value
     };
 
-    fetch("/api/myPage/update", {
+    fetch("/api/member/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
@@ -172,6 +118,7 @@ function saveMember() {
         .then(res => {
             if (res.ok) {
                 alert("수정되었습니다.");
+                toggleEditMode(false);
                 loadMyInfo(); // 저장 성공 시 최신 정보 다시 로드
             } else {
                 alert("수정 실패: 입력 정보를 확인해주세요.");
@@ -233,15 +180,31 @@ function loadBooks() {
 
 // 회원 정보 불러오기
 function loadMyInfo() {
-    fetch("/api/myPage/info")
+    fetch("/api/member/info")
         .then(res => res.json())
         .then(data => {
             document.getElementById("myUsername").value = data.username;
             document.getElementById("myName").value = data.name;
-            document.getElementById("myEmail").value = data.email;
-            document.getElementById("myPhone").value = data.phone;
 
-            toggleEditMode(false); // 로드 시엔 보기 모드
+            let emailStyle = data.email || "";
+            if (emailStyle === "@") emailStyle = "";
+
+            const displayEl = document.getElementById("emailDisplay");
+            if (displayEl) displayEl.value = emailStyle;
+
+            if (data.email && data.email.includes("@")) {
+                const parts = data.email.split("@");
+                document.getElementById("emailId").value = parts[0];
+                document.getElementById("emailDomainInput").value = parts[1];
+            } else {
+                document.getElementById("emailId").value ="";
+                document.getElementById("emailDomainInput").value = "";
+            }
+
+            const phoneStyle = data.phone || "";
+            document.getElementById("phoneDisplay").value = phoneStyle;
+            document.getElementById("myPhone").value = phoneStyle;
+            toggleEditMode(false);
         })
         .catch(err => console.error("회원정보 로드 실패:", err));
 }
@@ -249,8 +212,8 @@ function loadMyInfo() {
 // 회원 탈퇴
 function deleteMember() {
     const passwordInput = document.getElementById("deletePassword");
-
     const password = passwordInput.value;
+
     if (!password) {
         alert("비밀번호를 입력해주세요.");
         return;
@@ -258,7 +221,7 @@ function deleteMember() {
 
     if (!confirm("정말 탈퇴하시겠습니까?")) return;
 
-    fetch("/api/myPage/delete", {
+    fetch("/api/member/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: password })
@@ -266,7 +229,8 @@ function deleteMember() {
         .then(res => {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
-                location.reload();
+                // location.reload();
+                location.href="/";
             } else {
                 alert("비밀번호가 일치하지 않거나 오류가 발생했습니다.");
             }

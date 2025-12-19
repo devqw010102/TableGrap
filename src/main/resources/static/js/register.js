@@ -1,51 +1,35 @@
-// 이메일 드롭다운
-function selectDomain() {
-    const domainInput = document.getElementById('emailDomainInput');
-    const domainSelect = document.getElementById('emailDomainSelect');
-    
-    const selectedValue = domainSelect.value;
+document.addEventListener("DOMContentLoaded", () => {
+    const registerForm = document.getElementById("registerForm");
 
-    if (selectedValue === "") {
-        // 직접 입력창 비우고 쓰기 가능하게 함
-        domainInput.value = "";
-        domainInput.readOnly = false;
-        domainInput.focus(); 
-    } else {
-        // 도메인 선택 시 입력창에 값 넣고 수정 불가능하게 막음
-        domainInput.value = selectedValue;
-        domainInput.readOnly = true;
+    if (registerForm) {
+        registerForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            // 최종 전송용 데이터 조립
+            const data = {
+                name: document.getElementById("registerName").value,
+                username: document.getElementById("registerId").value,
+                email: document.getElementById("totalEmail").value,
+                phone: document.getElementById("registerPhone").value,
+                password: document.getElementById("registerPwd").value,
+                passwordConfirm: document.getElementById("registerPwdConfirm").value
+            };
+
+            fetch("/api/member/register", { // MemberController의 POST 경로
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+                .then(async res => {
+                    if (res.ok) {
+                        alert("회원가입이 완료되었습니다!");
+                        window.location.href = "/"; // 성공 시 홈으로
+                    } else {
+                        const errorMsg = await res.text();
+                        alert("가입 실패: " + errorMsg);
+                    }
+                })
+                .catch(err => console.error("Register Error:", err));
+        });
     }
-    // 합치기
-    combineEmail();
-}
-
-// 이메일 합치기
-function combineEmail() {
-    const emailId = document.getElementById('emailId').value;
-    const emailDomain = document.getElementById('emailDomainInput').value;
-    const totalEmail = document.getElementById('totalEmail');
-
-    // totalEmail 확인
-    if(totalEmail) {
-        if(emailId && emailDomain) {
-            totalEmail.value = emailId + '@' + emailDomain;
-        } else {
-            totalEmail.value = '';
-        }
-    }
-}
-
-// 전화번호 합치기
-function combinePhone() {
-    const p1 = document.getElementById('phone1').value;
-    const p2 = document.getElementById('phone2').value;
-    const p3 = document.getElementById('phone3').value;
-    const totalPhone = document.getElementById('totalPhone');
-
-    // null도 허용
-    if (!p1 && !p2 && !p3) {
-        totalPhone.value = "";
-    } else {
-        totalPhone.value = p1 + '-' + p2 + '-' + p3;
-    }
-}
+});

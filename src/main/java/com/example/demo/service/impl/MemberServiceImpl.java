@@ -50,11 +50,17 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findById(id).map(this::mapToMemberDto).orElseThrow();
     }
 
+    // Create
     @Override
-    public MemberDto createMember(MemberDto memberDto) {    // insert
+    public MemberDto createMember(MemberDto memberDto) {
         String phoneNumber = memberDto.getPhone();
         if (phoneNumber != null && phoneNumber.isEmpty()) {
             phoneNumber = null;
+
+            String email = memberDto.getEmail();
+            if (email == null || email.trim().isEmpty() || email.equals("@")) {
+               email = null;
+            }
         }
 
         Member member = Member.builder()
@@ -77,6 +83,7 @@ public class MemberServiceImpl implements MemberService {
         return mapToMemberDto(member);
     }
 
+    // validation check
     @Override
     public Optional<MemberDto> findByEmail(String email) {  // 이메일 확인
         return memberRepository.findByEmail(email).
@@ -107,13 +114,14 @@ public class MemberServiceImpl implements MemberService {
         );
     }
 
+// edit member
     @Override
     public Member getMember(String username) {
         return memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("해당 아이디의 회원이 없습니다: " + username));
     }
 
-    // update
+    // update member
     @Override
     @Transactional
     public MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto) {
@@ -121,7 +129,14 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId).
                 orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다, 다시 확인 해주세요."));
 
-        member.setEmail(dto.getEmail());
+
+        String email = dto.getEmail();
+        if (email == null || email.trim().isEmpty() || email.startsWith("@") || email.endsWith("@") || email.equals("@")) {
+            member.setEmail(null);
+        } else {
+            member.setEmail(email);
+        }
+
         member.setPhone(dto.getPhone());
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -133,27 +148,7 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    // delete
-    /*
-    @Override
-    @Transactional
-    public boolean deleteMember(Long memberId, String checkPassword) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다, 다시 확인해주세요."));
-
-        String realPassword = member.getPassword();
-        boolean matches = passwordEncoder.matches(checkPassword, realPassword);
-
-        if(matches) {
-            memberRepository.delete(member);
-            return true;
-        }else{
-            return false;
-        }
-    }
-    */
-
-
+    // Delete member
     @Override
     @Transactional
     public boolean deleteMember(Long memberId, String checkPassword) {
