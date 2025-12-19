@@ -46,8 +46,7 @@
                         <th>예약 인원</th>
                         <th>예약자 명</th>
                         <th>예약 확정</th>
-                        <th>예약 취소</th>
-                        <th>후기 작성</th>
+                        <th>취소/후기</th>
                     </tr>
                     </thead>
                     <tbody id="bookTable">
@@ -127,10 +126,12 @@
                   <h2>후기 목록</h2>
                   <table class="table table-bordered table-hover">
                     <thead class="table-light">
-                    <tr>
-                      <th>평점</th>
-                      <th>내용</th>
-                    </tr>
+                        <tr>
+                        <th>식당</th>
+                        <th>평점</th>
+                        <th>내용</th>
+                        <th>작성일</th>
+                        </tr>
                     </thead>
                     <tbody id="reviewTable">
                     </tbody>
@@ -176,6 +177,7 @@
             <div class="modal-body">
                 <form method="post" th:action="@{api/mypage/review/create}">
                     <input type="hidden" id="modalDinerId">
+                    <input type="hidden" id="modalDinerName">
                     <div class="mb-3">
                         <label class="form-label">별점</label>
                         <input type="number" id="modalRating" class="form-control" min="1" max="5" required>

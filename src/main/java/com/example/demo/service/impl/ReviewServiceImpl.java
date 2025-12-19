@@ -16,8 +16,8 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
 
     @Override
-    public List<ReviewDto> getTop5Reviews(Long dinerId, Long memberId) {
-        return reviewRepository.findTop5ByDinerIdAndMemberId(dinerId, memberId).stream().map(this::mapToReviewDto).toList();
+    public List<ReviewDto> getTop5Reviews(Long dinerId) {
+        return reviewRepository.findTop5ByDinerIdOrderByCreateTimeDesc(dinerId).stream().map(this::mapToReviewDto).toList();
     }
 
     @Override
@@ -28,16 +28,17 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewDto createReview(ReviewDto reviewDto, Long memberId) {
+    public void createReview(ReviewDto reviewDto, Long memberId) {
         Review review = Review.builder()
                 .memberId(memberId)
                 .dinerId(reviewDto.getDinerId())
+                .dinerName(reviewDto.getDinerName())
                 .rating(reviewDto.getRating())
                 .comment(reviewDto.getComment())
                 .build();
 
         Review savedReview = reviewRepository.save(review);
-        return mapToReviewDto(savedReview);
+        mapToReviewDto(savedReview);
     }
 
     public ReviewDto mapToReviewDto(Review review) {
@@ -45,8 +46,10 @@ public class ReviewServiceImpl implements ReviewService {
                 .reviewId(review.getReviewId())
                 .memberId(review.getMemberId())
                 .dinerId(review.getDinerId())
+                .dinerName(review.getDinerName())
                 .rating(review.getRating())
                 .comment(review.getComment())
+                .createTime(review.getCreateTime())
                 .build();
-    };
+    }
 }

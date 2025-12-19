@@ -6,8 +6,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 
 public interface ReviewService {
-    List<ReviewDto> getTop5Reviews(Long dinerId, Long memberId);
+    List<ReviewDto> getTop5Reviews(Long dinerId);
     List<ReviewDto> getAllMyReview(Long memberId);
     @Transactional
-    public ReviewDto createReview(ReviewDto reviewDto, Long memberId);
+    public void createReview(ReviewDto reviewDto, Long memberId);
 }

@@ -9,5 +9,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 마이페이지에서 리뷰 가져오기
     List<Review> findByMemberId(Long MemberId);
     // 식당 리뷰 5개 가져오기
-    List<Review> findTop5ByDinerIdAndMemberId(Long dinerId, Long memberId);
+    List<Review> findTop5ByDinerIdOrderByCreateTimeDesc(Long dinerId);
 }

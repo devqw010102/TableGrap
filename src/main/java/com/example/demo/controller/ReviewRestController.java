@@ -30,7 +30,7 @@ public class ReviewRestController {
         }
         //식당 페이지
         if(dinerId != null){
-            return reviewService.getTop5Reviews(dinerId, user.getMemberId());
+            return reviewService.getTop5Reviews(dinerId);
         } else {
             //마이 페이지
             return reviewService.getAllMyReview(user.getMemberId());

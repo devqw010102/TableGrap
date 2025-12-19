@@ -196,10 +196,24 @@ function loadBooks() {
             data.forEach(book => {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
-                //예약 확정 상태에 따라 리뷰버튼 활성화 여부 결정
-                const reviewBtn = book.success
-                    ? `<button class="btn btn-success btn-sm btn-review" data-diner-id="${book.dinerId}">후기 작성</button>`
-                    : `<span class="text-muted">-</span>`;
+                // 예약 취소 | 후기 작성 버튼 변환
+                //const date = new Date();
+                //테스트용 시간 설정, 미래로 시간 설정 -> 예약 대기 상태에서는 버튼 출력x
+                const date = new Date("2026-01-01");
+                //과거로 시간 설정
+                //const date = new Date("2025-01-01");
+                const bookDate = new Date(book.bookingDate);
+                const timeDiff = date - bookDate; //현재 시간과 예약
+
+                //버튼 변경 로직
+                const changeBtn =
+                (timeDiff > 0 && book.success)
+                ? `<button class="btn btn-success btn-sm btn-review" data-diner-id="${book.dinerId}" data-diner-name="${book.dinerName}">후기 작성</button>`
+                // 예약 일자 경과 전
+                : (timeDiff <= 0 && (book.success || !book.success))
+                ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
+                : "";
+
                 tbody.innerHTML += `
                     <tr>
                         <td><a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a></td>
@@ -207,8 +221,7 @@ function loadBooks() {
                         <td>${book.personnel}</td>
                         <td>${book.memberName}</td>
                         <td>${book.success ? "확정" : "대기"}</td>
-                        <td><button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">취소</button></td>
-                        <td>${reviewBtn}</td>
+                        <td>${changeBtn}</td>
                     </tr>
                 `;
             });
@@ -216,7 +229,8 @@ function loadBooks() {
             document.querySelectorAll(".btn-review").forEach(btn => {
                 btn.addEventListener("click", (e) => {
                     const dinerId = e.target.getAttribute("data-diner-id");
-                    openModal(dinerId);
+                    const dinerName = e.target.getAttribute("data-diner-name");
+                    openModal(dinerId, dinerName);
                 })
             })
 
@@ -297,24 +311,27 @@ function loadMyReview(){
         .then(data => {
             const reviewTable = document.getElementById("reviewTable");
             if(!data || data.length === 0){
-                reviewTable.innerHTML = '<tr><td colspan="2" class="text-center">작성한 후기가 없습니다.</td></tr>';
+                reviewTable.innerHTML = '<tr><td colspan="4" class="text-center">작성한 후기가 없습니다.</td></tr>';
                 return;
             }
             reviewTable.innerHTML=``;
             data.forEach(review => {
                 reviewTable.innerHTML += `
                     <tr>
+                        <td><a href="/reservation?id=${review.dinerId}" class="text-primary text-decoration-underline">${review.dinerName}</a></td>
                         <td>${review.rating}</td>
                         <td>${review.comment}</td>
+                        <td>${review.createTime}</td>
                     </tr>`
             });
         });
 }
 
 //모달 출력함수
-function openModal(dinerId) {
+function openModal(dinerId, dinerName) {
     //dinerId 저장
     document.getElementById("modalDinerId").value = dinerId;
+    document.getElementById("modalDinerName").value = dinerName;
     //모달 띄우기
     const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
     reviewModal.show();
@@ -323,12 +340,14 @@ function openModal(dinerId) {
 //리뷰 작성 메소드
 function createReview(dinerId) {
     const reviewDinerId = document.getElementById("modalDinerId").value;
+    const reviewDinerName = document.getElementById("modalDinerName").value;
     const rating = document.getElementById("modalRating").value;
     const comment = document.getElementById("modalComment").value;
 
     // 후기 모달 데이터
     const reviewData = {
         dinerId: parseInt(reviewDinerId),
+        dinerName: reviewDinerName,
         rating: parseInt(rating),
         comment: comment
     };
@@ -343,6 +362,7 @@ function createReview(dinerId) {
         .then(res => {
             if (res.ok) {
                 alert("후기가 DB에 성공적으로 저장되었습니다.");
+                location.reload();
             } else {
                 alert("후기 저장 실패!");
             }
