@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reviewLink = document.querySelector('a[href="#review"]');
     if (bookLink) bookLink.addEventListener('click', loadBooks);
     if (infoLink) infoLink.addEventListener('click', loadMyInfo);
-    if (reviewLink) infoLink.addEventListener('click', loadMyReview);
+    if (reviewLink) reviewLink.addEventListener('click', loadMyReview);
 
     // 회원정보 수정/저장/취소 버튼 이벤트 연결
     const btnEdit = document.getElementById("btnEdit");
@@ -292,7 +292,7 @@ function cancelBooking(bookId) {
 
 // 후기 불러오기
 function loadMyReview(){
-    fetch("api/review/list")
+    fetch("/api/review/list")
         .then(res => res.json())
         .then(data => {
             const reviewTable = document.getElementById("reviewTable");
@@ -302,7 +302,7 @@ function loadMyReview(){
             }
             reviewTable.innerHTML=``;
             data.forEach(review => {
-                reviewTable.innerHTML = `
+                reviewTable.innerHTML += `
                     <tr>
                         <td>${review.rating}</td>
                         <td>${review.comment}</td>
