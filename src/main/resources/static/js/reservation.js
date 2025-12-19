@@ -266,38 +266,91 @@ document.addEventListener('DOMContentLoaded', function() {
     renderCalendar();
 
     // 예약 수정
-        const bookIdInput = document.querySelector('input[name="bookId"]');
-        const oldDateInput = document.getElementById('oldDate');
-        const oldPersonnelInput = document.getElementById('oldPersonnel');
+    const bookIdInput = document.querySelector('input[name="bookId"]');
+    const oldDateInput = document.getElementById('oldDate');
+    const oldPersonnelInput = document.getElementById('oldPersonnel');
 
-        if(bookIdInput && bookIdInput.value) {
+    if(bookIdInput && bookIdInput.value) {
 
-            if (oldPersonnelInput) {
-                const count = oldPersonnelInput.value;
-                if (guestInput) guestInput.value = count;
-                if (inputPersonnel) inputPersonnel.value = count;
-                updateGuestSummary(count);
+        if (oldPersonnelInput) {
+            const count = oldPersonnelInput.value;
+            if (guestInput) guestInput.value = count;
+            if (inputPersonnel) inputPersonnel.value = count;
+            updateGuestSummary(count);
+        }
+        if (oldDateInput) {
+            const rawDate = oldDateInput.value;
+            if (inputCombinedDate) inputCombinedDate.value = rawDate;
+
+            const dateParts = rawDate.split('T');
+            const datePart = dateParts[0];
+            const timePart = dateParts[1].substring(0, 5);
+
+            if (summaryDate) {
+                summaryDate.innerText = datePart;
+                summaryDate.classList.add("text-primary-custom")
             }
-            if (oldDateInput) {
-                const rawDate = oldDateInput.value;
-                if (inputCombinedDate) inputCombinedDate.value = rawDate;
-
-                const dateParts = rawDate.split('T');
-                const datePart = dateParts[0];
-                const timePart = dateParts[1].substring(0, 5);
-
-                if (summaryDate) {
-                    summaryDate.innerText = datePart;
-                    summaryDate.classList.add("text-primary-custom")
-                }
-                if (summaryTime) {
-                    summaryTime.innerText = timePart;
-                    summaryTime.classList.add("text-primary-custom")
-                }
-            }
-
-            if (btnBook) {
-                btnBook.innerText = "수정하기";
+            if (summaryTime) {
+                summaryTime.innerText = timePart;
+                summaryTime.classList.add("text-primary-custom")
             }
         }
+
+        if (btnBook) {
+            btnBook.innerText = "수정하기";
+        }
+    }
+    //리뷰를 불러오기
+    document.getElementById("review-tab").addEventListener("click", () => {
+        loadReviews()});
+
+    //async 리뷰 불러오기 함수
+    async function loadReviews() {
+        // HTML의 hidden input에서 dinerId를 가져오기
+        const dinerIdInput = document.querySelector('input[name="dinerId"]');
+        const dinerId = dinerIdInput ? dinerIdInput.value : null;
+
+        if (!dinerId) {
+            console.error("식당 ID를 찾을 수 없습니다.");
+            return;
+        }
+
+        const url = `/api/review/list?dinerId=${dinerId}`;
+
+        try {
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                console.log("받아온 데이터:", data);
+                renderReviews(data);
+            } else {
+                console.error("리뷰 로드 실패 (400/500 에러)");
+            }
+        } catch (e) {
+            console.error("통신 중 오류 발생:", e);
+        }
+    }
+
+    function renderReviews(data) {
+        const tbody = document.getElementById("review-tbody");
+        if (!tbody) return;
+
+        tbody.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center">작성한 후기가 없습니다.</td></tr>';
+            return;
+        }
+
+        // 데이터를 반복하며 테이블 행(tr) 생성
+        data.forEach(review => {
+            const row = `
+                <tr>
+                    <td>${review.rating}/5</td>
+                    <td class="text-start">${review.comment}</td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
 });
