@@ -358,17 +358,17 @@ function openModal(bookId, dinerId, dinerName) {
 
 // 리뷰 수정 모달
 function openEditModal(reviewId, bookId, dinerId, dinerName){
-    document.getElementById("modalUpReviewId").value = reviewId;
-    document.getElementById("modalUpBookId").value = bookId;
-    document.getElementById("modalUpDinerId").value = dinerId;
-    document.getElementById("modalUpDinerName").value = dinerName;
+    document.getElementById("editReviewId").value = reviewId;
+    document.getElementById("editBookId").value = bookId;
+    document.getElementById("editDinerId").value = dinerId;
+    document.getElementById("editDinerName").value = dinerName;
 
     fetch(`/api/mypage/review/${reviewId}`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById("modalUpRating").value = data.rating;
-            document.getElementById("modalUpComment").value = data.comment;
-            const reviewModal = new bootstrap.Modal(document.getElementById("reviewUpModal"));
+            document.getElementById("editRating").value = data.rating;
+            document.getElementById("editComment").value = data.comment;
+            const reviewModal = new bootstrap.Modal(document.getElementById("reviewEditModal"));
             reviewModal.show();
         })
         .catch(err => console.error("리뷰를 불러올 수 없습니다.", err))
@@ -410,12 +410,12 @@ function createReview() {
 }
 
 function updateReview() {
-    const reviewId = document.getElementById("modalUpReviewId").value;
-    const updateRating = document.getElementById("modalUpRating").value;
-    const updateComment = document.getElementById("modalUpComment").value;
+    const reviewId = document.getElementById("editReviewId").value;
+    const editRating = document.getElementById("editRating").value;
+    const editComment = document.getElementById("editComment").value;
     const updateData = {
-        rating: parseInt(updateRating),
-        comment: updateComment
+        rating: parseInt(editRating),
+        comment: editComment
     };
     fetch(`api/mypage/review/update/${reviewId}`, {
       method: "PATCH",
@@ -437,7 +437,7 @@ function updateReview() {
 }
 
 function deleteReview(){
-    const reviewId = parseInt(document.getElementById("modalUpReviewId").value);
+    const reviewId = parseInt(document.getElementById("editReviewId").value);
 
     fetch(`api/mypage/review/delete/${reviewId}`, {
         method: "DELETE",
