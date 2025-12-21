@@ -6,9 +6,11 @@ import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.model.Review;
 import com.example.demo.data.repository.BookRepository;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.MemberRepository;
+import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.BookService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +31,29 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final DinerRepository dinerRepository;
     private final MemberRepository memberRepository;
+    //review 수정 위해 reviewRepository 주입
+    private final ReviewRepository reviewRepository;
 
     @Override
     public List<BookResponseDto> findMyBooks(Long memberId) {
         return bookRepository.findByMember_id(memberId)
                 .stream()
-                .map(book -> BookResponseDto.builder()
-                        .bookId(book.getBookId())   //  bookResponse dto에
-                        .dinerId(book.getDiner().getId()) //  bookResponse dto에
-                        .dinerName(book.getDiner().getDinerName())
-                        .bookingDate(book.getBookingDate())
-                        .personnel(book.getPersonnel())
-                        .memberName(book.getMember().getName())
-                        .success(book.getSuccess())
-                        .build())
+                .map(book -> {
+                        //버튼 변환 구현을 위해 dto에 reviewId 넣었으며, entity는 건드리지 않음
+                        Long reviewId = reviewRepository.findByBookId(book.getBookId())
+                                        .map(Review::getReviewId)
+                                        .orElse(null);
+                        return  BookResponseDto.builder()
+                            .bookId(book.getBookId())   //  bookResponse dto에
+                            .dinerId(book.getDiner().getId()) //  bookResponse dto에
+                            .dinerName(book.getDiner().getDinerName())
+                            .bookingDate(book.getBookingDate())
+                            .personnel(book.getPersonnel())
+                            .memberName(book.getMember().getName())
+                            .success(book.getSuccess())
+                            .reviewId(reviewId)
+                            .build();
+                        })
                 .toList();
     }
 
