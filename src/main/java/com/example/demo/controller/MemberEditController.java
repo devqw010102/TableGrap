@@ -1,3 +1,4 @@
+/*
 package com.example.demo.controller;
 
 import com.example.demo.data.dto.MemberDto;
@@ -66,3 +67,5 @@ public class MemberEditController {
     }
 
 }
+
+ */

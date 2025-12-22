@@ -1,109 +1,116 @@
 package com.example.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import com.example.demo.data.dto.MemberDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.MemberUpdateDto;
 import com.example.demo.data.model.MemberUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import com.example.demo.data.dto.MemberDto;
 import com.example.demo.service.MemberService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
-@RequestMapping("/member")
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
+
+// MemberController + MemberEditController RestController로 합치기
 public class MemberController {
 
     private final MemberService memberService;
 
+    // Home
     @GetMapping
     public String viewIndex() {
-        return  "index";
+        return "index";
     }
 
-    @GetMapping("/register")
-    public String getMemberAdd(@ModelAttribute("member")MemberDto memberDto) {
-        return "user/register";
+    // Member create - register
+    @PostMapping ("/register")
+    public ResponseEntity<?> register(@RequestBody @Valid MemberDto memberDto, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()){
+            String errorMessage = bindingResult.getFieldErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(","));
+            return ResponseEntity.badRequest().body(errorMessage);
     }
 
-    @PostMapping("/register")
-    public String postMemberAdd(@ModelAttribute("member") @Valid MemberDto memberDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {    // DTO 검증 결과 확인(@Size, @Pattern 등)
-            return "user/register";
+        if (memberService.isUsernameDuplicate(memberDto.getUsername())) {
+        return ResponseEntity.badRequest().body("Username is already in use");
+        }
+
+        if (memberService.findByEmail(memberDto.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email is already in use");
         }
         if (!memberDto.getPassword().equals(memberDto.getPasswordConfirm())) {
-            bindingResult.rejectValue("passwordConfirm", "MissMatch", "입력하신 패스워드가 다릅니다.");
-        }
-        if (memberService.findByEmail(memberDto.getEmail()).isPresent()) {
-            bindingResult.rejectValue("email", "AlreadyExist", "사용중인 이메일 입니다");
-        }
-        if (memberService.isUsernameDuplicate(memberDto.getUsername())) {
-            bindingResult.rejectValue("userName", "AlreadyExist", "이미 사용중인 아이디 입니다");
-        }
-        if (bindingResult.hasErrors()) {
-            return "user/register";
+            return ResponseEntity.badRequest().body("Passwords do not match");
         }
         memberService.createMember(memberDto);
-        return "redirect:/";
+        return ResponseEntity.ok("회원 가입이 완료되었습니다.");
     }
 
-    /*
-    // update
-    @GetMapping("/update")
-    public String updateForm(@AuthenticationPrincipal MemberUserDetails memberUserDetails, Model model) {
-        MemberInfoResponseDto myInfo = memberService.findMyInfo(memberUserDetails.getMemberId());
-
-        MemberUpdateDto updateMemberDto = MemberUpdateDto.builder()
-                .email(myInfo.getEmail())
-                .phone(myInfo.getPhone())
-                .build();
-
-        model.addAttribute("memberUpdateDto", updateMemberDto);
-        return "user/myPage";
+    // Email double check
+    @GetMapping("/check-email")
+    public String checkEmail(@RequestParam String email) {
+        boolean isDuplicate = memberService.findByEmail(email).isPresent();
+        return isDuplicate ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.";
     }
 
+    // ID double check
+    @GetMapping("/check-username")
+    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
+        return ResponseEntity.ok(memberService.isUsernameDuplicate(username));
+    }
+
+    // Member 조회
+    @GetMapping("/info")
+    public ResponseEntity<MemberInfoResponseDto> getMyInfo(@AuthenticationPrincipal MemberUserDetails userDetails) {
+        return ResponseEntity.ok(memberService.findMyInfo(userDetails.getMember().getId()));
+    }
+
+    // Member edit
     @PostMapping("/update")
-    public String updateMember(
+    public void updateMember(
             @AuthenticationPrincipal MemberUserDetails userDetails,
-            @ModelAttribute("memberUpdateDto") MemberUpdateDto memberUpdateDto,
-            BindingResult bindingResult
-    ) {
-        // 비밀번호 수정 시, 비밀번호 확인 일치 여부 검사
-        if (memberUpdateDto.getPassword() != null && !memberUpdateDto.getPassword().isEmpty()) {
-            if (!memberUpdateDto.getPassword().equals(memberUpdateDto.getPasswordConfirm())) {
-                bindingResult.rejectValue("passwordConfirm", "MissMatch", "비밀번호가 일치하지 않습니다.");
-                return "/user/myPage";
-            }
-        }
-        memberService.updateMember(userDetails.getMemberId(), memberUpdateDto);
+            @RequestBody MemberUpdateDto memberUpdateDto) {
+        memberService.updateMember(userDetails.getMember().getId(), memberUpdateDto);
 
-        return "redirect:/user/myPage";
     }
 
-    // delete
+    // Member delete
     @PostMapping("/delete")
-    public String deleteMember(
+    public ResponseEntity<?> deleteMember(
+            @RequestBody Map<String, String> request,
             @AuthenticationPrincipal MemberUserDetails userDetails,
-            @RequestParam("password") String password,
-            RedirectAttributes redirectAttributes
-    )
-    {
-        boolean isSuccess = memberService.deleteMember(userDetails.getMemberId(), password);
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
 
-        if (isSuccess) {
-            return "redirect:/logout";
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않아 탈퇴에 실패했습니다.");
-            return "redirect:/member/myPage";
+        String password = request.get("password");
+
+        try {
+            memberService.deleteMember(userDetails.getMember().getId(), password);
+
+            // 2. DB 삭제 성공 시에만 세션 및 보안 컨텍스트 초기화 (로그아웃)
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                new SecurityContextLogoutHandler().logout(httpRequest, httpResponse, auth);
+            }
+            return ResponseEntity.ok().body("회원 탈퇴가 완료되었습니다.");
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    */
 }
