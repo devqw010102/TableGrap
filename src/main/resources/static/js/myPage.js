@@ -324,7 +324,7 @@ function cancelBooking(bookId) {
 
 // 후기 불러오기
 function loadMyReview(){
-    fetch("/api/review/list")
+    fetch(`/api/review/list`)
         .then(res => res.json())
         .then(data => {
             const reviewTable = document.getElementById("reviewTable");
@@ -363,7 +363,7 @@ function openEditModal(reviewId, bookId, dinerId, dinerName){
     document.getElementById("editDinerId").value = dinerId;
     document.getElementById("editDinerName").value = dinerName;
 
-    fetch(`/api/mypage/review/${reviewId}`)
+    fetch(`/api/review/${reviewId}`)
         .then(res => res.json())
         .then(data => {
             document.getElementById("editRating").value = data.rating;
@@ -391,7 +391,7 @@ function createReview() {
         comment: comment
     };
 
-    fetch(`/api/mypage/review/create`, {
+    fetch(`/api/review/create`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -417,7 +417,7 @@ function updateReview() {
         rating: parseInt(editRating),
         comment: editComment
     };
-    fetch(`api/mypage/review/update/${reviewId}`, {
+    fetch(`api/review/update/${reviewId}`, {
       method: "PATCH",
       headers: {
           "Content-Type": "application/json"
@@ -439,7 +439,7 @@ function updateReview() {
 function deleteReview(){
     const reviewId = parseInt(document.getElementById("editReviewId").value);
 
-    fetch(`api/mypage/review/delete/${reviewId}`, {
+    fetch(`api/review/delete/${reviewId}`, {
         method: "DELETE",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(reviewId)
