@@ -200,14 +200,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" th:action="@{api/mypage/review/create}">
+                <form>
                     <input type="hidden" id="modalReviewId">
                     <input type="hidden" id="modalBookId">
                     <input type="hidden" id="modalDinerId">
-                    <input type="hidden" id="modalDinerName">
                     <div class="mb-3">
                         <label class="form-label">별점</label>
-                        <input type="number" id="modalRating" class="form-control" min="1" max="5" required>
+                        <input type="text" id="modalRating" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">후기</label>
@@ -229,18 +228,17 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">후기 작성</h5>
+                <h5 class="modal-title">후기 수정</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" th:action="@{api/mypage/review/update}">
+                <form>
                     <input type="hidden" id="editReviewId">
                     <input type="hidden" id="editBookId">
                     <input type="hidden" id="editDinerId">
-                    <input type="hidden" id="editDinerName">
                     <div class="mb-3">
                         <label class="form-label">별점</label>
-                        <input type="number" id="editRating" class="form-control" min="1" max="5" required>
+                        <input type="text" id="editRating" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">후기</label>

@@ -31,14 +31,14 @@ public class ReviewRestController {
             return reviewService.getTop5Reviews(dinerId);
         } else {
             //마이 페이지
-            return reviewService.getAllMyReview(user.getMemberId());
+            return reviewService.getAllMyReview(user.getMember().getId());
         }
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createReview(@RequestBody ReviewDto reviewDto, @AuthenticationPrincipal MemberUserDetails user) {
         System.out.println("식당ID: " + reviewDto.getDinerId());
-        reviewService.createReview(reviewDto, user.getMemberId());
+        reviewService.createReview(reviewDto, user.getMember().getId());
         return ResponseEntity.ok().build();
     }
     //리뷰 수정 모달에서 리뷰 내용 출력을 위함

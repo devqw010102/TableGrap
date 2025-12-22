@@ -2,7 +2,9 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.ReviewDto;
 import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Review;
+import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.ReviewService;
 import jakarta.transaction.Transactional;
@@ -16,20 +18,40 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
+    private final DinerRepository dinerRepository;
+
     //식당페이지 리뷰 가져오기
     @Override
     public List<ReviewDto> getTop5Reviews(Long dinerId) {
-        return reviewRepository.findTop5ByDinerIdOrderByCreateTimeDesc(dinerId).stream().map(this::mapToReviewDto).toList();
+        Diner diner = dinerRepository.findById(dinerId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 식당이 없습니다."));
+        String dinerName = diner.getDinerName();
+        return reviewRepository.findTop5ByDinerIdOrderByCreateTimeDesc(dinerId)
+                .stream().
+                map(review -> mapToReviewDto(review, dinerName)).toList();
     }
     //마이페이지에서 내가 작성한 리뷰
     @Override
     public List<ReviewDto> getAllMyReview(Long memberId) {
-        return reviewRepository.findByMemberId(memberId).stream().map(this::mapToReviewDto).toList();
+        return reviewRepository.findByMemberId(memberId)
+                .stream()
+                .map(review -> {
+                    String dinerName = dinerRepository.findById(review.getDinerId())
+                            .map(Diner::getDinerName).orElse("알 수 없는 식당");
+                    return mapToReviewDto(review, dinerName);
+                })
+                .toList();
     }
     //리뷰 수정 모달에 리뷰가져오기
     @Override
-    public Optional<ReviewDto> getReview(Long bookId) {
-        return reviewRepository.findByBookId(bookId).stream().map(this::mapToReviewDto).toList().stream().findFirst();
+    public Optional<ReviewDto> getReview(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .map(review -> {
+                    String dinerName = dinerRepository.findById(review.getDinerId())
+                            .map(Diner::getDinerName)
+                            .orElse("알 수 없는 식당");
+                    return mapToReviewDto(review, dinerName);
+                });
     }
     //리뷰 수정
     @Override
@@ -40,23 +62,27 @@ public class ReviewServiceImpl implements ReviewService {
         review.setRating(reviewDto.getRating());
         review.setComment(reviewDto.getComment());
         reviewRepository.save(review);
-        mapToReviewDto(review);
+        String dinerName = dinerRepository.findById(review.getDinerId())
+                        .map(Diner::getDinerName)
+                        .orElse("알 수 없는 식당");
+        mapToReviewDto(review, dinerName);
     }
     //리뷰 생성
     @Override
     @Transactional
     public void createReview(ReviewDto reviewDto, Long memberId) {
+        Diner diner = dinerRepository.findById(reviewDto.getDinerId())
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 식당이 없습니다."));
         Review review = Review.builder()
                 .memberId(memberId)
                 .bookId(reviewDto.getBookId())
                 .dinerId(reviewDto.getDinerId())
-                .dinerName(reviewDto.getDinerName())
                 .rating(reviewDto.getRating())
                 .comment(reviewDto.getComment())
                 .build();
-
+        String dinerName = diner.getDinerName();
         Review savedReview = reviewRepository.save(review);
-        mapToReviewDto(savedReview);
+        mapToReviewDto(savedReview, dinerName);
     }
 
     //리뷰 삭제
@@ -65,13 +91,13 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.deleteById(reviewId);
     }
 
-    public ReviewDto mapToReviewDto(Review review) {
+    public ReviewDto mapToReviewDto(Review review, String dinerName) {
         return ReviewDto.builder()
                 .reviewId(review.getReviewId())
                 .memberId(review.getMemberId())
                 .bookId(review.getBookId())
                 .dinerId(review.getDinerId())
-                .dinerName(review.getDinerName())
+                .dinerName(dinerName)
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createTime(review.getCreateTime())

@@ -23,7 +23,6 @@ public class Review {
     private Long memberId;
     private Long bookId;
     private Long dinerId;
-    private String dinerName;
     private int rating;
     private String comment;
 
