@@ -6,8 +6,6 @@ import com.example.demo.data.model.Member;
 import com.example.demo.data.model.OwnerRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface OwnerRequestRepository extends JpaRepository<OwnerRequest, Long> {
 
     boolean existsByMemberAndDinerAndStatus(Member member, Diner diner, RequestStatus status);

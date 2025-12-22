@@ -48,6 +48,7 @@ public class AdminDataInitializer implements CommandLineRunner {
                     .username(adminUsername)
                     .password(passwordEncoder.encode(adminPassword))
                     .name(adminName)
+                    .email("admin@naver.com")
                     // .role(...) -> 이 부분 삭제됨! Member에는 role 필드가 없을 테니까요.
                     .build();
 

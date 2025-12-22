@@ -26,7 +26,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**", "/api/adminPage/**").hasRole("ADMIN")           // ADMIN 권한 필요
                         .requestMatchers("/h2-console/**").permitAll()           // H2 콘솔 허용
                         .requestMatchers("/api/myPage/**", "/mypage").authenticated()
-                        //.requestMatchers("/member/**").hasAuthority("ROLE_MEMBER") // 필요시 활성화
                         .anyRequest().permitAll()
                 )
                 .httpBasic(withDefaults())

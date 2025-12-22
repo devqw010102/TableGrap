@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     if (btnDeleteMember) btnDeleteMember.addEventListener("click", deleteMember);
-    loadMyInfo();
+    loadBooks();
 });
 
 // 수정 모드 토글

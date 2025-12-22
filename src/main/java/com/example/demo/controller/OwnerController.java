@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/owner/bookings")
+@RequestMapping("/api/owner")
 @PreAuthorize("hasRole('OWNER')")
 public class OwnerController {
 

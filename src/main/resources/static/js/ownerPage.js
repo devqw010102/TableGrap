@@ -32,7 +32,7 @@ async function fetchJson(url, options = {}) {
 
 async function loadOwnerDiners() {
     const select = document.getElementById("dinerSelect");
-    const diners = await fetchJson("/api/owner/bookings/diners");
+    const diners = await fetchJson("/api/owner/diners");
 
     select.innerHTML = `<option value="">전체</option>`;
     diners.forEach(d =>
@@ -44,7 +44,7 @@ async function loadOwnerDiners() {
 async function loadBookings({pending, date = null, page = 0}) {
     const dinerId = document.getElementById("dinerSelect")?.value || "";
 
-    let url = `/api/owner/bookings?pending=${pending}&page=${page}&size=${pageSize}`;
+    let url = `/api/owner?pending=${pending}&page=${page}&size=${pageSize}`;
 
     if(dinerId) url += `&dinerId=${dinerId}`;
     if(date) url += `&date=${date}`;
@@ -153,10 +153,10 @@ async function processBooking(url, message, successMessage) {
 }
 
 async function approveBooking(id) {
-    await processBooking(`/api/owner/bookings/${id}/approve`, "승인하시겠습니까?", "승인 완료");
+    await processBooking(`/api/owner/${id}/approve`, "승인하시겠습니까?", "승인 완료");
 }
 async function rejectBooking(id) {
-    await processBooking(`/api/owner/bookings/${id}/reject`, "반려하시겠습니까?", "반려 처리 완료");
+    await processBooking(`/api/owner/${id}/reject`, "반려하시겠습니까?", "반려 처리 완료");
 }
 
 function renderEmptyRow(tbody, col, msg) {
