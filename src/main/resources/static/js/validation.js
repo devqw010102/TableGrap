@@ -1,5 +1,6 @@
 let validationTimer;
 
+// error
 const showError = (errorId, message) => {
     const errorDiv = document.getElementById(`error-${errorId}`);
     const inputId = document.getElementById(errorId);
@@ -15,24 +16,27 @@ const showError = (errorId, message) => {
 
 const clearError = (elementId, successMsg = "") => {
     const errorDiv = document.getElementById(`error-${elementId}`);
-    const inputEl = document.getElementById(elementId);
+    const inputValue = document.getElementById(elementId);
 
     if (errorDiv) {
         errorDiv.innerText = successMsg;
         errorDiv.style.color = "green";
     }
-    if (inputEl) {
-        inputEl.classList.remove('is-invalid');
-        inputEl.classList.add('is-valid');
+    if (inputValue) {
+        inputValue.classList.remove('is-invalid');
+        inputValue.classList.add('is-valid');
     }
 };
 
-
+// 이름 (한글/영문 10자까지)
 function checkName(name) {
-    if (name.value.trim().length > 0 && name.value.length <= 10) {
+    const nameVal = name.value.trim();
+    const nameReg = /^[a-zA-Z가-힣]+$/;
+
+    if (nameVal.length > 0 && nameVal.length <= 10 && nameReg.test(nameVal)) {
         clearError("registerName");
     } else {
-        showError("registerName", "이름은 1~10자 이내여야 합니다.")
+        showError("registerName", "이름은 한글/영문 1~10자 이내여야 합니다.");
     }
 }
 
@@ -68,51 +72,50 @@ function checkUsername(id) {
 
 // 이메일 통합 검증 (합쳐서 서버 체크)
 function EmailValidation() {
-    // register(registerEmail) or myPage(emailId)
     const emailInput = document.getElementById("registerEmail") || document.getElementById("emailId");
     const domainInput = document.getElementById("registerDomain") || document.getElementById("emailDomainInput");
-    //const resultShow = document.getElementById("emailCheckResult");
-    const totalEmailField = document.getElementById("totalEmail");
     const emailId = emailInput.id;
 
     const emailPrefix = emailInput.value.trim();
     const domain = domainInput.value.trim();
 
+    emailInput.classList.remove('is-valid', 'is-invalid');
+    domainInput.classList.remove('is-valid', 'is-invalid');
 
-    // 공백, 형식 체크
-    if(emailPrefix === "" || domain === "") {
-        showError(emailId, "이메일 주소를 입력해주세요.");
-        return;
-
-        const fullEmail = `${emailPrefix}@${domain}`;
-        const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-        if(!emailReg.test(fullEmail)) {
-            showError(emailId, "유효한 이메일 형식이 아닙니다.");
-            return;
-        }
-        if(totalEmailField) totalEmailField.value = fullEmail;
-
-        clearTimeout(validationTimer);
-        validationTimer = setTimeout(() => {
-            const xhr = new XMLHttpRequest();
-            // MemberController의 /api/member/check-email 호출
-            xhr.open("GET", `/api/member/check-email?email=${encodeURIComponent(fullEmail)}`);
-            xhr.onreadystatechange = function () {
-                if(xhr.readyState === 4 && xhr.status === 200) {
-                    const response = xhr.responseText;
-                    if(response.includes("가능")){
-                        clearError(emailId, response);
-                        domainInput.classList.add("is-valid");
-                    }else {
-                        showError(emailId, response);
-                        domainInput.classList.add("is-invalid")
-                    }
-                }
-            };
-            xhr.send();
-        }, 500);
+    if(emailPrefix.length < 2 || domain === "") {
+        showError(emailId, "이메일 앞자리는 2자 이상, 도메인은 필수입니다.");
+        domainInput.classList.add('is-invalid');
+        return false;
     }
+
+    const fullEmail = `${emailPrefix}@${domain}`;
+    const emailReg = /^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if(!emailReg.test(fullEmail)) {
+        showError(emailId, "유효한 이메일 형식이 아닙니다.");
+        return false;
+    }
+
+    clearTimeout(validationTimer);
+    validationTimer = setTimeout(() => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/api/member/check-email?email=${encodeURIComponent(fullEmail)}`);
+        xhr.onreadystatechange = function () {
+            if(xhr.readyState === 4 && xhr.status === 200) {
+                const response = xhr.responseText;
+                if(response.includes("가능")){
+                    clearError(emailId, response);
+                    domainInput.classList.remove('is-invalid');
+                    domainInput.classList.add('is-valid');
+                } else {
+                    showError(emailId, response);
+                    domainInput.classList.remove('is-valid');
+                    domainInput.classList.add('is-invalid');
+                }
+            }
+        };
+        xhr.send();
+    }, 500);
 }
 
 // 도메인 선택 핸들러
@@ -131,23 +134,35 @@ function selectDomain() {
     EmailValidation();
 }
 
-// 전화번호 검사 (Regex)
+// 전화번호 검사
 function checkPhone(phone) {
-    // MemberDto 패턴: 01012345678 형식
+    const phoneVal = phone.value.trim();
     const regPhone = /^01(?:0|1|[6-9])(?:\d{3}|\d{4})\d{4}$/;
-    if(regPhone.test(phone.value)) {
+
+    if (phoneVal === "") {
+        const errorDiv = document.getElementById(`error-${phone.id}`);
+        if (errorDiv) errorDiv.innerText = "";
+        phone.classList.remove('is-invalid');
+        phone.classList.remove('is-valid');
+        return;
+    }
+
+    if(regPhone.test(phoneVal)) {
         clearError(phone.id, "올바른 전화번호 형식입니다.");
     } else {
-        showError(phone.id, "(-) 제외 10~11자리 번호만 입력해주세요.")
+        showError(phone.id, "(-) 제외 10~11자리 번호만 입력해주세요.");
     }
 }
 
-// 비밀번호 검사 (8자 이상)
+// 비밀번호 검사
 function checkPwd(pwd) {
-    if(pwd.value.length >= 8) {
-        clearError(pwd.id, "사용 가능한 비밀번호 입니다. ")
+    const pwdVal = pwd.value;
+    const pwdReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\d~!@#$%^&*()+|=]{8,16}$/;
+
+    if(pwdReg.test(pwdVal)) {
+        clearError(pwd.id, "사용 가능한 비밀번호입니다.");
     } else {
-        showError(pwd.id, "비밀번호는 8자 이상이어야 합니다.")
+        showError(pwd.id, "영문, 숫자, 특수문자(~!@#$%^&*)를 포함하여 8자 이상 입력해주세요.");
     }
     checkPwdConfirm(); // 비번 바뀔 때 확인란도 재체크
 }
@@ -157,7 +172,6 @@ function checkPwdConfirm() {
     const pwdInput = document.getElementById("registerPwd") || document.getElementById("newPassword");
     const confirmInput = document.getElementById("registerPwdConfirm") || document.getElementById("pwdConfirm");
     const pwdId = confirmInput.id;
-    //const resultShow = document.getElementById("serverPwdConfirmError") || document.getElementById("pwdConfirmResult");
 
     if (!pwdInput || !confirmInput) return;
 

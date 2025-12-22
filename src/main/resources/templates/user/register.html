@@ -22,36 +22,26 @@
 
                 <form id="registerForm" th:object="${member}" th:action="@{/member/register}" method="post">
 
-                    <div class="form-floating mb-3" style="position : relative;">
-                        <input type="text" class="form-control" id="registerName" th:field="*{name}" placeholder="이름" onkeyup="checkName(this)" style="border-radius: 8px">
-                        <label for="registerName">이름 <span style="color: red; font-weight: bold;"> * </span> </label>
-                        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"  id="serverNameError" class="text-danger small ms-1">Name Error</div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="registerName" th:field="*{name}" placeholder="이름" onkeyup="checkName(this)">
+                        <label for="registerName">이름 <span class="text-danger">*</span></label>
+                        <div id="error-registerName" class="small ms-1"></div>
                     </div>
 
-                    <div class="form-floating mb-3" style="position: relative;"
-                         onmouseover="document.getElementById('guide-username').style.display='block'"
-                         onmouseout="document.getElementById('guide-username').style.display='none'">
-
-                        <div id="guide-username" class="validation-guide"
-                             style="display: none; position: absolute; top: -40px; left: 10px; background: #333; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 11px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                            영문 소문자, 숫자 포함 4~20자 이내
-                            <div style="position: absolute; bottom: -5px; left: 20px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #333;"></div>
-                        </div>
-
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="registerId" th:field="*{username}" placeholder="아이디" onkeyup="checkUsername(this)" style="border-radius: 8px;">
-                        <label for="registerId">아이디 <span style="color: red; font-weight: bold;">*</span></label>
-                        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" id="serverUsernameError" class="text-danger small ms-1">Error</div>
+                        <input type="text" class="form-control" id="registerId" th:field="*{username}" placeholder="아이디" onkeyup="checkUsername(this)">
+                        <label for="registerId">아이디 <span class="text-danger">*</span></label>
+                        <div id="error-registerId" class="small ms-1"></div>
                     </div>
 
                     <div class="mb-3">
+                        <label class="form-label ms-1">이메일 <span class="text-danger">*</span></label>
                         <input type="hidden" id="totalEmail" th:field="*{email}">
-
                         <div class="input-group">
-                            <input type="text" class="form-control" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation()" style="height: 58px;" >
+                            <input type="text" class="form-control" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation()">
                             <span class="input-group-text">@</span>
-                            <input type="text" class="form-control" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation()"  style="height: 58px;">
-                            <select class="form-select" id="emailDomainSelect" onchange="selectDomain()" style="height: 58px; max-width: 130px;">
+                            <input type="text" class="form-control" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation()">
+                            <select class="form-select" id="emailDomainSelect" onchange="selectDomain()">
                                 <option value="">직접 입력</option>
                                 <option value="naver.com">naver.com</option>
                                 <option value="gmail.com">gmail.com</option>
@@ -59,38 +49,34 @@
                                 <option value="kakao.com">kakao.com</option>
                             </select>
                         </div>
-
-                        <div id="emailCheckResult" class="small ms-1 mt-1"></div>
-                        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" id="serverEmailError" class="text-danger small ms-1">Error</div>
-
+                        <div id="error-registerEmail" class="small ms-1 mt-1"></div>
                     </div>
 
                     <div class="mb-3">
                         <label for="registerPhone" class="form-label ms-1">전화번호(선택)</label>
-                        <input type="text" class="form-control" id="registerPhone" name="phone" placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
-
-                        <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" id="serverPhoneError" class="text-danger small ms-1 mt-1">Error</div>
+                        <input type="text" class="form-control" id="registerPhone" name="phone"
+                               placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
+                        <div id="error-registerPhone" class="small ms-1 mt-1"></div>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="registerPwd" th:field="*{password}" placeholder="Password" onkeyup="checkPwd(this)">
-                        <label for="registerPwd">비밀번호<span style="color: red; font-weight: bold;">*</span></label>
-                        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" id="serverPwdError" class="text-danger small ms-1">Error</div>
+                        <input type="password" class="form-control" id="registerPwd" th:field="*{password}" onkeyup="checkPwd(this)">
+                        <label for="registerPwd">비밀번호 <span class="text-danger">*</span></label>
+                        <div id="error-registerPwd" class="small ms-1"></div>
                     </div>
 
                     <div class="form-floating mb-4">
-                        <input type="password" class="form-control" id="registerPwdConfirm" th:field="*{passwordConfirm}" placeholder="Password Confirm" onkeyup="checkPwdConfirm()">
-                        <label for="registerPwdConfirm">비밀번호 확인<span style="color: red; font-weight: bold;">*</span></label>
-                        <div th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" id="serverPwdConfirmError" class="text-danger small ms-1">Error</div>
+                        <input type="password" class="form-control" id="registerPwdConfirm" th:field="*{passwordConfirm}" onkeyup="checkPwdConfirm()">
+                        <label for="registerPwdConfirm">비밀번호 확인 <span class="text-danger">*</span></label>
+                        <div id="error-registerPwdConfirm" class="small ms-1"></div>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">가입 완료</button>
-                    </div>
                 </form>
-
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 </div>
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
