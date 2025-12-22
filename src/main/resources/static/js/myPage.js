@@ -143,10 +143,31 @@ function loadBooks() {
             data.forEach(book => {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
-                //예약 확정 상태에 따라 리뷰버튼 활성화 여부 결정
-                const reviewBtn = book.success
-                    ? `<button class="btn btn-success btn-sm btn-review" data-diner-id="${book.dinerId}">후기 작성</button>`
-                    : `<span class="text-muted">-</span>`;
+                // 예약 취소 | 후기 작성 버튼 변환
+                const date = new Date();
+                //테스트용 시간 설정 (미래) -> 예약 대기 상태에서는 버튼 출력x
+                //const date = new Date("2026-01-01");
+                //테스트용 시간 설정 (과거)
+                //const date = new Date("2025-01-01");
+                const bookDate = new Date(book.bookingDate);
+                const timeDiff = date - bookDate; //현재 시간과 예약
+
+                //버튼 변경 로직
+                const changeBtn =
+                (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
+                    data-review-id="${book.reviewId}"  
+                    data-book-id="${book.bookId}" 
+                    data-diner-id="${book.dinerId}"
+                    data-diner-name="${book.dinerName}">후기 수정</button>` :
+                (timeDiff > 0 && book.success)
+                ? `<button class="btn btn-success btn-sm btn-review" 
+                    data-book-id="${book.bookId}" data-diner-id="${book.dinerId}" 
+                    data-diner-name="${book.dinerName}">후기 작성</button>`
+                // 예약 일자 경과 전
+                : (timeDiff <= 0 && (book.success || !book.success))
+                ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
+                : "";
+
                 tbody.innerHTML += `
                     <tr>
                         <td><a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a></td>
@@ -154,19 +175,30 @@ function loadBooks() {
                         <td>${book.personnel}</td>
                         <td>${book.memberName}</td>
                         <td>${book.success ? "확정" : "대기"}</td>
-                        <td><button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">취소</button></td>
-                        <td>${reviewBtn}</td>
+                        <td>${changeBtn}</td>
                     </tr>
                 `;
             });
             // 리뷰작성 이벤트 리스너
             document.querySelectorAll(".btn-review").forEach(btn => {
                 btn.addEventListener("click", (e) => {
+                    const bookId = e.target.getAttribute("data-book-id");
                     const dinerId = e.target.getAttribute("data-diner-id");
-                    openModal(dinerId);
+                    const dinerName = e.target.getAttribute("data-diner-name");
+                    openModal(bookId, dinerId, dinerName);
                 })
             })
 
+            //리뷰수정 이벤트 리스너
+            document.querySelectorAll(".btn-update-review").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const reviewId = e.target.getAttribute("data-review-id");
+                    const bookId = e.target.getAttribute("data-book-id");
+                    const dinerId = e.target.getAttribute("data-diner-id");
+                    const dinerName = e.target.getAttribute("data-diner-name");
+                    openEditModal(reviewId, bookId, dinerId, dinerName)
+                })
+            })
 
             // 이벤트 리스너 다시 걸기
             document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
@@ -256,48 +288,74 @@ function cancelBooking(bookId) {
 
 // 후기 불러오기
 function loadMyReview(){
-    fetch("/api/review/list")
+    fetch(`/api/review/list`)
         .then(res => res.json())
         .then(data => {
             const reviewTable = document.getElementById("reviewTable");
             if(!data || data.length === 0){
-                reviewTable.innerHTML = '<tr><td colspan="2" class="text-center">작성한 후기가 없습니다.</td></tr>';
+                reviewTable.innerHTML = '<tr><td colspan="4" class="text-center">작성한 후기가 없습니다.</td></tr>';
                 return;
             }
             reviewTable.innerHTML=``;
             data.forEach(review => {
                 reviewTable.innerHTML += `
                     <tr>
+                        <td><a href="/reservation?id=${review.dinerId}" class="text-primary text-decoration-underline">${review.dinerName}</a></td>
                         <td>${review.rating}</td>
                         <td>${review.comment}</td>
+                        <td>${review.createTime}</td>
                     </tr>`
             });
         });
 }
 
 //모달 출력함수
-function openModal(dinerId) {
+function openModal(bookId, dinerId, dinerName) {
     //dinerId 저장
+    document.getElementById("modalBookId").value = bookId;
     document.getElementById("modalDinerId").value = dinerId;
+    document.getElementById("modalDinerName").value = dinerName;
     //모달 띄우기
     const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
     reviewModal.show();
 }
 
+// 리뷰 수정 모달
+function openEditModal(reviewId, bookId, dinerId, dinerName){
+    document.getElementById("editReviewId").value = reviewId;
+    document.getElementById("editBookId").value = bookId;
+    document.getElementById("editDinerId").value = dinerId;
+    document.getElementById("editDinerName").value = dinerName;
+
+    fetch(`/api/review/${reviewId}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("editRating").value = data.rating;
+            document.getElementById("editComment").value = data.comment;
+            const reviewModal = new bootstrap.Modal(document.getElementById("reviewEditModal"));
+            reviewModal.show();
+        })
+        .catch(err => console.error("리뷰를 불러올 수 없습니다.", err))
+}
+
 //리뷰 작성 메소드
-function createReview(dinerId) {
+function createReview() {
+    const reviewBookId = document.getElementById("modalBookId").value;
     const reviewDinerId = document.getElementById("modalDinerId").value;
+    const reviewDinerName = document.getElementById("modalDinerName").value;
     const rating = document.getElementById("modalRating").value;
     const comment = document.getElementById("modalComment").value;
 
     // 후기 모달 데이터
     const reviewData = {
+        bookId: parseInt(reviewBookId),
         dinerId: parseInt(reviewDinerId),
+        dinerName: reviewDinerName,
         rating: parseInt(rating),
         comment: comment
     };
 
-    fetch("/api/mypage/review/create", {
+    fetch(`/api/review/create`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -307,11 +365,59 @@ function createReview(dinerId) {
         .then(res => {
             if (res.ok) {
                 alert("후기가 DB에 성공적으로 저장되었습니다.");
+                location.reload();
             } else {
                 alert("후기 저장 실패!");
             }
         })
         .catch(err => console.error("에러 발생:", err));
+}
+
+function updateReview() {
+    const reviewId = document.getElementById("editReviewId").value;
+    const editRating = document.getElementById("editRating").value;
+    const editComment = document.getElementById("editComment").value;
+    const updateData = {
+        rating: parseInt(editRating),
+        comment: editComment
+    };
+    fetch(`api/review/update/${reviewId}`, {
+      method: "PATCH",
+      headers: {
+          "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updateData)
+    })
+        .then(res => {
+            if(res.ok){
+                alert("후기가 수정되었습니다.");
+                location.reload();
+            } else {
+                const errorMsg=res.text();
+                alert("후기 수정에 실패했습니다." + errorMsg);
+            }
+        })
+        .catch(err => console.error("에러 발생", err));
+}
+
+function deleteReview(){
+    const reviewId = parseInt(document.getElementById("editReviewId").value);
+
+    fetch(`api/review/delete/${reviewId}`, {
+        method: "DELETE",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(reviewId)
+    })
+        .then(res => {
+            if(res.ok){
+                alert("후기가 삭제되었습니다.");
+                location.reload();
+            } else {
+                const errMsg = res.text();
+                alert("후기 삭제에 실패했습니다." + errMsg);
+            }
+        })
+        .catch(err => console.error("에러 발생", err));
 }
 
 // 빈 테이블 렌더링

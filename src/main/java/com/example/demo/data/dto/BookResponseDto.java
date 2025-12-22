@@ -23,4 +23,6 @@ public class BookResponseDto {
     private Integer personnel;
     private String memberName;
     private Boolean success;
+    //후기 수정 구현위해 dto에 reviewId추가, 화면 출력만을 위해 필요하므로 entity에 추가x
+    private Long reviewId;
 }
