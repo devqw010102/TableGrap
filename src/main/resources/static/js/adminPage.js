@@ -1,10 +1,14 @@
-document.querySelector('a[href="#list"]').addEventListener('click', loadDiners);
-document.querySelector('a[href="#stats"]').addEventListener('click', loadMembers);
-document.querySelector('a[href="#ownerRequestList"]').addEventListener('click', loadOwnerRequests);
-document.querySelector('a[href="#reservationList"]').addEventListener('click', loadReservations);
-document.querySelector('a[href="#ownerList"]').addEventListener('click', loadOwners);
-document.querySelector('a[href="#reviewList"]').addEventListener('click', loadReviews);
-document.querySelector('a[href="#dashboard"]').addEventListener('click', loadDashboard);
+// Tab-head
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector('a[href="#list"]').addEventListener('click', loadDiners);
+    document.querySelector('a[href="#stats"]').addEventListener('click', loadMembers);
+    document.querySelector('a[href="#ownerRequestList"]').addEventListener('click', loadOwnerRequests);
+    document.querySelector('a[href="#reservationList"]').addEventListener('click', loadReservations);
+    document.querySelector('a[href="#ownerList"]').addEventListener('click', loadOwners);
+    document.querySelector('a[href="#reviewList"]').addEventListener('click', loadReviews);
+    document.querySelector('a[href="#dashboard"]').addEventListener('click', loadDashboard);
+})
+
 
 // async function 으로 수정한 이유(아래 모든 메소드와 동일 사유)
 // answer) 실패에 대한 반응이 없음, 이를 추가하기위해 status 기반 분기 가능
@@ -129,6 +133,17 @@ async function loadOwnerRequests() {
     }
 }
 
+// 현재 신청 상태 column design
+function statusBadge(status) {
+    if (status === "PENDING") {
+        return `<span class="badge bg-warning">대기</span>`;
+    }
+    if (status === "APPROVED") {
+        return `<span class="badge bg-success">승인</span>`;
+    }
+    return `<span class="badge bg-secondary">반려</span>`;
+}
+
 // 예약 목록 fetch
 async function loadReservations() {
     const tbody = document.getElementById('reservationTable');
@@ -216,7 +231,7 @@ async function loadReviewsCommon({ url, tbodyId, emptyMessage }) {
 
         if (!res.ok) {
             const errorMsg = await res.text();
-            renderEmptyRow(tbody, 6, errorMsg || emptyMessage);
+            renderEmptyRow(tbody, 6, errorMsg || "리뷰 목록을 불러오지 못했습니다.");
             return;
         }
 
@@ -254,24 +269,9 @@ async function loadReviews() {
         emptyMessage: "리뷰 목록이 없습니다."
     });
 }
-async function loadTodayReviews() {
-    await loadReviewsCommon({
-        url: "/api/adminPage/dashboard",
-        tbodyId: "dashboardReviewTable",
-        emptyMessage: "오늘 작성된 리뷰가 없습니다."
-    });
-}
-
 
 // Dashboard fetch
 async function loadDashboard() {
-    await Promise.all([
-        loadDashboardSummary(),
-        loadTodayReviews()
-    ]);
-}
-
-async function loadDashboardSummary() {
     try {
         const res = await fetch("/api/adminPage/dashboard");
 
@@ -281,44 +281,44 @@ async function loadDashboardSummary() {
         }
 
         const data = await res.json();
-
-        document.getElementById("dashboardDinerCount").innerText = data.dinerCount;
-        document.getElementById("dashboardTodayBooking").innerText = data.todayBookingCount;
-        document.getElementById("dashboardMemberCount").innerText = data.totalMemberCount;
-        document.getElementById("dashboardUserCount").innerText = data.userCount;
-        document.getElementById("dashboardOwnerCount").innerText = data.ownerCount;
+        renderDashboardSummary(data);
+        renderDashboardReviews(data.todayReviews);
     }
     catch(e) {
         console.error("대시보드 요약 오류");
     }
 }
 
-async function loadDashboardReviews() {
-    const tbody = document.getElementById('dashboardReviewTable');
-
-    try {
-        const res = await fetch("/api/adminPage/dashboard/reviews");
-        if(!res.ok) {
-            const errorMsg = await res.text();
-            renderEmptyRow(tbody, 6, errorMsg ||  "리뷰 목록을 불러오지 못했습니다.");
-            return;s
-        }
-    }
-    catch(e) {
-        console.error(e);
-        renderEmptyRow(tbody, 6, "네트워크 오류가 발생했습니다.");
-    }
+function renderDashboardSummary(data) {
+    document.getElementById("dashboardDinerCount").innerText = data.dinerCount;
+    document.getElementById("dashboardTodayBooking").innerText = data.todayBookingCount;
+    document.getElementById("dashboardMemberCount").innerText = data.memberCount;
+    document.getElementById("dashboardUserCount").innerText = data.userCount;
+    document.getElementById("dashboardOwnerCount").innerText = data.ownerCount;
 }
 
-// 현재 신청 상태 column design
-function statusBadge(status) {
-    if (status === "PENDING") {
-        return `<span class="badge bg-warning">대기</span>`;
+function renderDashboardReviews(reviews) {
+    const tbody = document.getElementById("dashboardReviewTable");
+    tbody.innerHTML = "";
+
+    if (!reviews || reviews.length === 0) {
+        renderEmptyRow(tbody, 6, "오늘 작성된 리뷰가 없습니다.");
+        return;
     }
-    if (status === "APPROVED") {
-        return `<span class="badge bg-success">승인</span>`;
-    }
-    return `<span class="badge bg-secondary">반려</span>`;
+
+    reviews.forEach(r => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${r.reviewId}</td>
+                <td>${r.memberUsername}</td>
+                <td>${r.dinerName}</td>
+                <td>${r.rating}</td>
+                <td>${r.comment}</td>
+                <td>${formatDate(r.createTime)}</td>
+            </tr>
+        `;
+    });
+
 }
 
 // load 시키는 메소드에서 만약 fetch 과정에서 문제가 있거나 데이터가 없을경우 실행
