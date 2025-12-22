@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.data.dto.ReviewDto;
+import com.example.demo.data.dto.admin.AdminReviewDto;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface ReviewService {
     public void createReview(ReviewDto reviewDto, Long memberId);
     @Transactional
     void deleteReview(Long reviewId);
+    List<AdminReviewDto> getAll();
 }

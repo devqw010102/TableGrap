@@ -1,19 +1,14 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.dto.DinerDetailDto;
-import com.example.demo.data.dto.MemberDto;
-import com.example.demo.data.dto.MemberInfoResponseDto;
-import com.example.demo.data.dto.OwnerRequestDto;
-import com.example.demo.service.DinerExcelService;
-import com.example.demo.service.DinerService;
-import com.example.demo.service.MemberService;
-import com.example.demo.service.OwnerRequestService;
+import com.example.demo.data.dto.*;
+import com.example.demo.data.dto.admin.AdminBookDto;
+import com.example.demo.data.dto.admin.AdminDashboardDto;
+import com.example.demo.data.dto.admin.AdminOwnerDto;
+import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -24,6 +19,9 @@ public class AdminController {
     private final OwnerRequestService ownerRequestService;
     private final DinerService dinerService;
     private final MemberService  memberService;
+    private final BookService bookService;
+    private final ReviewService reviewService;
+    private final AdminService adminService;
 
     // 식당 목록 fetch
     @GetMapping("/diners")
@@ -53,5 +51,26 @@ public class AdminController {
     @PutMapping("/owner-requests/{id}/reject")
     public void rejectOwner(@PathVariable Long id) {
         ownerRequestService.reject(id);
+    }
+
+    // 예약 목록 fetch
+    @GetMapping("/books")
+    public List<AdminBookDto> books() {
+        return bookService.getAll();
+    }
+
+    @GetMapping("/owners")
+    public List<AdminOwnerDto> owners() {
+        return dinerService.getAll();
+    }
+
+    @GetMapping("/reviews")
+    public List<AdminReviewDto> reviews() {
+        return reviewService.getAll();
+    }
+
+    @GetMapping("/dashboard")
+    public AdminDashboardDto dashboard() {
+        return adminService.getDashboard();
     }
 }

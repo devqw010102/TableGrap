@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.data.dto.admin.AdminBookDto;
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookOwnerResponseDto;
 import com.example.demo.data.dto.BookResponseDto;
@@ -23,4 +24,7 @@ public interface BookService {
     void approveBooking(Long bookId);
 
     void rejectBooking(Long bookId);
+
+    // adminPage 구현
+    List<AdminBookDto> getAll();
 }
