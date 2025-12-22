@@ -13,7 +13,6 @@ import com.example.demo.data.repository.OwnerRequestRepository;
 import com.example.demo.service.OwnerRequestService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Request;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

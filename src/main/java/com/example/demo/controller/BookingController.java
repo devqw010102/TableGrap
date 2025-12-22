@@ -9,6 +9,7 @@ import com.example.demo.service.BookService;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,7 @@ import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class BookingController {
     private final DinerService dinerService;
     private final MemberService memberService;
@@ -81,13 +83,11 @@ public class BookingController {
             bookDto.setMemberId(member.getId());
         }
 
-        System.out.println("컨트롤러로 들어온 데이터: " + bookDto);
-
         try {
             bookService.createBooking(bookDto);
             return "redirect:/mypage";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("예약 실패 - bookId={}", bookDto.getBookId(), e);
             return "redirect:/reservation?error=true";
         }
     }
@@ -111,7 +111,7 @@ public class BookingController {
             bookService.updateBooking(bookDto);
             return "redirect:/mypage";
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("예약 수정 실패 - bookId={}", bookDto.getBookId(), e);
             return "redirect:/reservation?error=true";
         }
     }
