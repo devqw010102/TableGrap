@@ -298,7 +298,7 @@ function loadMyReview(){
 
             const reviewTable = document.getElementById("reviewTable");
             if(!data || data.length === 0){
-                reviewTable.innerHTML = '<tr><td colspan="4" class="text-center">작성한 후기가 없습니다.</td></tr>';
+                reviewTable.innerHTML = '<tr><td colspan="5" class="text-center">작성한 후기가 없습니다.</td></tr>';
                 return;
             }
             reviewTable.innerHTML=``;
@@ -309,6 +309,7 @@ function loadMyReview(){
                         <td>${review.rating}</td>
                         <td>${review.comment}</td>
                         <td>${review.createTime}</td>
+                        <td>${review.updateTime}</td>
                     </tr>`
             });
         });

@@ -101,6 +101,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createTime(review.getCreateTime())
+                .updateTime(review.getUpdateTime())
                 .build();
     }
 
