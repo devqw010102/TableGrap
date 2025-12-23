@@ -65,25 +65,33 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         select new com.example.demo.data.dto.owner.OwnerReviewDto(
             r.reviewId,
             m.username,
-            r.dinerName,
+            d.dinerName,
             r.rating,
             r.comment,
             r.createTime
         )
         from Review r
         join Member m on r.memberId = m.id
+        join Diner d on r.dinerId = d.id
         where r.dinerId = :dinerId
     """)
     Page<OwnerReviewDto> findReviewByDinerId(@Param("dinerId") Long dinerId, Pageable pageable);
 
     // Owner 의 식당들 리뷰 전체
     @Query("""
-            SELECT new com.example.demo.data.dto.owner.OwnerReviewDto(
-            r.reviewId, m.username, r.dinerName, r.rating, r.comment, r.createTime)
-            FROM Review r
-            JOIN Member m ON r.memberId = m.id
-            WHERE r.dinerId IN :dinerIds
-""")
+        select new com.example.demo.data.dto.owner.OwnerReviewDto(
+            r.reviewId, 
+            m.username, 
+            d.dinerName, 
+            r.rating, 
+            r.comment, 
+            r.createTime
+        )
+        from Review r
+        join Member m on r.memberId = m.id
+        join Diner d on r.dinerId = d.id
+        where r.dinerId in :dinerIds
+    """)
     Page<OwnerReviewDto> findReviewByDinerIds(@Param("dinerIds") List<Long> dinerIds, Pageable pageable);
 
 }
