@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.data.dto.OwnerRequestDto;
+import com.example.demo.data.dto.owner.OwnerRequestDto;
 
 import java.util.List;
 

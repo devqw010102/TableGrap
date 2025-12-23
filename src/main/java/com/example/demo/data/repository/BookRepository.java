@@ -1,6 +1,6 @@
 package com.example.demo.data.repository;
 
-import com.example.demo.data.dto.BookOwnerResponseDto;
+import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import com.example.demo.data.model.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     List<Book> findByMember_id(Long memberId);
 
     @Query("""
-    select new com.example.demo.data.dto.BookOwnerResponseDto(
+    select new com.example.demo.data.dto.owner.BookOwnerResponseDto(
         b.bookId,
         d.dinerName,
         b.bookingDate,

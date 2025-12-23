@@ -1,4 +1,4 @@
-package com.example.demo.data.dto;
+package com.example.demo.data.dto.owner;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

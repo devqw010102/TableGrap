@@ -2,7 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
-import com.example.demo.data.dto.OwnerDinerDto;
+import com.example.demo.data.dto.owner.OwnerDinerDto;
 import com.example.demo.data.dto.admin.AdminOwnerDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;

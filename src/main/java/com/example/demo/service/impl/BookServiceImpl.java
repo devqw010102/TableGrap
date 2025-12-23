@@ -2,7 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.admin.AdminBookDto;
 import com.example.demo.data.dto.BookDto;
-import com.example.demo.data.dto.BookOwnerResponseDto;
+import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Diner;

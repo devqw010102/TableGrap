@@ -5,6 +5,7 @@ import com.example.demo.data.dto.admin.AdminBookDto;
 import com.example.demo.data.dto.admin.AdminDashboardDto;
 import com.example.demo.data.dto.admin.AdminOwnerDto;
 import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
