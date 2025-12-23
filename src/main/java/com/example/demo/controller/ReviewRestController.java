@@ -7,6 +7,7 @@ import com.example.demo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -19,20 +20,16 @@ import java.util.Optional;
 public class ReviewRestController {
     private final ReviewService reviewService;
 
+    //reservation.html에서 식당 후기 출력
+    @GetMapping("/reservation/list")
+    public List<ReviewDto> getTop5Reviews(@RequestParam(value = "dinerId") Long dinerId) {
+        return reviewService.getTop5Reviews(dinerId);
+        //model.addAttribute("reviews", reviewList); 비동기에는 이거 안쓴다...
+    }
+
     @GetMapping("/list")
-    //마이페이지에서 내가 쓴 리뷰 전체를 보기 위해서 required=false사용
-    public List<ReviewDto> getReviews(@RequestParam(value = "dinerId", required = false) Long dinerId,
-                                      @AuthenticationPrincipal MemberUserDetails user) {
-        if(user == null){
-            return Collections.emptyList(); //로그인하지 않았으면 빈 목록
-        }
-        //식당 페이지
-        if(dinerId != null){
-            return reviewService.getTop5Reviews(dinerId);
-        } else {
-            //마이 페이지
-            return reviewService.getAllMyReview(user.getMember().getId());
-        }
+    public List<ReviewDto> getAllReviews(@AuthenticationPrincipal MemberUserDetails user) {
+        return reviewService.getAllMyReview(user.getMember().getId());
     }
 
     @PostMapping("/create")

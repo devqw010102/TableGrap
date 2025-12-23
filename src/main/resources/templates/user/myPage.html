@@ -207,7 +207,7 @@
                     <input type="hidden" id="modalDinerId">
                     <div class="mb-3">
                         <label class="form-label">별점</label>
-                        <input type="text" id="modalRating" class="form-control" required>
+                        <input type="number" id="modalRating" class="form-control" min="1" max="5" placeholder="1점부터 5점까지 입력해주세요" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">후기</label>
@@ -217,8 +217,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 <button type="button" class="btn btn-primary" onclick="createReview()">저장하기</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
@@ -239,7 +239,7 @@
                     <input type="hidden" id="editDinerId">
                     <div class="mb-3">
                         <label class="form-label">별점</label>
-                        <input type="text" id="editRating" class="form-control" required>
+                        <input type="number" id="editRating" class="form-control" min="1" max="5" placeholder="1점부터 5점까지 입력해주세요" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">후기</label>
@@ -249,9 +249,9 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                <button type="button" class="btn btn-danger btn-delete-review" onclick="deleteReview()">삭제</button>
                 <button type="button" class="btn btn-primary" onclick="updateReview()">수정하기</button>
+                <button type="button" class="btn btn-danger btn-delete-review" onclick="deleteReview()">삭제</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>

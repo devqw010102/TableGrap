@@ -306,7 +306,7 @@ function loadMyReview(){
                 reviewTable.innerHTML += `
                     <tr>
                         <td>${review.dinerName}</a></td>
-                        <td>${review.rating}</td>
+                        <td>${"⭐".repeat(review.rating)}</td>
                         <td>${review.comment}</td>
                         <td>${review.createTime}</td>
                         <td>${review.updateTime}</td>
@@ -315,7 +315,7 @@ function loadMyReview(){
         });
 }
 
-//모달 출력함수
+//리뷰 작성 모달 열기
 function openModal(bookId, dinerId) {
     document.getElementById("modalBookId").value = bookId;
     document.getElementById("modalDinerId").value = dinerId;
@@ -323,8 +323,18 @@ function openModal(bookId, dinerId) {
     const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
     reviewModal.show();
 }
+//review type=number유지하고 1-5이외의 숫자 or 문자 입력시 빈칸 처리
+document.getElementById("modalRating").addEventListener("input", e => {
+  //1-5까지의 숫자를 제외하고 빈칸으로 처리
+  let rating = e.target.value.replace(/[^1-5]$/g, "");
+  //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
+  if(rating.length > 1){
+  rating = rating.slice(0, 1);
+  }
+  e.target.value = rating;
+})
 
-// 리뷰 수정 모달
+// 리뷰 수정 모달 열기
 function openEditModal(reviewId, bookId, dinerId){
     document.getElementById("editReviewId").value = reviewId;
     document.getElementById("editBookId").value = bookId;
@@ -341,19 +351,19 @@ function openEditModal(reviewId, bookId, dinerId){
         .catch(err => console.error("리뷰를 불러올 수 없습니다.", err))
 }
 
+//review type=number유지하고 1-5이외의 숫자 or 문자 입력시 빈칸 처리
+document.getElementById("editRating").addEventListener("input", e => {
+  //1-5까지의 숫자를 제외하고 빈칸으로 처리
+  let rating = e.target.value.replace(/[^1-5]$/g, "");
+  //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
+  if(rating.length > 1){
+  rating = rating.slice(0, 1);
+  }
+  e.target.value = rating;
+})
+
 //리뷰 작성 메소드
 function createReview() {
-    //유효성 검사를 위해 ratingInput을 가져옴
-    const ratingInput = document.getElementById("modalRating");
-
-    //별점에서 문자열,음수 혹은 5이상의 숫자 입력시 리뷰 저장x
-        const reg = /^[1-5]$/;
-        if(!reg.test(ratingInput.value)){
-          alert("1-5사이의 숫자를 입력해주세요!")
-          ratingInput.value="";
-          ratingInput.focus();
-          return;
-        }
 
     //후기에 저장하는 값
     const reviewBookId = document.getElementById("modalBookId").value;
@@ -390,15 +400,6 @@ function createReview() {
 
 //리뷰 수정
 function updateReview() {
-    const editRatingInput = document.getElementById("editRating");
-    const reg = /^[1-5]$/;
-            if(!reg.test(editRatingInput.value)){
-              alert("1-5사이의 숫자를 입력해주세요!")
-              editRatingInput.value="";
-              editRatingInput.focus();
-              return;
-            }
-
     const reviewId = document.getElementById("editReviewId").value;
     const editRating = document.getElementById("editRating").value;
     const editComment = document.getElementById("editComment").value;
