@@ -30,6 +30,9 @@
     <li class = "nav-item">
         <a class = "nav-link" data-bs-toggle="tab" href = "#tab3">확정된 예약 목록</a>
     </li>
+    <li class = "nav-item">
+        <a class = "nav-link" data-bs-toggle="tab" href = "#tab4">리뷰 목록</a>
+    </li>
 </ul>
 
 <!-- Tab-content -->
@@ -86,9 +89,41 @@
             </table>
         </div>
     </div>
+    <!-- tab4-content -->
+    <div id = "tab4" class = "tab-pane fade">
+        <div class = "container mt-4">
+            <h2>리뷰 목록</h2>
+            <table class = "table table-boarded">
+                <thead>
+                <tr>
+                    <th>회원 아이디</th>
+                    <th>식당 이름</th>
+                    <th>평점</th>
+                    <th>내용</th>
+                    <th>작성 일자</th>
+                </tr>
+                </thead>
+                <tbody id = "reviewListTable"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<!-- <h4>가게 정보 수정하기</h4> -->
+<!-- Page 이동 버튼 -->
+<div class="d-flex justify-content-center align-items-center mt-3">
+    <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm me-2">
+        이전
+    </button>
 
+    <span id="pageInfo" class="mx-2"></span>
+
+    <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm ms-2">
+        다음
+    </button>
+</div>
+<!-- 페이지 -->
+<nav class="d-flex justify-content-center mt-4">
+    <ul id="pagination" class="pagination pagination-sm"></ul>
+</nav>
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>

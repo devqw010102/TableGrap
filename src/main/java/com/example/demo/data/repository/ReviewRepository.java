@@ -1,7 +1,10 @@
 package com.example.demo.data.repository;
 
 import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Review;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -56,4 +59,31 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    // Owner 의 식당 중 카테고리로 선택된 식당의 리뷰
+    @Query("""
+        select new com.example.demo.data.dto.owner.OwnerReviewDto(
+            r.reviewId,
+            m.username,
+            r.dinerName,
+            r.rating,
+            r.comment,
+            r.createTime
+        )
+        from Review r
+        join Member m on r.memberId = m.id
+        where r.dinerId = :dinerId
+    """)
+    Page<OwnerReviewDto> findReviewByDinerId(@Param("dinerId") Long dinerId, Pageable pageable);
+
+    // Owner 의 식당들 리뷰 전체
+    @Query("""
+            SELECT new com.example.demo.data.dto.owner.OwnerReviewDto(
+            r.reviewId, m.username, r.dinerName, r.rating, r.comment, r.createTime)
+            FROM Review r
+            JOIN Member m ON r.memberId = m.id
+            WHERE r.dinerId IN :dinerIds
+""")
+    Page<OwnerReviewDto> findReviewByDinerIds(@Param("dinerIds") List<Long> dinerIds, Pageable pageable);
+
 }

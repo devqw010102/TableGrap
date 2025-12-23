@@ -2,11 +2,20 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.ReviewDto;
 import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.data.dto.owner.OwnerReviewDto;
+import com.example.demo.data.model.Diner;
+import com.example.demo.data.model.Member;
 import com.example.demo.data.model.Review;
+import com.example.demo.data.repository.DinerRepository;
+import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.ReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +24,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
+
     private final ReviewRepository reviewRepository;
+    private final DinerRepository dinerRepository;
+    private final MemberRepository memberRepository;
     //식당페이지 리뷰 가져오기
     @Override
     public List<ReviewDto> getTop5Reviews(Long dinerId) {
@@ -82,5 +94,24 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<AdminReviewDto> getAll() {
         return reviewRepository.findAllForAdmin();
+    }
+
+    @Override
+    public Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createTime").descending());
+
+        // 카테고리 선택
+        if(dinerId != null) {
+            return reviewRepository.findReviewByDinerId(dinerId, pageable);
+        }
+        // 미선택 (전체)
+        List<Diner> diners = dinerRepository.findAllByOwner(owner);
+        List<Long> dinerIds = diners.stream().map(Diner::getId).toList();
+
+        if(dinerIds.isEmpty()) {
+            return Page.empty();
+        }
+        return reviewRepository.findReviewByDinerIds(dinerIds, pageable);
     }
 }

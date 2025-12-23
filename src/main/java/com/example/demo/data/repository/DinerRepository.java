@@ -1,7 +1,8 @@
 package com.example.demo.data.repository;
 
-import com.example.demo.data.dto.OwnerDinerDto;
+import com.example.demo.data.dto.owner.OwnerDinerDto;
 import com.example.demo.data.model.Diner;
+import com.example.demo.data.model.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     Optional<Diner> findById(Long id);
 
     @Query("""
-        select new com.example.demo.data.dto.OwnerDinerDto(
+        select new com.example.demo.data.dto.owner.OwnerDinerDto(
             d.id,
             d.dinerName
         )
@@ -36,4 +37,6 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
 
     @Query("select count(d) from Diner d")
     Long countAllDiners();
+
+    List<Diner> findAllByOwner(Member owner);
 }
