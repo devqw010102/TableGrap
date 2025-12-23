@@ -19,7 +19,7 @@ public interface ReviewService {
     //리뷰 수정
     void updateReview(Long reviewId, ReviewDto reviewDto);
     @Transactional
-    public void createReview(ReviewDto reviewDto, Long memberId);
+    void createReview(ReviewDto reviewDto, Long memberId);
     @Transactional
     void deleteReview(Long reviewId);
     List<AdminReviewDto> getAll();

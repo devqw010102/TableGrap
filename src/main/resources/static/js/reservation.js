@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+  loadReviews()
 // api & 중복 수정
     const NAVER_CLIENT_ID = "k0np2vmny3";
     const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
@@ -300,9 +301,6 @@ document.addEventListener('DOMContentLoaded', function() {
             btnBook.innerText = "수정하기";
         }
     }
-    //리뷰를 불러오기
-    document.getElementById("review-tab").addEventListener("click", () => {
-        loadReviews()});
 
     //async 리뷰 불러오기 함수
     async function loadReviews() {
@@ -315,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const url = `/api/review/list?dinerId=${dinerId}`;
+        const url = `/api/review/reservation/list?dinerId=${dinerId}`;
 
         try {
             const res = await fetch(url);
@@ -323,6 +321,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await res.json();
                 console.log("받아온 데이터:", data);
                 renderReviews(data);
+
+                //후기 탭 제목
+                const reviewCnt = data.length;
+                const reviewTab = document.getElementById("review-tab");
+                if(reviewTab){
+                  reviewTab.innerText = `⭐ 후기(${reviewCnt})`;
+                }
             } else {
                 console.error("리뷰 로드 실패 (400/500 에러)");
             }
@@ -346,8 +351,8 @@ document.addEventListener('DOMContentLoaded', function() {
         data.forEach(review => {
             const row = `
                 <tr>
-                    <td>${review.rating}/5</td>
-                    <td class="text-start">${review.comment}</td>
+                    <td>${"⭐".repeat(review.rating)}</td>
+                    <td>${review.comment}</td>
                 </tr>
             `;
             tbody.insertAdjacentHTML('beforeend', row);

@@ -55,8 +55,4 @@ public class MemberUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true; // 활성화 상태
     }
-
-    public Long getMemberId() {
-        return member.getId(); // 리뷰가져오기 할 때 필요
-    }
 }

@@ -48,15 +48,8 @@
                         </button>
                     </li>
                     <!-- 후기 개수에 따라 탭 제목 구분 -->
-                    <li class="nav-item" role="presentation" th:if ="${!#lists.isEmpty(reviews)}">
-                        <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab"
-                                th:text="|⭐ 후기 + ${#lists.size(reviews)}|">
-                            ⭐ 후기 (0)
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation" th:unless ="${!#lists.isEmpty(reviews)}">
-                        <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab"
-                                th:text="|⭐ 후기 (0)|">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">
                             ⭐ 후기 (0)
                         </button>
                     </li>

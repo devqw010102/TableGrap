@@ -22,6 +22,6 @@ public class ReviewDto {
     private String comment;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime createTime;
-    //후기 작성 여부 확인 -> 추후 리뷰작성하면 버튼 비활성화
-    private Boolean reviewWritten;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    private LocalDateTime updateTime;
 }
