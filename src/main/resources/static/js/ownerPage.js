@@ -3,11 +3,19 @@ let currentPage = 0;
 let totalPages = 0;
 const pageSize = 10;
 
+// 식당 카테고리 채우기, 첫화면(승인대기 목록) load
 document.addEventListener("DOMContentLoaded", async () => {
     await loadOwnerDiners();
     await loadPendingBookings(0);
 })
 
+// add select Event
+document.getElementById("dinerSelect")?.addEventListener("change", () => {
+    currentPage = 0;
+    tabLoaders[currentTab](0);
+});
+
+// click event 달기위한 map
 const tabMenu = {
     '#tab1': 'pending',
     '#tab2': 'today',
@@ -15,6 +23,7 @@ const tabMenu = {
     '#tab4': 'reviews'
 }
 
+// add EventListener
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', e => {
         const targetTab = tabMenu[e.target.getAttribute('href')];
@@ -26,12 +35,11 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-document.getElementById("dinerSelect")?.addEventListener("change", () => {
-        currentPage = 0;
-        tabLoaders[currentTab](0);
-});
+// add page move button event
+document.getElementById("prevPageBtn")?.addEventListener("click", () => movePage(-1));
+document.getElementById("nextPageBtn")?.addEventListener("click", () => movePage(1));
 
-/* 페이지 버튼 */
+/* Tab menu */
 const tabLoaders = {
     pending: (page) => loadBookings({ pending: true, page }),
     today: (page) => loadBookings({
@@ -43,10 +51,7 @@ const tabLoaders = {
     reviews: (page) => loadReviews(page)
 };
 
-
-document.getElementById("prevPageBtn")?.addEventListener("click", () => movePage(-1));
-document.getElementById("nextPageBtn")?.addEventListener("click", () => movePage(1));
-
+// fetch Method
 async function fetchJson(url, options = {}) {
     const res = await fetch(url, options);
     if(!res.ok) {
@@ -63,6 +68,7 @@ async function fetchJson(url, options = {}) {
     return null;
 }
 
+// load 식당 목록(카테고리)
 async function loadOwnerDiners() {
     const select = document.getElementById("dinerSelect");
     const diners = await fetchJson("/api/owner/diners");
@@ -74,6 +80,7 @@ async function loadOwnerDiners() {
 
 }
 
+// 승인대기목록, 오늘의 예약, 확정된 예약 목록
 async function loadBookings({pending, date = null, page = 0}) {
     const dinerId = document.getElementById("dinerSelect")?.value || "";
 
@@ -101,6 +108,7 @@ async function loadBookings({pending, date = null, page = 0}) {
     }
 }
 
+// load Reviews
 async function loadReviews(page = 0) {
     const dinerId = document.getElementById('dinerSelect')?.value || "";
     const url = `/api/owner/reviews?dinerId=${dinerId}&page=${page}&size=${pageSize}`;
@@ -115,20 +123,13 @@ async function loadReviews(page = 0) {
     }
 }
 
+// 첫화면 구현을 위한 승인대기목록 load method
 async function loadPendingBookings(page = 0) {
     currentTab = "pending";
     await loadBookings({pending: true, page});
 }
-async function loadTodayBookings(page = 0) {
-    currentTab = "today";
-    const today = new Date().toISOString().substring(0, 10);
-    await loadBookings({pending: false, date: today, page});
-}
-async function loadApproveBookings(page = 0) {
-    currentTab = "approve";
-    await loadBookings({pending: false, page});
-}
 
+// Rendering Table
 function renderPendingTable(data) {
     const tbody = document.getElementById("bookRequestTable");
 
@@ -201,6 +202,7 @@ function renderReviewTable(data) {
     `).join("");
 }
 
+// process 승인 반려
 async function processBooking(url, message, successMessage) {
     if(!confirm(message)) return;
 
@@ -217,7 +219,7 @@ async function processBooking(url, message, successMessage) {
         alert("처리 실패");
     }
 }
-
+// 승인, 반려 처리
 async function approveBooking(id) {
     await processBooking(`/api/owner/${id}/approve`, "승인하시겠습니까?", "승인 완료");
 }
@@ -232,6 +234,7 @@ function renderEmptyRow(tbody, col, msg) {
         </tr>
     `;
 }
+// 날짜 출력 스타일
 function formatDate(dt) {
     return dt.replace("T", " ").substring(0, 16);
 }
@@ -294,6 +297,7 @@ function renderPagination() {
     });
 }
 
+// 탭 이동 or load 된 데이터가 생기면 Page update
 function updatePaginationInfo(data) {
     currentPage = data.number;
     totalPages = data.totalPages;
