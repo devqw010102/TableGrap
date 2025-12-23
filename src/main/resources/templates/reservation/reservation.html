@@ -35,7 +35,7 @@
         <input type="hidden" id="dinerLng" th:value="${diner.dx}">
 
         <div class="row">
-            <div class="col-lg-7 col-md-12 mb-4">
+            <div class="col-lg-7 col-md-12 mb-4 d-flex flex-column">
                 <div class="map-container">
                     <img id="staticMap" alt="식당 위치"
                          style="width: 750px; height: 500px; max-width: 100%; border: 1px solid #ccc; border-radius: 5px;">
@@ -117,12 +117,14 @@
                 </div>
             </div>
 
-            <div class="col-lg-5 col-md-12">
+            <div class="col-lg-5 col-md-12 d-flex flex-column">
                 <div class="reservation-box">
-                    <div id="topSummaryBox" class="selected-summary-top mb-3" style="display:none">
-                        <div class="summary-item"><strong>날짜:</strong><span id="sumDate">-</span></div>
-                        <div class="summary-item"><strong>시간:</strong><span id="sumTime">-</span></div>
-                        <div class="summary-item"><strong>인원:</strong><span id="sumPersonnel">-</span></div>
+                    <div class="summary-wrapper">
+                        <div id="topSummaryBox" class="selected-summary-top">
+                            <div class="summary-item"><strong>선택한 날짜:</strong> <span id="sumDate">-</span></div>
+                            <div class="summary-item"><strong>선택한 시간:</strong> <span id="sumTime">-</span></div>
+                            <div class="summary-item"><strong>선택한 인원:</strong> <span id="sumPersonnel">-</span></div>
+                        </div>
                     </div>
 
                     <div class="section-header">
@@ -162,22 +164,6 @@
                             <button class="count-btn" type="button" id="btnPlus">+</button>
                         </div>
                     </div>
-
-                    <div class="selected-info">
-                        <div class="info-row">
-                            <span class="info-label">날짜</span>
-                            <strong id="displayDate" class="info-value">날짜를 선택하세요</strong>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">시간</span>
-                            <strong id="displayTime" class="info-value text-primary-custom">시간을 선택하세요</strong>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">인원수</span>
-                            <strong id="displayPersonnel" class="info-value text-primary-custom">인원수를 선택하세요</strong>
-                        </div>
-                    </div>
-
                     <button type="button" id="btnBook"> 예약하기 </button>
                 </div>
             </div>
