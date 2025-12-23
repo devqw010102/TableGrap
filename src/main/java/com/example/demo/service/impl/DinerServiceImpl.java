@@ -39,6 +39,8 @@ public class DinerServiceImpl implements DinerService {
                 .tel(diner.getTel())
                 .dx(diner.getDx())
                 .dy(diner.getDy())
+                .status(diner.getStatus())
+                .ownerPhone(diner.getOwner() != null ? diner.getOwner().getPhone() : null)
                 .build();
     }
 

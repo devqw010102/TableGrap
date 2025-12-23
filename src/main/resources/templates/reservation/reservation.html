@@ -73,9 +73,21 @@
                         </p>
                         <hr>
 
-                        <h5>운영 시간</h5>
-                        <p class="small text-muted mb-0">평일 11:00 ~ 20:00 (Break time: 15:00 ~ 17:00)</p>
-                        <p class="small text-muted">주말 12:00 ~ 23:00</p>
+                        <h5>예약 가능 여부</h5>
+                        <div th:if="${diner.status != null}">
+                                  <span th:if="${diner.status.name() == 'PUBLIC'}" class="badge bg-success fs-6">예약 가능</span>
+                            <span th:if="${diner.status.name() == 'CLOSED'}" class="badge bg-danger fs-6">영업 종료</span>
+                            <span th:if="${diner.status.name() == 'CLAIMED'}" class="badge bg-warning fs-6">준비 중</span>
+                        </div>
+                        <hr>
+
+                    <h5>사장님 연락처</h5>
+                       <p class="text-muted" th:if="${diner.ownerPhone != null}">
+                            📞 <span th:text="${diner.ownerPhone}">010-0000-0000</span>
+                        </p>
+                        <p class="text-muted" th:unless="${diner.ownerPhone != null}">
+                            📞 등록된 사장님 연락처 정보가 없습니다.
+                        </p>
                     </div>
 
                     <div class="tab-pane fade" id="review" role="tabpanel">
@@ -107,6 +119,11 @@
 
             <div class="col-lg-5 col-md-12">
                 <div class="reservation-box">
+                    <div id="topSummaryBox" class="selected-summary-top mb-3" style="display:none">
+                        <div class="summary-item"><strong>날짜:</strong><span id="sumDate">-</span></div>
+                        <div class="summary-item"><strong>시간:</strong><span id="sumTime">-</span></div>
+                        <div class="summary-item"><strong>인원:</strong><span id="sumPersonnel">-</span></div>
+                    </div>
 
                     <div class="section-header">
                         <h5>날짜 선택</h5>
@@ -125,7 +142,15 @@
                     <hr class="my-4">
 
                     <h5 class="fw-bold mb-3">시간 선택</h5>
-                    <div class="time-slots-grid" id="timeSlotsContainer"></div>
+                    <div class="time-section">
+                        <div class="time-label">오전</div>
+                        <div id="amSlotsContainer" class="time-slots-grid"></div>
+                    </div>
+
+                    <div class="time-section mt-3">
+                        <div class="time-label">오후</div>
+                        <div id="pmSlotsContainer" class="time-slots-grid"></div>
+                    </div>
 
                     <hr class="my-4">
 

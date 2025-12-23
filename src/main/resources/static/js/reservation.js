@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         '5-5': '어린이날',
         '12-25': '성탄절'
     };
+    const maxRevDate = new Date();
+    maxRevDate.setFullYear(maxRevDate.getFullYear()+1);
 
     // DOM 요소
     // 지도
@@ -27,7 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevNextIcons = document.querySelectorAll("#prevMonth, #nextMonth");
 
     // 시간 및 인원 UI
-    const timeContainer = document.getElementById("timeSlotsContainer");
+    // 오전 오후로 수정
+    const amContainer = document.getElementById("amSlotsContainer");
+    const pmContainer = document.getElementById("pmSlotsContainer");
+
+    //const timeContainer = document.getElementById("timeSlotsContainer");
     const guestInput = document.getElementById("guestCount");
     const btnMinus = document.getElementById("btnMinus");
     const btnPlus = document.getElementById("btnPlus");
@@ -36,6 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const summaryDate = document.getElementById("displayDate");
     const summaryTime = document.getElementById("displayTime");
     const summaryPersonnel = document.getElementById("displayPersonnel");
+
+    // 상단 요약 정보
+    const topSummaryBox = document.getElementById("topSummaryBox");
+    const sumDate = document.getElementById("sumDate");
+    const sumTime = document.getElementById("sumTime");
+    const sumPersonnel = document.getElementById("sumPersonnel")
 
     // 예약 폼
     const btnBook = document.getElementById("btnBook");
@@ -71,6 +83,31 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("지도 표시를 위한 필수 요소가 누락되었습니다.");
     }
 
+    const updateAllSummaries = () => {
+        const selectedDateElem = document.querySelector(".day.selected");
+        const selectedTimeElem = document.querySelector(".time-btn.btn-success");
+        const personnelCount = guestInput.value;
+
+        const dateText = selectedDateElem ? summaryDate.innerText : "날짜를 선택하세요";
+        const timeText = selectedTimeElem ? selectedTimeElem.innerText : "시간을 선택하세요";
+        const personnalText = `${personnelCount}명`;
+
+        // 하단 요약 (항상 업데이트)
+        summaryDate.innerText = dateText;
+        summaryTime.innerText = timeText;
+        summaryPersonnel.innerText = personnalText;
+
+        // 상단 요약 (날짜/시간 모두 선택 시 노출)
+        if (selectedDateElem && selectedTimeElem) {
+            sumDate.innerText = dateText;
+            sumTime.innerText = timeText;
+            sumPersonnel.innerText = personnalText;
+            topSummaryBox.style.display = "flex";
+        } else {
+            topSummaryBox.style.display = "none";
+        }
+    };
+
     /* 달력 요일 헤더 */
     if (calendarHeader) {
         calendarHeader.innerHTML = DAY_NAMES.map((day, index) => {
@@ -81,12 +118,60 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join("");
     }
 
-    /* 시간 버튼 생성 */
-    if (timeContainer) {
-        timeContainer.innerHTML = TIME_SLOTS.map(time =>
-            `<button type="button" class="btn btn-outline-secondary btn-sm">${time}</button>`
-        ).join("");
-    }
+    /* 시간 렌더링 */
+    const renderTimeSlots = () => {
+        if(!amContainer || !pmContainer) return;
+
+        const selectedDay = document.querySelector(".day.selected");
+        const now = new Date();
+        const isToday = selectedDay &&
+                        currYear === now.getFullYear() &&
+                        currMonth === now.getMonth() &&
+                        parseInt(selectedDay.getAttribute("data-day"))
+
+        let showAm = "";
+        let showPm = "";
+
+        TIME_SLOTS.forEach(time => {
+            const [hours, minute] = time.split(":").map(Number);
+            let disabledClass = "";
+
+            if(isToday) {
+                const slotTime = new Date();
+                slotTime.setHours(hour, minute, 0, 0);
+                if(slotTime <= now) disabledClass = "disabled";
+            }
+
+            const btnHtml = `<button type="button" class="btn btn-outline-secondary btn-sm">${time}</button>`
+            if (hour < 15) showAm += btnHtml;
+            else showPm += btnHtml;
+        });
+        amContainer.innerHTML = showAm;
+        pmContainer.innerHTML = showPm;
+
+        attachTimeClickEvents();
+    };
+
+    const attachTimeClickEvents = () => {
+        const timeButtons = document.querySelectorAll(".time-btn");
+        timeButtons.forEach(btn => {
+            btn.addEventListener("click", function (){
+                timeButtons.forEach(b => {
+                    b.classList.remove("btn=success", "text-white");
+                    b.classList.add("btn-outline-secondary");
+                });
+                this.classList.remove("btn-outline-secondary");
+                this.classList.add("btn-success", "text-white" );
+
+                if(summaryTime) {
+                    summaryTime.innerText = this.innerText;
+                    summaryTime.classLsit.add("text-primary-custom")
+                }
+            });
+        });
+    };
+renderTimeSlots();
+updateAllSummaries();
 
     // 주요 함수
     /* 달력 렌더링 함수 */
@@ -95,14 +180,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
         let liTag = "";
 
+        //이번달 날짜 채우기
+        const todayObj = new Date();
+        todayObj.setHours(0,0,0,0);
+
         // 지난달 빈 날짜 채우기
         for (let i = firstDayofMonth; i > 0; i--) {
             liTag += `<div class="day inactive"></div>`;
         }
-
-        // 이번 달 날짜 채우기
-        const todayObj = new Date();
-        todayObj.setHours(0, 0, 0, 0); // 시간 초기화
 
         for (let i = 1; i <= lastDateofMonth; i++) {
             const checkDateObj = new Date(currYear, currMonth, i);
@@ -111,8 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // today, holiday
             let statusClass = "";
-            if (checkDateObj.getTime() === todayObj.getTime()) statusClass = "today";
-            else if (checkDateObj < todayObj) statusClass = "inactive";
+            if(checkDateObj < todayObj || checkDateObj > maxRevDate){
+                statusClass = "inactive";
+            } else if (checkDateObj.getTime() === todayObj.getTime()) {
+                statusClass = "today";
+            }
 
             let holidayClass = HOLIDAYS[checkDateStr] ? "holiday" : "";
             let sundayClass = (checkDay === 0) ? "sunday" : "";
@@ -138,9 +226,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const attachDateClickEvents = () => {
         const days = document.querySelectorAll(".day");
         days.forEach(day => {
-            if (day.classList.contains("inactive")) return;
-
             day.addEventListener("click", () => {
+
+                const selectDateObj = new Date(currYear, currMonth, day.getAttribute())
+                if (selectDateObj > maxRevDate){
+                    alert("예약은 오늘로부터 1년 이내의 날짜만 가능합니다.");
+                    return;
+                }
+                if (day.classList.contains("inactive")) return;
+
                 // 기존 선택 제거
                 document.querySelector(".day.selected")?.classList.remove("selected");
                 // 새 선택 추가
@@ -148,6 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const selectedDay = day.getAttribute("data-day");
                 const dayOfWeek = new Date(currYear, currMonth, selectedDay).getDay();
+
+                renderTimeSlots();
+                updateAllSummaries();
 
                 // 하단 요약 업데이트
                 if (summaryDate) {
@@ -181,27 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 date = new Date();
             }
             renderCalendar();
-        });
-    });
-
-    /* 시간 버튼 클릭 */     // 이벤트 위임??
-    const timeButtons = document.querySelectorAll(".time-slots-grid .btn");
-    timeButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            // 초기화
-            timeButtons.forEach(b => {
-                b.classList.remove("btn-success", "text-white");
-                b.classList.add("btn-outline-secondary");
-            });
-            // 활성화
-            this.classList.remove("btn-outline-secondary");
-            this.classList.add("btn-success", "text-white");
-
-            // 요약 업데이트
-            if (summaryTime) {
-                summaryTime.innerText = this.innerText;
-                summaryTime.classList.add("text-primary-custom");
-            }
         });
     });
 

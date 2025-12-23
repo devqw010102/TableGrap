@@ -111,9 +111,12 @@
 .day:hover:not(.inactive):not(.selected) {
     background-color: #f1f3f5;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .day.selected {
@@ -175,21 +178,16 @@
 
 /* 시간 선택 */
 .time-slots-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    grid-template-columns: repeat(7, 1fr);
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 10px;
+    margin-bottom: 1rem;
 }
 
 .time-slots-grid .btn {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 80px;
-    border-radius: 4px;
-    font-size: 14px;
+    width: 100%;
     padding: 8px 0;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 .btn-success {
@@ -283,4 +281,63 @@
 
 #btnBook:hover {
     background-color: #357abd;
+}
+
+/* 식당 정보 탭 (사이즈 키우기) */
+.tab-pane h4 {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+.tab-pane .fs-5 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem;
+}
+
+/* 시간 섹션 분리 (오전/오후) */
+.time-section {
+    margin-bottom: 1rem;
+}
+.time-label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* 상단 요약 박스 */
+#topSummaryBox {
+    background-color: #f0f7ff;
+    border: 1px dashed #468de3;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: none;          /* 기본 숨김 */
+    flex-direction: column;
+    gap: 5px;
+    animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+.summary-item strong { color: #468de3; }
+
+/* 블록된 날짜/시간 안내 메시지 스타일 */
+.day.inactive::after {
+}
+
+.time-btn.disabled {
+    background-color: #f8f9fa !important;
+    color: #dee2e6 !important;
+    border-color: #eee !important;
+    cursor: not-allowed;
+    pointer-events: none;
 }
