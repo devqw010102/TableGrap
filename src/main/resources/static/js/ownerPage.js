@@ -1,18 +1,51 @@
 let currentTab = "pending";     // pending, today, approve
 let currentPage = 0;
+let totalPages = 0;
 const pageSize = 10;
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadOwnerDiners();
     await loadPendingBookings(0);
 })
-document.querySelector('a[href="#tab1"]')?.addEventListener('click', () => loadPendingBookings(0));
-document.querySelector('a[href="#tab2"]')?.addEventListener('click', () => loadTodayBookings(0));
-document.querySelector('a[href="#tab3"]')?.addEventListener('click', () => loadApproveBookings(0));
+
+const tabMenu = {
+    '#tab1': 'pending',
+    '#tab2': 'today',
+    '#tab3': 'approve',
+    '#tab4': 'reviews'
+}
+
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+        const targetTab = tabMenu[e.target.getAttribute('href')];
+        if(targetTab) {
+            currentTab = targetTab;
+            currentPage = 0;
+            tabLoaders[currentTab](0);
+        }
+    });
+});
+
 document.getElementById("dinerSelect")?.addEventListener("change", () => {
         currentPage = 0;
-        currentTab === "pending" ? loadPendingBookings() : loadTodayBookings();
-    });
+        tabLoaders[currentTab](0);
+});
+
+/* 페이지 버튼 */
+const tabLoaders = {
+    pending: (page) => loadBookings({ pending: true, page }),
+    today: (page) => loadBookings({
+        pending: false,
+        date: new Date().toISOString().substring(0, 10),
+        page
+    }),
+    approve: (page) => loadBookings({ pending: false, page }),
+    reviews: (page) => loadReviews(page)
+};
+
+
+document.getElementById("prevPageBtn")?.addEventListener("click", () => movePage(-1));
+document.getElementById("nextPageBtn")?.addEventListener("click", () => movePage(1));
 
 async function fetchJson(url, options = {}) {
     const res = await fetch(url, options);
@@ -49,19 +82,37 @@ async function loadBookings({pending, date = null, page = 0}) {
     if(dinerId) url += `&dinerId=${dinerId}`;
     if(date) url += `&date=${date}`;
 
-    const data = await fetchJson(url);
+    try {
+        const data = await fetchJson(url);
+        updatePaginationInfo(data);
 
-    if(currentTab === "pending") {
-        renderPendingTable(data.content);
+        if(currentTab === "pending") {
+            renderPendingTable(data.content);
+        }
+        else if(currentTab === "today") {
+            renderTodayTable(data.content);
+        }
+        else {
+            renderApprovedTable(data.content);
+        }
     }
-    else if(currentTab === "today") {
-        renderTodayTable(data.content);
+    catch(e) {
+        console.error(e);
     }
-    else {
-        renderApprovedTable(data.content);
-    }
+}
 
-    currentPage = data.number;
+async function loadReviews(page = 0) {
+    const dinerId = document.getElementById('dinerSelect')?.value || "";
+    const url = `/api/owner/reviews?dinerId=${dinerId}&page=${page}&size=${pageSize}`;
+
+    try {
+        const data = await fetchJson(url);
+        updatePaginationInfo(data);
+        renderReviewTable(data.content);
+    }
+    catch(e) {
+        console.error(e);
+    }
 }
 
 async function loadPendingBookings(page = 0) {
@@ -135,6 +186,21 @@ function renderApprovedTable(data) {
     `).join("");
 }
 
+function renderReviewTable(data) {
+    const tbody = document.getElementById("reviewListTable");
+    if(!data.length) return renderEmptyRow(tbody, 5, "작성된 리뷰가 없습니다.");
+
+    tbody.innerHTML = data.map(r => `
+        <tr>
+            <td>${r.memberUsername}</td>
+            <td>${r.dinerName}</td>
+            <td class="text-warning">${"⭐".repeat(r.rating)}</td>
+            <td>${r.comment}</td>
+            <td>${formatDate(r.createTime)}</td>
+        </tr>
+    `).join("");
+}
+
 async function processBooking(url, message, successMessage) {
     if(!confirm(message)) return;
 
@@ -168,4 +234,68 @@ function renderEmptyRow(tbody, col, msg) {
 }
 function formatDate(dt) {
     return dt.replace("T", " ").substring(0, 16);
+}
+
+/* 페이지 버튼 구현 */
+function movePage(delta) {
+    const nextPage = currentPage + delta;
+    if (nextPage < 0 || nextPage >= totalPages) return;
+    tabLoaders[currentTab](nextPage);
+}
+
+/* 페이지 번호 */
+function renderPagination() {
+    const ul = document.getElementById("pagination");
+    if (!ul || totalPages <= 1) {
+        ul.innerHTML = "";
+        return;
+    }
+
+    let html = "";
+
+    // 이전
+    html += `
+        <li class="page-item ${currentPage === 0 ? "disabled" : ""}">
+            <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo;</a>
+        </li>
+    `;
+
+    const start = Math.max(0, currentPage - 2);
+    const end = Math.min(totalPages - 1, currentPage + 2);
+
+    for (let i = start; i <= end; i++) {
+        html += `
+            <li class="page-item ${i === currentPage ? "active" : ""}">
+                <a class="page-link" href="#" data-page="${i}">
+                    ${i + 1}
+                </a>
+            </li>
+        `;
+    }
+
+    // 다음
+    html += `
+        <li class="page-item ${currentPage >= totalPages - 1 ? "disabled" : ""}">
+            <a class="page-link" href="#" data-page="${currentPage + 1}">&raquo;</a>
+        </li>
+    `;
+
+    ul.innerHTML = html;
+
+    // 이벤트 위임
+    ul.querySelectorAll("a.page-link").forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const page = Number(e.target.dataset.page);
+            if (!isNaN(page)) {
+                tabLoaders[currentTab](page);
+            }
+        });
+    });
+}
+
+function updatePaginationInfo(data) {
+    currentPage = data.number;
+    totalPages = data.totalPages;
+    renderPagination();
 }

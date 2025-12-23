@@ -1,4 +1,4 @@
-package com.example.demo.data.dto;
+package com.example.demo.data.dto.owner;
 
 import com.example.demo.data.model.OwnerRequest;
 import lombok.AllArgsConstructor;
