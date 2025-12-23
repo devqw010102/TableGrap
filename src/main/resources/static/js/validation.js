@@ -31,12 +31,12 @@ const clearError = (elementId, successMsg = "") => {
 // 이름 (한글/영문 10자까지)
 function checkName(name) {
     const nameVal = name.value.trim();
-    const nameReg = /^[a-zA-Z가-힣]+$/;
+    const nameReg = /^[가-힣]{2,10}$/;
 
-    if (nameVal.length > 0 && nameVal.length <= 10 && nameReg.test(nameVal)) {
+    if (nameVal.length > 1 && nameVal.length <= 10 && nameReg.test(nameVal)) {
         clearError("registerName");
     } else {
-        showError("registerName", "이름은 한글/영문 1~10자 이내여야 합니다.");
+        showError("registerName", "이름은 한글 2~10자 이내여야 합니다.");
     }
 }
 
@@ -47,9 +47,9 @@ function checkUsername(id) {
 
     clearTimeout(validationTimer);
 
-    const idReg = /^[a-z0-9]*$/;
-    if (username.length < 4 || username.length > 20 || !idReg.test(username)) {
-        showError(usernameId, "아이디는 4~20자의 영문 소문자와 숫자만 가능합니다.");
+    const idReg = /^[a-zA-Z0-9]{3,12}$/;
+    if (username.length < 3 || username.length > 12 || !idReg.test(username)) {
+        showError(usernameId, "아이디는 영문 소문자로 시작하고 숫자를 포함한 3~12자여야 합니다.");
         return;
     }
 
@@ -74,13 +74,17 @@ function checkUsername(id) {
 function EmailValidation() {
     const emailInput = document.getElementById("registerEmail") || document.getElementById("emailId");
     const domainInput = document.getElementById("registerDomain") || document.getElementById("emailDomainInput");
-    const emailId = emailInput.id;
+    const totalEmailInput = document.getElementById("totalEmail");
 
+    if (!emailInput || !domainInput) return;
+
+    const emailId = emailInput.id;
     const emailPrefix = emailInput.value.trim();
     const domain = domainInput.value.trim();
 
     emailInput.classList.remove('is-valid', 'is-invalid');
     domainInput.classList.remove('is-valid', 'is-invalid');
+
 
     if(emailPrefix.length < 2 || domain === "") {
         showError(emailId, "이메일 앞자리는 2자 이상, 도메인은 필수입니다.");
@@ -89,11 +93,21 @@ function EmailValidation() {
     }
 
     const fullEmail = `${emailPrefix}@${domain}`;
-    const emailReg = /^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailReg = /^[a-zA-Z0-9]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if(!emailReg.test(fullEmail)) {
         showError(emailId, "유효한 이메일 형식이 아닙니다.");
+        if(totalEmailInput) totalEmailInput.value = "";
         return false;
+    }
+
+    if(totalEmailInput) totalEmailInput.value = fullEmail;
+
+    const originEmail = emailInput.dataset.origin;
+    if(originEmail && fullEmail === originEmail) {
+        clearError(emailInput.id, "현재 사용 중인 이메일입니다.");
+        domainInput.classList.add('is-valid');
+    return;
     }
 
     clearTimeout(validationTimer);
@@ -142,8 +156,7 @@ function checkPhone(phone) {
     if (phoneVal === "") {
         const errorDiv = document.getElementById(`error-${phone.id}`);
         if (errorDiv) errorDiv.innerText = "";
-        phone.classList.remove('is-invalid');
-        phone.classList.remove('is-valid');
+        phone.classList.remove('is-invalid', 'is-valid');
         return;
     }
 

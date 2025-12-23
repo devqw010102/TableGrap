@@ -73,7 +73,7 @@
                             <td><input type="text" id="myName" class="form-control-plaintext" readonly/></td>
                         </tr>
                         <tr>
-                            <th class="bg-light text-center" style="vertical-align: middle;">이메일</th>
+                            <th class="bg-light text-center" style="vertical-align: middle;"><span class="text-danger">*</span>이메일</th>
                             <td>
                                 <input type="text" id="emailDisplay" class="form-control-plaintext" readonly>
 
@@ -96,38 +96,37 @@
                                     </select>
                                 </div>
 
-                                <div id="emailCheckResult" class="small ms-1 mt-1"></div>
+                                <div id="error-emailId" class="small ms-1 mt-1"></div>
                             </td>
                         </tr>
                         <tr>
-                            <th class="bg-light text-center" style="width: 20%;">전화번호</th>
+                            <th class="bg-light text-center" style="width: 20%;">전화번호(선택)</th>
                             <td>
                                 <input type="text" id="phoneDisplay" class="form-control-plaintext" readonly>
 
                                 <div id="phoneEditGroup" class="input-group" style="display:none;">
                                     <input type="text" id="myPhone" name="phone" class="form-control"
-                                           placeholder="01012345678" onkeyup="checkPhone(this)">
+                                           placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
                                 </div>
 
-                                <div id="phoneResult" class="small mt-1"></div>
+                                <div id="error-myPhone" class="small mt-1"></div>
                             </td>
                         </tr>
 
-                        <tr class="edit-mode-row" style="display:none;">
-                            <th class="bg-light text-center">새 비밀번호</th>
+                        <tr>
+                            <th class="bg-light text-center">비밀번호</th>
                             <td>
-                                <input type="password" id="newPassword" name="password"  class="form-control" readonly autocomplete="new-password" onkeyup = "checkPwd(this)">
-                                <div id="pwdResult" class="small"></div>
+                                <div id="pwdViewRow" class="form-control-plaintext">●●●●●●●●</div>
 
-                            </td>
-                        </tr>
-                        <tr class="edit-mode-row" style="display:none;">
-                            <th class="bg-light text-center">비밀번호 확인</th>
-                            <td>
-                                <input type="password" id="pwdConfirm" name="passwordConfirm"  class="form-control" readonly onkeyup= "checkPwdConfirm()">
-                                <div id="pwdConfirmResult" class="small"></div>
-
-
+                                <div id="pwdEditGroup" class="edit-mode-row" style="display:none;">
+                                    <div class="mb-2">
+                                        <input type="password" id="newPassword" class="form-control" placeholder="새 비밀번호 입력(선택)" onkeyup="checkPwd(this)">
+                                        <div id="error-newPassword" class="small"></div> </div>
+                                    <div>
+                                        <input type="password" id="pwdConfirm" class="form-control" placeholder="비밀번호 확인" onkeyup="checkPwdConfirm()">
+                                        <div id="error-pwdConfirm" class="small"></div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         </tbody>

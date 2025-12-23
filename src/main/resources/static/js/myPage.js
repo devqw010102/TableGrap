@@ -32,6 +32,9 @@ function toggleEditMode(isMemberEdit) {
     const phoneDisplay = document.getElementById("phoneDisplay");
     const phoneEditGroup = document.getElementById("phoneEditGroup");
 
+    const pwdViewRow = document.getElementById("pwdViewRow");
+    const pwdEditGroup = document.getElementById("pwdEditGroup");
+
     const otherFields = ['newPassword', 'pwdConfirm','myPhone', 'emailId', 'emailDomainInput'];
     const emailSelect = document.getElementById("emailDomainSelect");
 
@@ -40,6 +43,9 @@ function toggleEditMode(isMemberEdit) {
         if (emailEditGroup) emailEditGroup.style.display = "flex";
         if (phoneDisplay) phoneDisplay.style.display = "none";
         if (phoneEditGroup) phoneEditGroup.style.display = "flex";
+
+        if(pwdViewRow) pwdViewRow.style.display = "none";
+        if(pwdEditGroup) pwdEditGroup.style.display = "block";
 
     otherFields.forEach(id => {
         const editValue = document.getElementById(id);
@@ -56,6 +62,9 @@ function toggleEditMode(isMemberEdit) {
     if (phoneDisplay) phoneDisplay.style.display = "block";
     if (phoneEditGroup) phoneEditGroup.style.display = "none";
 
+    if(pwdViewRow) pwdViewRow.style.display = "block";
+    if(pwdEditGroup) pwdEditGroup.style.display = "none";
+
     otherFields.forEach(id => {
         const editValue = document.getElementById(id);
         if(editValue){
@@ -66,21 +75,26 @@ function toggleEditMode(isMemberEdit) {
     });
     if(emailSelect) emailSelect.disabled = true;
 
-    document.querySelectorAll(".small").forEach(div => div.innerHTML = "");
-}
-document.querySelectorAll(".edit-mode-row").forEach(row=> {
-    row.style.display = isMemberEdit ? "table-row" : "none";
-});
+    document.getElementById("newPassword").value = "";
+    document.getElementById("pwdConfirm").value = "";
 
+    document.querySelectorAll("[id^='error-']").forEach(div => div.innerHTML="");
+}
     document.getElementById("btnEdit").style.display = isMemberEdit ? "none" : "inline-block";
     document.getElementById("btnSave").style.display = isMemberEdit ? "inline-block": "none"
     document.getElementById("btnCancel").style.display = isMemberEdit ? "inline-block" : "none";
-};
-
+}
 
 
 // 회원 정보 저장 - /api/member/update
 function saveMember() {
+    const invalidInputs = document.querySelectorAll(".tab-pane.active .is-invalid");
+    if(invalidInputs.length > 0) {
+        alert("입력 항목 중 오류가 있습니다. 메세지를 확인해주세요.");
+        invalidInputs[0].focus();
+        return;
+    }
+
     const pwd = document.getElementById("newPassword").value;
     const pwdConfirm = document.getElementById("pwdConfirm").value;
 
@@ -215,6 +229,8 @@ function loadMyInfo() {
     fetch("/api/member/info")
         .then(res => res.json())
         .then(data => {
+            const emailInput = document.getElementById("emailId");
+
             document.getElementById("myUsername").value = data.username;
             document.getElementById("myName").value = data.name;
 
@@ -236,6 +252,10 @@ function loadMyInfo() {
             const phoneStyle = data.phone || "";
             document.getElementById("phoneDisplay").value = phoneStyle;
             document.getElementById("myPhone").value = phoneStyle;
+
+            if(data.email) {
+                emailInput.dataset.origin = data.email;
+            }
             toggleEditMode(false);
         })
         .catch(err => console.error("회원정보 로드 실패:", err));
