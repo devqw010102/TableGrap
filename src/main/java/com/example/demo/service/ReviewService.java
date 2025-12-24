@@ -1,12 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.data.dto.ReviewDto;
-import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Member;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;

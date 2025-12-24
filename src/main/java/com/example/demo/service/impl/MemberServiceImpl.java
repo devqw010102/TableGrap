@@ -10,11 +10,9 @@ import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-
-import java.util.List;
 import java.util.Optional;
 
 @Service

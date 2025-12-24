@@ -16,5 +16,4 @@ public class AdminReviewDto {
     private int rating;
     private String comment;
     private LocalDateTime createTime;
-
 }

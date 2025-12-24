@@ -4,23 +4,17 @@ import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
 import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.service.AdminService;
-import com.example.demo.service.BookService;
-import com.example.demo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/adminPage")
 public class AdminController {
 
-    private final BookService bookService;
-    private final ReviewService reviewService;
     private final AdminService adminService;
 
     // 식당 목록 fetch
@@ -53,16 +47,19 @@ public class AdminController {
         return adminService.getBooks(pageable);
     }
 
+    // 사장 목록 fetch
     @GetMapping("/owners")
     public Page<AdminOwnerDto> owners(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return adminService.getOwners(pageable);
     }
 
+    // 리뷰 목록 fetch
     @GetMapping("/reviews")
     public Page<AdminReviewDto> reviews(@PageableDefault(size = 10, sort = "reviewId") Pageable pageable) {
         return adminService.getReviews(pageable);
     }
 
+    // 대시보드 fetch
     @GetMapping("/dashboard")
     public AdminDashboardDto dashboard(@PageableDefault(size = 5) Pageable pageable) {
         return adminService.getDashboard(pageable);

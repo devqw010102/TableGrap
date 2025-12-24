@@ -2,13 +2,10 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
-import com.example.demo.data.dto.admin.AdminDinerDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
-import com.example.demo.data.dto.admin.AdminOwnerDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
