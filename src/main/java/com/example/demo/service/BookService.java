@@ -24,7 +24,4 @@ public interface BookService {
     void approveBooking(Long bookId);
 
     void rejectBooking(Long bookId);
-
-    // adminPage 구현
-    List<AdminBookDto> getAll();
 }

@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerListDto;
+import com.example.demo.data.dto.admin.AdminDinerDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
 import com.example.demo.data.dto.admin.AdminOwnerDto;
 import com.example.demo.data.model.Diner;
@@ -42,10 +43,6 @@ public class DinerServiceImpl implements DinerService {
                 .build();
     }
 
-    public List<DinerDetailDto> getList() {
-        return dinerRepository.findAll().stream().map(this::mapToDinerDetailDto).toList();
-    }
-
     @Override
     public DinerDetailDto getDinerById(Long id) {
       // DB에서 ID로 찾고 DinerDetailDto로 변환, 없으면 에러
@@ -64,19 +61,5 @@ public class DinerServiceImpl implements DinerService {
         return dinerRepository.findByOwnerId(ownerId);
     }
 
-    @Transactional
-    @Override
-    public List<AdminOwnerDto> getAll() {
-        return dinerRepository.findOwnerDiners().stream().map(d -> AdminOwnerDto.builder()
-                .memberId(d.getOwner().getId())
-                .ownerName(d.getOwner().getName())
-                .email(d.getOwner().getEmail())
-                .phone(d.getOwner().getPhone())
-                .dinerId(d.getId())
-                .dinerName(d.getDinerName())
-                .category(d.getCategory())
-                .status(d.getStatus().toString())
-                .build())
-                .toList();
-    }
+
 }

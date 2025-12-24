@@ -1,13 +1,15 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.dto.*;
-import com.example.demo.data.dto.admin.AdminBookDto;
-import com.example.demo.data.dto.admin.AdminDashboardDto;
-import com.example.demo.data.dto.admin.AdminOwnerDto;
-import com.example.demo.data.dto.admin.AdminReviewDto;
+import com.example.demo.data.dto.MemberInfoResponseDto;
+import com.example.demo.data.dto.admin.*;
 import com.example.demo.data.dto.owner.OwnerRequestDto;
-import com.example.demo.service.*;
+import com.example.demo.service.AdminService;
+import com.example.demo.service.BookService;
+import com.example.demo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,61 +19,52 @@ import java.util.List;
 @RequestMapping("/api/adminPage")
 public class AdminController {
 
-    private final OwnerRequestService ownerRequestService;
-    private final DinerService dinerService;
-    private final MemberService  memberService;
     private final BookService bookService;
     private final ReviewService reviewService;
     private final AdminService adminService;
 
     // 식당 목록 fetch
     @GetMapping("/diners")
-    public List<DinerDetailDto> diners() {
-        return dinerService.getList();
-    }
+    public Page<AdminDinerDto> diners(@PageableDefault(size = 10, sort = "id") Pageable pageable) { return adminService.getList(pageable); }
 
     // 회원 목록 fetch
     @GetMapping("/members")
-    public List<MemberInfoResponseDto> members() {
-        return memberService.getList();
-    }
+    public Page<MemberInfoResponseDto> members(@PageableDefault(size = 10, sort = "id") Pageable pageable) { return adminService.getMember(pageable); }
 
     // 권한 신청 목록 fetch
     @GetMapping("/owner-requests")
-    public List<OwnerRequestDto> ownerRequests() {
-        return ownerRequestService.findAll();
-    }
+    public Page<OwnerRequestDto> ownerRequests(@PageableDefault(size = 10, sort = "id") Pageable pageable) { return adminService.findAllByStatus(pageable); }
 
     // 권한 승인
     @PutMapping("/owner-requests/{id}/approve")
     public void approveOwner(@PathVariable Long id) {
-        ownerRequestService.approve(id);
+        adminService.approve(id);
     }
 
     // 권한 반려
     @PutMapping("/owner-requests/{id}/reject")
     public void rejectOwner(@PathVariable Long id) {
-        ownerRequestService.reject(id);
+        adminService.reject(id);
     }
 
     // 예약 목록 fetch
     @GetMapping("/books")
-    public List<AdminBookDto> books() {
-        return bookService.getAll();
+    public Page<AdminBookDto> books(@PageableDefault(size = 10, sort = "bookId") Pageable pageable) {
+        return adminService.getBooks(pageable);
     }
 
     @GetMapping("/owners")
-    public List<AdminOwnerDto> owners() {
-        return dinerService.getAll();
+    public Page<AdminOwnerDto> owners(@PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return adminService.getOwners(pageable);
     }
 
     @GetMapping("/reviews")
-    public List<AdminReviewDto> reviews() {
-        return reviewService.getAll();
+    public Page<AdminReviewDto> reviews(@PageableDefault(size = 10, sort = "reviewId") Pageable pageable) {
+        return adminService.getReviews(pageable);
     }
 
     @GetMapping("/dashboard")
-    public AdminDashboardDto dashboard() {
-        return adminService.getDashboard();
+    public AdminDashboardDto dashboard(@PageableDefault(size = 5) Pageable pageable) {
+        return adminService.getDashboard(pageable);
     }
 }

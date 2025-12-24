@@ -33,7 +33,7 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
         join fetch m.authorities a
         where a.authority = 'ROLE_OWNER'
     """)
-    List<Diner> findOwnerDiners();
+    Page<Diner> findOwnerDiners(Pageable pageable);
 
     @Query("select count(d) from Diner d")
     Long countAllDiners();

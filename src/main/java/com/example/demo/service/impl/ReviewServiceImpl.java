@@ -113,11 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
     }
 
-    @Transactional
-    @Override
-    public List<AdminReviewDto> getAll() {
-        return reviewRepository.findAllForAdmin();
-    }
+
 
     @Override
     public Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size) {

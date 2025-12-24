@@ -28,11 +28,13 @@ public class Member {
     private String email;       // 이메일
 
     private String phone;       // 전화번호
-    @Column(nullable = false)
 
+    @Column(nullable = false)
     private String name;        // 이름
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-
     private List<Authority> authorities = new ArrayList<>();
+
+
 }

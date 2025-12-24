@@ -22,7 +22,7 @@ public interface ReviewService {
     void createReview(ReviewDto reviewDto, Long memberId);
     @Transactional
     void deleteReview(Long reviewId);
-    List<AdminReviewDto> getAll();
+
     
     // OwnerPage 리뷰
     Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size);

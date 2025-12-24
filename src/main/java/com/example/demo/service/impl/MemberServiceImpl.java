@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 import java.util.List;
 import java.util.Optional;
 
@@ -29,17 +30,6 @@ public class MemberServiceImpl implements MemberService {
                 .id(member.getId())
                 .username(member.getUsername()) // 실제 id
                 .name(member.getName())         // 이름
-                .email(member.getEmail())
-                .phone(member.getPhone())
-                .build();
-    }
-
-    // Convert method : Member -> MemberInfoResponseDto
-    private MemberInfoResponseDto mapToMemberInfoDto(Member member) {
-        return MemberInfoResponseDto.builder()
-                .id(member.getId())
-                .username(member.getUsername())
-                .name(member.getName())
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
@@ -95,10 +85,7 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.existsByUsername(username);
     }
 
-    @Override
-    public List<MemberInfoResponseDto> getList() {
-        return memberRepository.findAll().stream().map(this::mapToMemberInfoDto).toList();
-    }
+
 
     @Override
     public MemberInfoResponseDto findMyInfo(Long memberId) {

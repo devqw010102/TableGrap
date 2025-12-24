@@ -139,18 +139,4 @@ public class BookServiceImpl implements BookService {
 
         bookRepository.delete(book);
     }
-
-    @Override
-    public List<AdminBookDto> getAll() {
-        return bookRepository.findAll().stream().map(book -> AdminBookDto.builder()
-                        .id(book.getBookId())
-                        .createDate(book.getAddDate())
-                        .dinerName(book.getDiner().getDinerName())
-                        .bookingDate(book.getBookingDate())
-                        .personnel(book.getPersonnel())
-                        .memberName(book.getMember().getName())
-                        .success(book.getSuccess())
-                        .build())
-                        .toList();
-    }
 }
