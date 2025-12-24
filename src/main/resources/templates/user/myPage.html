@@ -18,13 +18,17 @@
     <ul class="nav nav-tabs" id="myPageTab" role="tablist">
         <!-- tab1 -->
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="books-tab" data-bs-toggle="tab" href="#books" role="tab" aria-controls="books" aria-selected="true">예약 목록</a>
+            <a class="nav-link active" id="books-tab" data-bs-toggle="tab" href="#books" role="tab" aria-controls="books" aria-selected="true">현재 예약</a>
         </li>
         <!-- tab2 -->
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="info-tab" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">내 정보</a>
+            <a class="nav-link" id="pastBooks-tab" data-bs-toggle="tab" href="#pastBooks" role="tab" aria-controls="pastBooks" aria-selected="true">지난 예약</a>
         </li>
         <!-- tab3 -->
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="info-tab" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">내 정보</a>
+        </li>
+        <!-- tab4 -->
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="review-tab" data-bs-toggle="tab" href="#review" role="tab" aria-controls="info" aria-selected="false">내 리뷰</a>
         </li>
@@ -50,6 +54,28 @@
                     </tr>
                     </thead>
                     <tbody id="bookTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="pastBooks" role="tabpanel" aria-labelledby="books-tab">
+
+            <!-- 예약 목록(book) 출력할 table -->
+            <div class="container mt-4">
+                <h2>예약 목록</h2>
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                    <tr>
+                        <th>식당 이름</th>
+                        <th>예약일</th>
+                        <th>예약 인원</th>
+                        <th>예약자 명</th>
+                        <th>예약 확정</th>
+                        <th>취소/후기</th>
+                    </tr>
+                    </thead>
+                    <tbody id="pastBookTable">
                     </tbody>
                 </table>
             </div>

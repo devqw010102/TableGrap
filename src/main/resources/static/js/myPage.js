@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const bookLink = document.querySelector('a[href="#books"]');
+    const pastBookLink = document.querySelector('a[href="#pastBooks"]')
     const infoLink = document.querySelector('a[href="#info"]');
     const reviewLink = document.querySelector('a[href="#review"]');
     if (bookLink) bookLink.addEventListener('click', loadBooks);
+    if (pastBookLink) pastBookLink.addEventListener('click', loadBooks);
     if (infoLink) infoLink.addEventListener('click', loadMyInfo);
     if (reviewLink) reviewLink.addEventListener('click', loadMyReview);
 
@@ -47,39 +49,39 @@ function toggleEditMode(isMemberEdit) {
         if(pwdViewRow) pwdViewRow.style.display = "none";
         if(pwdEditGroup) pwdEditGroup.style.display = "block";
 
-    otherFields.forEach(id => {
-        const editValue = document.getElementById(id);
-        if (isMemberEdit) {
-            editValue.readOnly = false;
-            editValue.className = "form-control";
-        }
-    });
-    if (emailSelect) emailSelect.disabled = false;
+        otherFields.forEach(id => {
+            const editValue = document.getElementById(id);
+            if (isMemberEdit) {
+                editValue.readOnly = false;
+                editValue.className = "form-control";
+            }
+        });
+        if (emailSelect) emailSelect.disabled = false;
 
     } else{
-    if (emailDisplay) emailDisplay.style.display = "block";
-    if (emailEditGroup) emailEditGroup.style.display = "none";
-    if (phoneDisplay) phoneDisplay.style.display = "block";
-    if (phoneEditGroup) phoneEditGroup.style.display = "none";
+        if (emailDisplay) emailDisplay.style.display = "block";
+        if (emailEditGroup) emailEditGroup.style.display = "none";
+        if (phoneDisplay) phoneDisplay.style.display = "block";
+        if (phoneEditGroup) phoneEditGroup.style.display = "none";
 
-    if(pwdViewRow) pwdViewRow.style.display = "block";
-    if(pwdEditGroup) pwdEditGroup.style.display = "none";
+        if(pwdViewRow) pwdViewRow.style.display = "block";
+        if(pwdEditGroup) pwdEditGroup.style.display = "none";
 
-    otherFields.forEach(id => {
-        const editValue = document.getElementById(id);
-        if(editValue){
-            editValue.readOnly = true;
-            editValue.className = "form-control-plaintext";
-            editValue.classList.remove("is-valid", "is-invalid");
-        }
-    });
-    if(emailSelect) emailSelect.disabled = true;
+        otherFields.forEach(id => {
+            const editValue = document.getElementById(id);
+            if(editValue){
+                editValue.readOnly = true;
+                editValue.className = "form-control-plaintext";
+                editValue.classList.remove("is-valid", "is-invalid");
+            }
+        });
+        if(emailSelect) emailSelect.disabled = true;
 
-    document.getElementById("newPassword").value = "";
-    document.getElementById("pwdConfirm").value = "";
+        document.getElementById("newPassword").value = "";
+        document.getElementById("pwdConfirm").value = "";
 
-    document.querySelectorAll("[id^='error-']").forEach(div => div.innerHTML="");
-}
+        document.querySelectorAll("[id^='error-']").forEach(div => div.innerHTML="");
+    }
     document.getElementById("btnEdit").style.display = isMemberEdit ? "none" : "inline-block";
     document.getElementById("btnSave").style.display = isMemberEdit ? "inline-block": "none"
     document.getElementById("btnCancel").style.display = isMemberEdit ? "inline-block" : "none";
@@ -147,13 +149,18 @@ function loadBooks() {
     fetch("/api/myPage/books")
         .then(res => res.json())
         .then(data => {
-            const tbody = document.getElementById("bookTable");
+            const currentTbody = document.getElementById("bookTable");
+            const pastTbody = document.getElementById("pastBookTable");
+
+            currentTbody.innerHTML = '';
+            pastTbody.innerHTML = '';
+
             if (!data || data.length === 0) {
-                renderEmptyRow(tbody, 6, "예약 내역이 없습니다.");
+                renderEmptyRow(currentTbody, 6, "현재 예약 내역이 없습니다.");
+                renderEmptyRow(pastTbody, 6, "지난 예약 내역이 없습니다.");
                 return;
             }
 
-            tbody.innerHTML = '';
             data.forEach(book => {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
@@ -163,31 +170,33 @@ function loadBooks() {
                 const date = new Date("2026-01-01");
                 //테스트용 시간 설정 (과거)
                 //const date = new Date("2025-01-01");
+                //const now = new Date();
                 const bookDate = new Date(book.bookingDate);
-                const timeDiff = date - bookDate; //현재 시간과 예약
+                const isPast = date > bookDate;
 
+                const timeDiff = date - bookDate; //현재 시간과 예약
                 //버튼 변경 로직
                 const changeBtn =
-                (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
+                    (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
                     data-review-id="${book.reviewId}"  
                     data-book-id="${book.bookId}" 
                     data-diner-id="${book.dinerId}"
                     >후기 수정</button>` :
-                (timeDiff > 0 && book.success)
-                ? `<button class="btn btn-success btn-sm btn-review" 
+                        (timeDiff > 0 && book.success)
+                            ? `<button class="btn btn-success btn-sm btn-review" 
                     data-book-id="${book.bookId}"
                     data-diner-id="${book.dinerId}"
                     >후기 작성</button>`
-                // 예약 일자 경과 전
-                : (timeDiff <= 0 && (book.success || !book.success))
-                ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
-                : "";
+                            // 예약 일자 경과 전
+                            : (timeDiff <= 0 && (book.success || !book.success))
+                                ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
+                                : "";
 
                 //예약 시간이 경과한 후 예약 수정 페이지 진입 차단
                 const changeUrl =
-                (timeDiff >= 0 && book.success) ? `${book.dinerName}`
-                : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`
-                tbody.innerHTML += `
+                    (timeDiff >= 0 && book.success) ? `${book.dinerName}`
+                        : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`
+                currentTbody.innerHTML += `
                     <tr>
                         <td>${changeUrl}</td>
                         <td>${modifyDate}</td>
@@ -197,7 +206,17 @@ function loadBooks() {
                         <td>${changeBtn}</td>
                     </tr>
                 `;
-            });
+
+            if (isPast) {
+                pastTbody.innerHTML += rowHtml;
+            } else {
+                currentTbody.innerHTML += rowHtml;
+            }
+        });
+
+    if (currentTbody.innerHTML === '') renderEmptyRow(currentTbody, 6, "현재 예약 내역이 없습니다.");
+    if (pastTbody.innerHTML === '') renderEmptyRow(pastTbody, 6, "지난 예약 내역이 없습니다.");
+
             // 리뷰작성 이벤트 리스너
             document.querySelectorAll(".btn-review").forEach(btn => {
                 btn.addEventListener("click", (e) => {
@@ -223,8 +242,22 @@ function loadBooks() {
                     cancelBooking(this.getAttribute("data-id"));
                 });
             });
-        })
-        .catch(err => console.error("예약 조회 실패:", err));
+            addBookingEventListeners();
+        )}
+        .catch(err => console.error("예약 조회 실패:", err);
+});
+}
+
+function addBookingEventListeners() {
+    document.querySelectorAll(".btn-review").forEach(btn => {
+        btn.addEventListener("click", (e) => openModal(e.target.dataset.bookId, e.target.dataset.dinerId));
+    });
+    document.querySelectorAll(".btn-update-review").forEach(btn => {
+        btn.addEventListener("click", (e) => openEditModal(e.target.dataset.reviewId, e.target.dataset.bookId, e.target.dataset.dinerId));
+    });
+    document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
+        btn.addEventListener("click", function() { cancelBooking(this.getAttribute("data-id")); });
+    });
 }
 
 // 회원 정보 불러오기
@@ -345,13 +378,13 @@ function openModal(bookId, dinerId) {
 }
 //review type=number유지하고 1-5이외의 숫자 or 문자 입력시 빈칸 처리
 document.getElementById("modalRating").addEventListener("input", e => {
-  //1-5까지의 숫자를 제외하고 빈칸으로 처리
-  let rating = e.target.value.replace(/[^1-5]$/g, "");
-  //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
-  if(rating.length > 1){
-  rating = rating.slice(0, 1);
-  }
-  e.target.value = rating;
+    //1-5까지의 숫자를 제외하고 빈칸으로 처리
+    let rating = e.target.value.replace(/[^1-5]$/g, "");
+    //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
+    if(rating.length > 1){
+        rating = rating.slice(0, 1);
+    }
+    e.target.value = rating;
 })
 
 // 리뷰 수정 모달 열기
@@ -373,13 +406,13 @@ function openEditModal(reviewId, bookId, dinerId){
 
 //review type=number유지하고 1-5이외의 숫자 or 문자 입력시 빈칸 처리
 document.getElementById("editRating").addEventListener("input", e => {
-  //1-5까지의 숫자를 제외하고 빈칸으로 처리
-  let rating = e.target.value.replace(/[^1-5]$/g, "");
-  //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
-  if(rating.length > 1){
-  rating = rating.slice(0, 1);
-  }
-  e.target.value = rating;
+    //1-5까지의 숫자를 제외하고 빈칸으로 처리
+    let rating = e.target.value.replace(/[^1-5]$/g, "");
+    //111, 555 같이 범위내 같은 숫자 연속 입력 시, 잘라내기
+    if(rating.length > 1){
+        rating = rating.slice(0, 1);
+    }
+    e.target.value = rating;
 })
 
 //리뷰 작성 메소드
@@ -412,7 +445,7 @@ function createReview() {
                 location.reload();
             } else {
                 const errorMsg=res.text()
-                .then(errorMsg => alert("후기 저장에 실패했습니다." + errorMsg));
+                    .then(errorMsg => alert("후기 저장에 실패했습니다." + errorMsg));
             }
         })
         .catch(err => console.error("에러 발생:", err));
@@ -429,11 +462,11 @@ function updateReview() {
     };
 
     fetch(`/api/review/update/${reviewId}`, {
-      method: "PATCH",
-      headers: {
-          "Content-Type": "application/json"
-    },
-    body: JSON.stringify(updateData)
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updateData)
     })
         .then(res => {
             if(res.ok){
@@ -441,7 +474,7 @@ function updateReview() {
                 location.reload();
             } else {
                 const errorMsg=res.text()
-                .then(errorMsg => alert("후기 수정에 실패했습니다." + errorMsg));
+                    .then(errorMsg => alert("후기 수정에 실패했습니다." + errorMsg));
             }
         })
         .catch(err => console.error("에러 발생", err));
@@ -461,7 +494,7 @@ function deleteReview(){
                 location.reload();
             } else {
                 const errMsg = res.text()
-                .then(errMsg => alert("후기 삭제를 실패했습니다." + errMsg));
+                    .then(errMsg => alert("후기 삭제를 실패했습니다." + errMsg));
             }
         })
         .catch(err => console.error("에러 발생", err));
@@ -476,4 +509,3 @@ function renderEmptyRow(tbody, colSpan, message) {
             </td>
         </tr>
     `}
-

@@ -92,14 +92,18 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void createBooking(BookDto dto) {
-        try {
+            boolean exists = bookRepository.existsByMember_IdAndBookingDate(dto.getMemberId(), dto.getBookingDate());
+            if (exists) {
+                throw new IllegalArgumentException("날짜를 확인해주세요. 해당 날짜에 이미 예약이 존재합니다.");
+            }
+
             Diner diner = dinerRepository.findById(dto.getDinerId())
                     .orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
 
             Member member = memberRepository.findById(dto.getMemberId())
                     .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-            Book book= Book.builder()
+            Book book = Book.builder()
                     .diner(diner)
                     .member(member)
                     .bookingDate(dto.getBookingDate())
@@ -107,11 +111,6 @@ public class BookServiceImpl implements BookService {
                     .success(false)
                     .build();
             bookRepository.save(book);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("예약 처리 중 오류가 발생했습니다.");
-        }
     }
 
     @Override
