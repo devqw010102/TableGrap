@@ -1,8 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.data.enums.RequestStatus;
-import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.model.OwnerRequest;
@@ -57,55 +55,5 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
 
             ownerRequestRepository.save(request);
         }
-    }
-
-    // 권한 신청 목록
-    @Override
-    public List<OwnerRequestDto> findAll() {
-        return ownerRequestRepository.findAll().stream().map(OwnerRequestDto::from).toList();
-    }
-
-    // 승인 처리
-    @Override
-    public void approve(Long requestId) {
-        OwnerRequest request = ownerRequestRepository.findById(requestId).orElseThrow(() -> new IllegalArgumentException("not found request"));
-
-        if(request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("이미 처리된 신청입니다.");
-        }
-
-        Diner diner = request.getDiner();
-        Member member = request.getMember();
-
-        if(diner.getOwner() != null) {
-            throw new IllegalStateException("이미 사장이 등록된 식당입니다.");
-        }
-
-        // Status 승인으로, Diner entity 에도 owner 값 추가
-        request.setStatus(RequestStatus.APPROVED);
-        diner.setOwner(member);
-
-        // Authority 에 해당 아이디가 'ROLE_OWNER'를 가지고 있다면 추가 X
-        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(member, "ROLE_OWNER");
-        if(!hasOwnerRole) {
-            Authority ownerAuthority = Authority.builder()
-                    .member(member)
-                    .authority("ROLE_OWNER")
-                    .build();
-
-            authorityRepository.save(ownerAuthority);
-        }
-    }
-
-    // 반려 처리
-    @Override
-    public void reject(Long requestId) {
-        OwnerRequest request = ownerRequestRepository.findById(requestId).orElseThrow(() -> new IllegalArgumentException("not found request"));
-
-        if (request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("이미 처리된 신청입니다.");
-        }
-
-        request.setStatus(RequestStatus.REJECTED);
     }
 }

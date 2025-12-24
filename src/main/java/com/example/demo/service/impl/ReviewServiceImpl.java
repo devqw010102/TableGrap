@@ -1,7 +1,6 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.ReviewDto;
-import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
@@ -113,11 +112,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
     }
 
-    @Transactional
-    @Override
-    public List<AdminReviewDto> getAll() {
-        return reviewRepository.findAllForAdmin();
-    }
+
 
     @Override
     public Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size) {

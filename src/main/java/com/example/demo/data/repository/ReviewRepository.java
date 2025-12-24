@@ -21,9 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     //리뷰 수정 위해 추가
     Optional<Review> findByBookId(Long bookId);
 
-
-    List<Review> findTop5ByDinerIdAndMemberId(Long dinerId, Long memberId);
-
     @Query("""
         select new com.example.demo.data.dto.admin.AdminReviewDto(
             r.reviewId,
@@ -37,7 +34,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         join Member m on r.memberId = m.id
         join Diner d on r.dinerId = d.id
     """)
-    List<AdminReviewDto> findAllForAdmin();
+    Page<AdminReviewDto> findAllForAdmin(Pageable pageable);
 
     @Query("""
     select new com.example.demo.data.dto.admin.AdminReviewDto(
@@ -57,7 +54,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 """)
     List<AdminReviewDto> findTodayReviews(
             @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
+            @Param("end") LocalDateTime end,
+            Pageable pageable
     );
 
     // Owner 의 식당 중 카테고리로 선택된 식당의 리뷰
