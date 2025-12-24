@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.owner.OwnerDto;
+import com.example.demo.data.dto.owner.OwnerUpdateDto;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.AuthorityRepository;
@@ -18,7 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+
 public class OwnerServiceImpl implements OwnerService {
   private final OwnerRepository ownerRepository;
   private final PasswordEncoder passwordEncoder;
@@ -26,6 +27,7 @@ public class OwnerServiceImpl implements OwnerService {
   private final DinerRepository dinerRepository;
 
   @Override
+  @Transactional
   public OwnerDto createOwner(OwnerDto ownerDto) {
     //1. Owner 저장
       Owner owner = Owner.builder()
@@ -73,8 +75,39 @@ public class OwnerServiceImpl implements OwnerService {
     return ownerRepository.existsByUsername(username);
   }
 
+    @Override
+    public Optional<OwnerDto> findByOwnerId(Long id) {
+        return ownerRepository.findById(id).map(this::mapToOwnerDto);
+    }
+    //Owner 회원 정보 수정
 
-  public OwnerDto mapToOwnerDto(Owner owner, List<String> dinerNames) {
+    @Override
+    @Transactional
+    public void updateOwner(Long ownerId, OwnerUpdateDto dto) {
+        Owner owner = ownerRepository.findById(ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 오너가 없습니다."));
+        System.out.println("=== UPDATE REQUEST ===");
+        System.out.println("Email: " + dto.getEmail());
+        System.out.println("Phone: " + dto.getPhone());
+        System.out.println("Password: " + dto.getPassword());
+
+        if(dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            owner.setEmail(dto.getEmail());
+            System.out.println(">> Email Changed to: " + dto.getEmail()); // 변경 로그
+        }
+        if(dto.getPhone() != null && !dto.getPhone().isBlank()) {
+            owner.setPhone(dto.getPhone());
+            System.out.println(">> Phone Changed to: " + dto.getPhone()); // 변경 로그
+        }
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            owner.setPassword(passwordEncoder.encode(dto.getPassword()));
+            System.out.println(">> Password Changed"); // 변경 로그
+        }
+        ownerRepository.save(owner);
+        mapToOwnerDto(owner);
+    }
+
+    public OwnerDto mapToOwnerDto(Owner owner, List<String> dinerNames) {
     return OwnerDto.builder()
             .id(owner.getId())
             .name(owner.getName())

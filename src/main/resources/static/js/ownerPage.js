@@ -7,6 +7,13 @@ const pageSize = 10;
 document.addEventListener("DOMContentLoaded", async () => {
     await loadOwnerDiners();
     await loadPendingBookings(0);
+
+document.getElementById("btnEdit")?.addEventListener("click", () => toggleEditMode(true));
+    document.getElementById("btnCancel")?.addEventListener("click", () => {
+        toggleEditMode(false);
+        loadMyInfo(); // 취소하면 원래 데이터로 원복
+    });
+document.getElementById("btnSave")?.addEventListener("click", () => updateMember());
 })
 
 // add select Event
@@ -20,7 +27,8 @@ const tabMenu = {
     '#tab1': 'pending',
     '#tab2': 'today',
     '#tab3': 'approve',
-    '#tab4': 'reviews'
+    '#tab4': 'reviews',
+    '#tab5': 'ownerInfo'
 }
 
 // add EventListener
@@ -48,7 +56,8 @@ const tabLoaders = {
         page
     }),
     approve: (page) => loadBookings({ pending: false, page }),
-    reviews: (page) => loadReviews(page)
+    reviews: (page) => loadReviews(page),
+    ownerInfo: (page) => loadMyInfo(page)
 };
 
 // fetch Method
@@ -302,4 +311,141 @@ function updatePaginationInfo(data) {
     currentPage = data.number;
     totalPages = data.totalPages;
     renderPagination();
+}
+
+// 회원 정보 불러오기
+function loadMyInfo() {
+    fetch("/api/owner/info")
+        .then(res => res.json())
+        .then(data => {
+            const emailInput = document.getElementById("emailId");
+
+            document.getElementById("myUsername").value = data.username;
+            document.getElementById("myName").value = data.name;
+
+            let emailStyle = data.email || "";
+            if (emailStyle === "@") emailStyle = "";
+
+            const displayEl = document.getElementById("emailDisplay");
+            if (displayEl) displayEl.value = emailStyle;
+
+            if (data.email && data.email.includes("@")) {
+                const parts = data.email.split("@");
+                document.getElementById("emailId").value = parts[0];
+                document.getElementById("emailDomainInput").value = parts[1];
+            } else {
+                document.getElementById("emailId").value ="";
+                document.getElementById("emailDomainInput").value = "";
+            }
+
+            const phoneStyle = data.phone || "";
+            document.getElementById("phoneDisplay").value = phoneStyle;
+            document.getElementById("myPhone").value = phoneStyle;
+
+            if(data.email) {
+                emailInput.dataset.origin = data.email;
+            }
+            toggleEditMode(false);
+        })
+        .catch(err => console.error("회원정보 로드 실패:", err));
+}
+
+// 회원 정보 수정
+function updateMember() {
+    const invalidInputs = document.querySelectorAll(".tab-pane.active .is-invalid");
+    if(invalidInputs.length > 0) {
+        alert("입력 항목 중 오류가 있습니다. 메세지를 확인해주세요.");
+        invalidInputs[0].focus();
+        return;
+    }
+
+    const pwd = document.getElementById("newPassword").value;
+    const pwdConfirm = document.getElementById("pwdConfirm").value;
+
+    if(pwd && pwd !== pwdConfirm) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+    }
+
+    const emailId = document.getElementById("emailId").value.trim();
+    const domain = document.getElementById("emailDomainInput").value.trim();
+    let fullEmail = "";
+
+    if (emailId !== "" && domain !== "") {
+        fullEmail = emailId + "@" + domain;
+    } else if (emailId === "" && domain === "") {
+        fullEmail = "";
+    } else {
+        alert("이메일 주소를 정확히 입력해주세요.");
+        return;
+    }
+    const phoneValue = document.getElementById("myPhone").value;
+
+    const data = {
+        email:fullEmail,
+        phone: phoneValue,
+        password: document.getElementById("newPassword").value,
+        passwordConfirm: document.getElementById("pwdConfirm").value
+    };
+
+    fetch("/api/owner/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+        .then(res => {
+            if (res.ok) {
+                alert("수정되었습니다.");
+                toggleEditMode(false);
+                loadMyInfo(); // 저장 성공 시 최신 정보 다시 로드
+            } else {
+                alert("수정 실패: 입력 정보를 확인해주세요.");
+            }
+        })
+        .catch(err => console.error("Update Error:", err));
+}
+
+// 화면 모드 전환 함수 토글
+function toggleEditMode(isEdit) {
+    // 1. 보기 모드 요소들 (텍스트만 보이는 상태)
+    const viewElements = [
+        document.getElementById("emailDisplay"),
+        document.getElementById("phoneDisplay"),
+        document.getElementById("pwdViewRow"),
+        document.getElementById("btnEdit")
+    ];
+
+    // 2. 수정 모드 요소들 (입력창, 저장/취소 버튼)
+    const editElements = [
+        document.getElementById("emailEditGroup"),
+        document.getElementById("phoneEditGroup"),
+        document.getElementById("pwdEditGroup"),
+        document.getElementById("btnCancel"),
+        document.getElementById("btnSave")
+    ];
+
+    // 3. 상태에 따라 보여주기/숨기기 토글
+    if (isEdit) {
+        // 수정 모드일 때
+        viewElements.forEach(el => el && (el.style.display = "none"));
+        editElements.forEach(el => {
+            if (el) {
+                // 그룹(div)인 경우 flex, 버튼 등은 inline-block 등 상황에 맞게
+                if (el.classList.contains("input-group") || el.classList.contains("edit-mode-row")) {
+                    el.style.display = "flex";
+                } else {
+                    el.style.display = "inline-block";
+                }
+            }
+        });
+        // 도메인 선택창 활성화 등 추가 로직이 필요하면 여기에 작성
+        document.getElementById("emailDomainSelect").disabled = false;
+        document.getElementById("emailId").readOnly = false;
+        document.getElementById("emailDomainInput").readOnly = false;
+
+    } else {
+        // 보기 모드일 때 (취소하거나 저장 후)
+        viewElements.forEach(el => el && (el.style.display = "block")); // 혹은 원래 스타일대로
+        editElements.forEach(el => el && (el.style.display = "none"));
+    }
 }

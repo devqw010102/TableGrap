@@ -1,14 +1,13 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.dto.owner.BookOwnerResponseDto;
-import com.example.demo.data.dto.owner.OwnerDinerDto;
-import com.example.demo.data.dto.owner.OwnerDto;
-import com.example.demo.data.dto.owner.OwnerReviewDto;
+import com.example.demo.data.dto.owner.*;
 import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.model.OwnerUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.OwnerService;
 import com.example.demo.service.ReviewService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,14 +39,14 @@ public class OwnerController {
 
     @GetMapping
     public Page<BookOwnerResponseDto> getBookings(
-            @AuthenticationPrincipal MemberUserDetails userDetails,
+            @AuthenticationPrincipal OwnerUserDetails userDetails,
             @RequestParam(required = false) Long dinerId,
             @RequestParam(required = false) Boolean pending,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return bookService.getBookings(userDetails.getMember().getId(), dinerId, pending, date, page, size);
+        return bookService.getBookings(userDetails.getOwner().getId(), dinerId, pending, date, page, size);
     }
 
     @PutMapping("/{id}/approve")
@@ -62,16 +62,29 @@ public class OwnerController {
     }
 
     @GetMapping("/diners")
-    public List<OwnerDinerDto> myDiners(@AuthenticationPrincipal MemberUserDetails userDetails) {
-        return dinerService.getOwnerDiners(userDetails.getMember().getId());
+    public List<OwnerDinerDto> myDiners(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+        return dinerService.getOwnerDiners(userDetails.getOwner().getId());
     }
 
     @GetMapping("/reviews")
     public Page<OwnerReviewDto> getReviews(
-            @AuthenticationPrincipal MemberUserDetails userDetails,
+            @AuthenticationPrincipal OwnerUserDetails userDetails,
             @RequestParam(required = false) Long dinerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return reviewService.getOwnerReviews(userDetails.getMember(), dinerId, page, size);
+        return reviewService.getOwnerReviews(userDetails.getOwner(), dinerId, page, size);
+    }
+
+    @GetMapping("/info")
+    public Optional<OwnerDto> getOwnerInfo(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+        return ownerService.findByOwnerId(userDetails.getOwner().getId());
+    }
+
+    @PatchMapping("/update")
+    @Transactional
+    public void updateOwner(
+            @AuthenticationPrincipal OwnerUserDetails userDetails,
+            @RequestBody OwnerUpdateDto updateDto) {
+        ownerService.updateOwner(userDetails.getOwner().getId(), updateDto);
     }
 }

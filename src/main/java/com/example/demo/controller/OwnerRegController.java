@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.service.OwnerService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +55,7 @@ public class OwnerRegController {
 
     //owner 회원가입
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<?> register(@Valid @RequestBody OwnerDto ownerDto, BindingResult bindingResult) {
         if(bindingResult.hasErrors()){
             String errorMessage = bindingResult.getFieldErrors().stream()

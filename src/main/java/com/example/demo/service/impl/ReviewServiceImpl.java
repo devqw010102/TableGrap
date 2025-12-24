@@ -5,6 +5,7 @@ import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.model.Owner;
 import com.example.demo.data.model.Review;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.MemberRepository;
@@ -120,7 +121,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size) {
+    public Page<OwnerReviewDto> getOwnerReviews(Owner owner, Long dinerId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createTime").descending());
 
