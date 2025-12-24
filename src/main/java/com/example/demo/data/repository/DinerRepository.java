@@ -15,6 +15,12 @@ import java.util.Optional;
 public interface DinerRepository extends JpaRepository<Diner, Long> {
     Page<Diner> findByCategory(Pageable pageable, String category);
     Optional<Diner> findById(Long id);
+    // Owner's diners 조회
+    Optional<Diner> findByDinerName(String dinerName);
+    //공백을 제거하고 식당이름 가져오기
+    @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName")
+    Optional<Diner> findByDinerNameIgnoreSpace(@Param("dinerName") String dinerName);
+
 
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(

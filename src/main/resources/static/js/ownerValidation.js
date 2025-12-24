@@ -55,7 +55,7 @@ function checkUsername(id) {
 
     validationTimer = setTimeout(() => {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", `/api/member/check-username?username=${encodeURIComponent(username)}`, true);
+        xhr.open("GET", `/api/owner/check-username?username=${encodeURIComponent(username)}`, true);
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200) {
                 const isDuplicate = JSON.parse(xhr.responseText);
@@ -113,7 +113,7 @@ function EmailValidation() {
     clearTimeout(validationTimer);
     validationTimer = setTimeout(() => {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", `/api/member/check-email?email=${encodeURIComponent(fullEmail)}`);
+        xhr.open("GET", `/api/owner/check-email?email=${encodeURIComponent(fullEmail)}`);
         xhr.onreadystatechange = function () {
             if(xhr.readyState === 4 && xhr.status === 200) {
                 const response = xhr.responseText;
@@ -193,4 +193,16 @@ function checkPwdConfirm() {
     } else {
         showError(pwdId, "비밀번호가 일치하지 않습니다. ")
     }
+  }
+
+//사업자 번호 유효성 검사
+function checkBusinessNum(businessNumber) {
+    const bizNumVal = businessNumber.value.trim();
+    const bizNumReg = /^\d{10}$/;
+
+    if (bizNumReg.test(bizNumVal)) {
+        clearError(businessNumber.id);
+    } else {
+        showError(businessNumber.id, "사업자 번호는 숫자 10자리여야 합니다.");
+}
 }

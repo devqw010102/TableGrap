@@ -32,9 +32,17 @@ public class OwnerDto {
   private String password;
   @NotBlank(message = "비밀번호를 확인해주세요")
   private String passwordConfirm;
+  @NotBlank(message = "이메일을 입력하세요")
+  @Pattern(regexp = "^[a-zA-Z0-9]{2,}@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          message = "올바른 이메일 형식이 아닙니다.")
   private String email;
   @Pattern(regexp = "^$|^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", message = "(-) 제외 번호만 입력해주세요.")
   private String phone;
+  @NotBlank(message = "사업자 등록번호를 입력하세요")
+  @Pattern(regexp = "^\\d{10}$",
+          message = "사업자 등록번호는 숫자 10자리여야 합니다.")
+  private String businessNum; //조회용도
+  private String dinerName; //조회용도
   //entity에 저장하지 않음 식당 조회용도
   private List<String> dinerNames;
 }

@@ -20,8 +20,8 @@ public class OwnerRequestDto {
     public static OwnerRequestDto from(OwnerRequest request) {
         return new OwnerRequestDto(
                 request.getId(),
-                request.getMember().getUsername(),
-                request.getMember().getName(),
+                request.getOwner().getUsername(),
+                request.getOwner().getName(),
                 request.getDiner().getDinerName(),
                 request.getDiner().getLocation(),
                 request.getStatus().name(),

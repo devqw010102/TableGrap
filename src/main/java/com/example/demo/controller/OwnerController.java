@@ -74,41 +74,4 @@ public class OwnerController {
             @RequestParam(defaultValue = "10") int size) {
         return reviewService.getOwnerReviews(userDetails.getMember(), dinerId, page, size);
     }
-
-    //owner 회원가입
-    @PostMapping("/register")
-    public ResponseEntity<?>  register(@RequestBody OwnerDto ownerDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
-            String errorMessage = bindingResult.getFieldErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.joining(","));
-            return ResponseEntity.badRequest().body(errorMessage);
-        }
-
-        if (ownerService.existsByUsername(ownerDto.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is already in use");
-        }
-
-        if (ownerService.findByEmail(ownerDto.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email is already in use");
-        }
-        if (!ownerDto.getPassword().equals(ownerDto.getPasswordConfirm())) {
-            return ResponseEntity.badRequest().body("Passwords do not match");
-        }
-        ownerService.createOwner(ownerDto);
-        return ResponseEntity.ok("회원 가입이 완료되었습니다.");
-    }
-
-    // Email double check
-    @GetMapping("/check-email")
-    public String checkEmail(@RequestParam String email) {
-        boolean isDuplicate = ownerService.findByEmail(email).isPresent();
-        return isDuplicate ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.";
-    }
-
-    // ID double check
-    @GetMapping("/check-username")
-    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
-        return ResponseEntity.ok(ownerService.existsByUsername(username));
-    }
 }

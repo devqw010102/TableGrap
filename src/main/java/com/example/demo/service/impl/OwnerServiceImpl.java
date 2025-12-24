@@ -4,8 +4,10 @@ import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.AuthorityRepository;
+import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.OwnerService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,33 +18,49 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OwnerServiceImpl implements OwnerService {
   private final OwnerRepository ownerRepository;
   private final PasswordEncoder passwordEncoder;
   private final AuthorityRepository authorityRepository;
+  private final DinerRepository dinerRepository;
 
   @Override
   public OwnerDto createOwner(OwnerDto ownerDto) {
-    String phoneNumber = ownerDto.getPhone();
-    if (phoneNumber != null && phoneNumber.isEmpty()) {
-      phoneNumber = null;
-    }
+    //1. Owner 저장
       Owner owner = Owner.builder()
               .id(ownerDto.getId())
               .name(ownerDto.getName())
               .username(ownerDto.getUsername())
               .password(passwordEncoder.encode(ownerDto.getPassword()))
-              .phone(phoneNumber)
+              .phone(ownerDto.getPhone())
+              .email(ownerDto.getEmail())
               .build();
-      //dinerName 찾기
       ownerRepository.save(owner);
 
       Authority authority = Authority.builder()
-              .authority("ROLE_USER")
+              .authority("ROLE_OWNER")
               .owner(owner)
               .build();
       authorityRepository.save(authority);
-      return mapToOwnerDto(owner, dinerNames);
+
+      //2. 식당 정보 조회
+      String dinerName = ownerDto.getDinerName();
+      String strippedDinerName = dinerName.replace(" ", "");
+      //공백 제외하고 식당이름 조회
+      dinerRepository.findByDinerNameIgnoreSpace(strippedDinerName)
+              .ifPresentOrElse(diner -> {
+                //이미 식당 주인이 있는 경우 예외 처리
+                if(diner.getOwner() != null) {
+                  throw new IllegalArgumentException("이미 소유자가 있는 식당입니다");
+                }
+                  diner.setBusinessNum(ownerDto.getBusinessNum());
+                  diner.setOwner(owner);
+              }, () -> {
+                  // 식당이 존재하지 않을 경우 예외 처리
+                  throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
+              });
+      return mapToOwnerDto(owner);
     }
 
   @Override

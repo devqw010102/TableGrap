@@ -2,14 +2,8 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.data.enums.RequestStatus;
-import com.example.demo.data.model.Authority;
-import com.example.demo.data.model.Diner;
-import com.example.demo.data.model.Member;
-import com.example.demo.data.model.OwnerRequest;
-import com.example.demo.data.repository.AuthorityRepository;
-import com.example.demo.data.repository.DinerRepository;
-import com.example.demo.data.repository.MemberRepository;
-import com.example.demo.data.repository.OwnerRequestRepository;
+import com.example.demo.data.model.*;
+import com.example.demo.data.repository.*;
 import com.example.demo.service.OwnerRequestService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +20,16 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
     private final MemberRepository memberRepository;
     private final DinerRepository dinerRepository;
     private final AuthorityRepository authorityRepository;
+    private final OwnerRepository ownerRepository;
 
     // 권한 신청
     // + List 로 권한 신청을 하기 때문에 Transaction Annotation 추가
     @Override
     @Transactional
-    public void requestOwner(Long memberId, List<Long> dinerIds) {
+    public void requestOwner(Long ownerId, List<Long> dinerIds) {
 
         // member 의 정보는 반복시킬 필요가 없으므로
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("not found member"));
+        Owner owner = ownerRepository.findById(ownerId).orElseThrow(() -> new IllegalArgumentException("not found member"));
 
         for(Long dinerId : dinerIds){
 
@@ -44,13 +39,13 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
                 throw new IllegalStateException("이미 사장이 등록된 식당입니다.");
             }
 
-            boolean alreadyRequested = ownerRequestRepository.existsByMemberAndDinerAndStatus(member, diner, RequestStatus.PENDING);
+            boolean alreadyRequested = ownerRequestRepository.existsByOwnerAndDinerAndStatus(owner, diner, RequestStatus.PENDING);
             if(alreadyRequested) {
                 throw new IllegalStateException("이미 신청한 식당입니다.");
             }
 
             OwnerRequest request = OwnerRequest.builder()
-                    .member(member)
+                    .owner(owner)
                     .diner(diner)
                     .status(RequestStatus.PENDING)
                     .build();
@@ -75,7 +70,7 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
         }
 
         Diner diner = request.getDiner();
-        Member member = request.getMember();
+        Owner owner = request.getOwner();
 
         if(diner.getOwner() != null) {
             throw new IllegalStateException("이미 사장이 등록된 식당입니다.");
@@ -83,13 +78,13 @@ public class OwnerRequestServiceImpl implements OwnerRequestService {
 
         // Status 승인으로, Diner entity 에도 owner 값 추가
         request.setStatus(RequestStatus.APPROVED);
-        diner.setOwner(member);
+        diner.setOwner(owner);
 
         // Authority 에 해당 아이디가 'ROLE_OWNER'를 가지고 있다면 추가 X
-        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(member, "ROLE_OWNER");
+        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(owner, "ROLE_OWNER");
         if(!hasOwnerRole) {
             Authority ownerAuthority = Authority.builder()
-                    .member(member)
+                    .owner(owner)
                     .authority("ROLE_OWNER")
                     .build();
 

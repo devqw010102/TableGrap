@@ -28,5 +28,6 @@ public class Diner {
     private DinerStatus status;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = true)
-    private Member owner;
+    private Owner owner;
+    private String businessNum;  // 사업자 등록번호
 }
