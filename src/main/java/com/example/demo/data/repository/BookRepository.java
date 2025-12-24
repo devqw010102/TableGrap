@@ -56,4 +56,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    // Notification
+    List<Book> findByDinerId(Long dinerId);
 }
