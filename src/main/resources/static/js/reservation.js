@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadReviews()
+
 // api & 설정값
     const NAVER_CLIENT_ID = "k0np2vmny3";
     const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currYear = date.getFullYear();
     let currMonth = date.getMonth();
 
-    // 선택 데이터 (상/하단 요약 합침)
+    // 선택 데이터 상단 (하단 없앰)
     let selectedDate = "";
     let selectedTime = "";
     let selectedPersonnel = document.getElementById("guestCount")?.value || "2";
@@ -62,9 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 상단 요약 업데이트
     const updateAllSummaries = () => {
+        // 선택된 값
         const isAllSelected = selectedDate !== "" && selectedTime !== "";
 
-        // 상단 요약 요소들만 업데이트
         const sumDate = document.getElementById("sumDate");
         const sumTime = document.getElementById("sumTime");
         const sumPersonnel = document.getElementById("sumPersonnel");
@@ -73,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(sumTime) sumTime.innerText = selectedTime || "-";
         if(sumPersonnel) sumPersonnel.innerText = `${selectedPersonnel}명`;
 
+        // 모두 선택하면 뿅
         if (topSummaryBox) {
             if (isAllSelected) {
                 topSummaryBox.style.display = "flex";
@@ -84,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // 달력 오늘부터 1년 뒤까지만 선택 가능하게 제한
+    // 달력 오늘부터 1년 뒤까지만 선택 가능하게( 특정 날짜는 아니고 달로 26년 12월까지)
     // 달력 렌더링
     const renderCalendar = () => {
         const firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
@@ -117,16 +119,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const attachDateClickEvents = () => {
         document.querySelectorAll(".day").forEach(day => {
             day.addEventListener("click", () => {
-                if (day.classList.contains("out-of-range") || (day.classList.contains("inactive") && !day.classList.contains("today"))) {
+                if (day.classList.contains("out-of-range")) {
                     alert("예약 가능한 날짜가 아닙니다.(오늘부터 1년 이내만 가능합니다)");
                     return;
                 }
                 document.querySelector(".day.selected")?.classList.remove("selected");
                 day.classList.add("selected");
+
                 const dayVal = day.getAttribute("data-day");
                 const selDate = new Date(currYear, currMonth, dayVal);
                 selectedDate = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(dayVal).padStart(2, '0')} (${DAY_NAMES[selDate.getDay()]})`;
-                selectedTime = "";
+                // selectedTime = "";
                 renderTimeSlots(selDate.toDateString() === new Date().toDateString());
                 updateAllSummaries();
             });
@@ -148,13 +151,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             return `<button type="button" class="btn ${isDisabled ? 'disabled-time' : activeClass}" ${isDisabled ? 'disabled' : ''}>${time}</button>`;
         };
-
+        // 오전 7개 오후 7개
         if (amSection) amSection.innerHTML = TIME_SLOTS.filter(t => parseInt(t.split(':')[0]) <= 14).map(createButton).join("");
         if (pmSection) pmSection.innerHTML = TIME_SLOTS.filter(t => parseInt(t.split(':')[0]) >= 17).map(createButton).join("");
         attachTimeClickEvents();
     };
 
-    // (참고) 시간 클릭 이벤트 분리 (중복 방지)
+    // 시간 클릭 이벤트 분리
     function attachTimeClickEvents() {
         document.querySelectorAll(".time-slots-grid .btn").forEach(btn => {
             btn.addEventListener("click", function() {
@@ -171,51 +174,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-        // 시간 버튼 클릭
-    //    document.querySelectorAll(".time-slots-grid .btn").forEach(btn => {
-    //        btn.addEventListener("click", function() {
-    //            if (this.classList.contains('disabled-time')) {
-    //                alert("이미 지난 시간은 예약할 수 없습니다.");
-    //                return;
-    //            }
-    //            document.querySelectorAll(".time-slots-grid .btn").forEach(b => {
-    //                b.classList.remove("btn-success", "text-white");
-    //               b.classList.add("btn-outline-secondary");
-    //            });
-    //            this.classList.replace("btn-outline-secondary", "btn-success");
-    //            this.classList.add("text-white");
-    //            selectedTime = this.innerText;
-    //            updateAllSummaries();
-    //        });
-    //    });
-    // };
-
-    // 인원 및 달력 컨트롤
+    // 인원 클릭
     document.getElementById("btnMinus")?.addEventListener("click", () => {
         if (parseInt(inputPersonnel.value) > 1) {
             inputPersonnel.value = --selectedPersonnel;
             updateAllSummaries();
         }
     });
+    // 인원수 맥스 20
     document.getElementById("btnPlus")?.addEventListener("click", () => {
         if (parseInt(inputPersonnel.value) < 20) {
             inputPersonnel.value = ++selectedPersonnel;
             updateAllSummaries();
         }
     });
-
+    // 달력 클릭
     document.querySelectorAll("#prevMonth, #nextMonth").forEach(icon => {
         icon.addEventListener("click", () => {
-            currMonth = icon.id === "prevMonth" ? currMonth - 1 : currMonth + 1;
-            let temp = new Date(currYear, currMonth);
-            currYear = temp.getFullYear(); currMonth = temp.getMonth();
-            renderCalendar();
-        });
+            const nextMonthDate = icon.id === "prevMonth" ? new Date(currYear, currMonth, - 1) : new Date(currYear, currMonth + 1);
+            const today = new Date();
+            const oneYearLater = new Date();
+            oneYearLater.setFullYear(today.getFullYear() + 1);
+
+            if (nextMonthDate < new Date(today.getFullYear(), today.getMonth(), 1) ||
+                nextMonthDate > new Date(oneYearLater.getFullYear(), oneYearLater.getMonth(), 1)) {
+            alert("예약은 오늘부터 1년 이내만 가능합니다.");
+            return;
+        }
+        currMonth = nextMonthDate.getMonth();
+        currYear = nextMonthDate.getFullYear();
+        renderCalendar();
     });
+});
 
     // 수정 모드 초기화
     const bookIdInput = document.querySelector('input[name="bookId"]');
+
     if(bookIdInput && bookIdInput.value) {
+        if (topSummaryBox) {
+           topSummaryBox.classList.add("modify-mode");
+        }
         const oldDateInput = document.getElementById('oldDate');
         const oldPersonnelInput = document.getElementById('oldPersonnel');
         if (oldPersonnelInput) {
@@ -228,9 +226,13 @@ document.addEventListener('DOMContentLoaded', function() {
             selectedDate = `${currYear}.${String(currMonth+1).padStart(2,'0')}.${String(rawDate.getDate()).padStart(2,'0')} (${DAY_NAMES[rawDate.getDay()]})`;
             selectedTime = `${String(rawDate.getHours()).padStart(2,'0')}:${String(rawDate.getMinutes()).padStart(2,'0')}`;
         }
-        if (document.getElementById("btnBook")) document.getElementById("btnBook").innerText = "수정하기";
-    }
+        if (document.getElementById("btnBook")) {
+            const btnBook = document.getElementById("btnBook");
+            btnBook.innerText = "수정하기";
+            btnBook.classList.add("modify-btn");
+        }    }
 
+    // Msg
     document.getElementById("btnBook")?.addEventListener("click", function() {
         if (!selectedDate || !selectedTime) { alert("날짜와 시간을 선택해주세요."); return; }
         const dateOnly = selectedDate.split(' ')[0].replace(/\./g, '-');
@@ -248,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderTimeSlots();
     }
     updateAllSummaries();
-    loadReviews();
+    //loadReviews();
 });
 
     //async 리뷰 불러오기 함수

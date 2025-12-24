@@ -203,7 +203,33 @@
     color: #e2e2e2;
 }
 
+/* 수정 모드일 때 상단 요약 박스 배경색 변경 */
+#topSummaryBox.modify-mode {
+    background-color: #e34695 !important; /* 연한 붉은색/분홍색 계열 (원하는 색상으로 변경 가능) */
+    border: 1px solid #e34695;
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+}
 
+/* 만약 텍스트 색상도 바꾸고 싶다면 */
+#topSummaryBox.modify-mode #displayDate,
+#topSummaryBox.modify-mode #displayTime,
+#topSummaryBox.modify-mode #displayPersonnel {
+    color: #842029; /* 진한 붉은색 텍스트 */
+}
+
+/* 수정 모드일 때 버튼 색상 */
+#btnBook.modify-btn {
+    background-color: #e34695; /* 파란색 (원하는 색상 코드로 변경 가능) */
+    border-color: #e34695;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* 마우스를 올렸을 때 색상 */
+#btnBook.modify-btn:hover {
+    background-color: #e34695;
+    border-color: #e34695;
+}
 /* ==========================================================================
    4. 시간 선택 (Time Selection)
    ========================================================================== */
