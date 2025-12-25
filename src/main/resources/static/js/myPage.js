@@ -152,8 +152,8 @@ function loadBooks() {
             const currentTbody = document.getElementById("bookTable");
             const pastTbody = document.getElementById("pastBookTable");
 
-            currentTbody.innerHTML = '';
-            pastTbody.innerHTML = '';
+            if(currentTbody) currentTbody.innerHTML = '';
+            if(pastTbody) pastTbody.innerHTML = '';
 
             if (!data || data.length === 0) {
                 renderEmptyRow(currentTbody, 6, "현재 예약 내역이 없습니다.");
@@ -196,7 +196,8 @@ function loadBooks() {
                 const changeUrl =
                     (timeDiff >= 0 && book.success) ? `${book.dinerName}`
                         : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`
-                currentTbody.innerHTML += `
+
+                const rowHtml = `
                     <tr>
                         <td>${changeUrl}</td>
                         <td>${modifyDate}</td>
@@ -207,15 +208,30 @@ function loadBooks() {
                     </tr>
                 `;
 
-            if (isPast) {
-                pastTbody.innerHTML += rowHtml;
-            } else {
-                currentTbody.innerHTML += rowHtml;
-            }
-        });
+                if (isPast) {
+                    if(pastTbody) pastTbody.innerHTML += rowHtml;
+                } else {
+                    if(currentTbody) currentTbody.innerHTML += rowHtml;
+                }
+            });
 
-    if (currentTbody.innerHTML === '') renderEmptyRow(currentTbody, 6, "현재 예약 내역이 없습니다.");
-    if (pastTbody.innerHTML === '') renderEmptyRow(pastTbody, 6, "지난 예약 내역이 없습니다.");
+            if (currentTbody && currentTbody.innerHTML === '') renderEmptyRow(currentTbody, 6, "현재 예약 내역이 없습니다.");
+            if (pastTbody && pastTbody.innerHTML === '') renderEmptyRow(pastTbody, 6, "지난 예약 내역이 없습니다.");
+
+            addBookingEventListeners();
+        })
+        .catch(err => console.error("예약 조회 실패:", err));
+    }
+    function addBookingEventListeners() {
+        document.querySelectorAll(".btn-review").forEach(btn => {
+            btn.addEventListener("click", (e) => openModal(e.target.dataset.bookId, e.target.dataset.dinerId));
+        });
+        document.querySelectorAll(".btn-update-review").forEach(btn => {
+            btn.addEventListener("click", (e) => openEditModal(e.target.dataset.reviewId, e.target.dataset.bookId, e.target.dataset.dinerId));
+        });
+        document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
+            btn.addEventListener("click", function() { cancelBooking(this.getAttribute("data-id")); });
+        });
 
             // 리뷰작성 이벤트 리스너
             document.querySelectorAll(".btn-review").forEach(btn => {
@@ -242,22 +258,6 @@ function loadBooks() {
                     cancelBooking(this.getAttribute("data-id"));
                 });
             });
-            addBookingEventListeners();
-        )}
-        .catch(err => console.error("예약 조회 실패:", err);
-});
-}
-
-function addBookingEventListeners() {
-    document.querySelectorAll(".btn-review").forEach(btn => {
-        btn.addEventListener("click", (e) => openModal(e.target.dataset.bookId, e.target.dataset.dinerId));
-    });
-    document.querySelectorAll(".btn-update-review").forEach(btn => {
-        btn.addEventListener("click", (e) => openEditModal(e.target.dataset.reviewId, e.target.dataset.bookId, e.target.dataset.dinerId));
-    });
-    document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
-        btn.addEventListener("click", function() { cancelBooking(this.getAttribute("data-id")); });
-    });
 }
 
 // 회원 정보 불러오기
