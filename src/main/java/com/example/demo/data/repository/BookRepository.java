@@ -56,4 +56,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    //식당 삭제전 해당 식당의 예약 존재 확인
+    boolean existsByDiner_IdAndBookingDateAfter(Long dinerId, LocalDateTime now);
 }

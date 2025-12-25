@@ -8,13 +8,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadOwnerDiners();
     await loadPendingBookings(0);
 
-document.getElementById("btnEdit")?.addEventListener("click", () => toggleEditMode(true));
+    document.getElementById("btnEdit")?.addEventListener("click", () => toggleEditMode(true));
     document.getElementById("btnCancel")?.addEventListener("click", () => {
         toggleEditMode(false);
         loadMyInfo(); // 취소하면 원래 데이터로 원복
     });
-document.getElementById("btnSave")?.addEventListener("click", () => updateMember());
-})
+    document.getElementById("btnSave")?.addEventListener("click", () => updateMember());
+    document.getElementById("addBtn")?.addEventListener("click", () => addDiner());
+    document.getElementById("btnDeleteOwner")?.addEventListener("click", () => deleteOwner());
+});
 
 // add select Event
 document.getElementById("dinerSelect")?.addEventListener("change", () => {
@@ -28,7 +30,8 @@ const tabMenu = {
     '#tab2': 'today',
     '#tab3': 'approve',
     '#tab4': 'reviews',
-    '#tab5': 'ownerInfo'
+    '#tab5': 'ownerInfo',
+    '#tab6': 'ownerDiner'
 }
 
 // add EventListener
@@ -57,7 +60,8 @@ const tabLoaders = {
     }),
     approve: (page) => loadBookings({ pending: false, page }),
     reviews: (page) => loadReviews(page),
-    ownerInfo: (page) => loadMyInfo(page)
+    ownerInfo: (page) => loadMyInfo(page),
+    ownerDiner: (page) => loadDeleteTab(page)
 };
 
 // fetch Method
@@ -449,3 +453,216 @@ function toggleEditMode(isEdit) {
         editElements.forEach(el => el && (el.style.display = "none"));
     }
 }
+
+//식당 삭제 시 식당 목록출력
+async function loadDeleteTab() {
+    const dinerId = document.getElementById('dinerSelect')?.value || "";
+    const tbody = document.getElementById("owner-diner");
+
+    if(!dinerId){
+        tbody.innerHTML=`
+            <td colspan =3 >
+               삭제할 식당을 선택해주세요
+            </td>`
+        return;
+    }
+    const url = `/api/owner/diner/${dinerId}`
+
+    try{
+        const dinerData = await fetchJson(url)
+        if(!dinerData){
+            throw new Error("식당정보를 가져올 수 없습니디ㅏ.");
+        }
+        tbody.innerHTML = `
+            <td>${dinerData.id}</td>
+            <td>${dinerData.dinerName}</td>
+            <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
+        `
+    } catch(e) {
+        console.error(e);
+        alert("오류발생!" + e);
+    }
+}
+
+async function deleteDiner(dinerId){
+    //예약 존재 여부 먼저 확인
+    const hasBooking = await hasActiveBookings(dinerId);
+    if(hasBooking) {
+        alert("현재 진행 중인 예약이 존재하여 식당을 삭제할 수 없습니다. \n 기존 예약을 먼저 처리해주세요.");
+        return;
+    }
+
+    const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
+    if(answer) {
+        const url = `/api/owner/delete/diner/${dinerId}`;
+        try {
+            const res = await fetch(url, {method: "DELETE"});
+            if(res.ok){
+                alert("식당이 삭제되었습니다.");
+                window.location.reload();
+            } else {
+                const errMsg = await res.text();
+                alert("식당을 삭제하는 데 실패했습니다." + errMsg);
+            }
+        } catch(err) {
+            console.error(err);
+            alert("오류 발생" + err);
+        }
+    }
+}
+
+//예약 존재 여부 확인
+async function hasActiveBookings(dinerId){
+    try{
+        //대기 중인 예약 확인
+        const pendingUrl = `/api/owner?pending=true&dinerId=${dinerId}&page=0&size=1`
+        const pendingRes = await fetchJson(pendingUrl);
+
+        if(pendingRes?.totalElements > 0 || pendingRes?.content?.length > 0) {
+            return true;
+        }
+        //확정 된 예약 중 삭제 신청일보다 미래인 예약 확인
+        const approvedUrl = `/api/owner?pending=false&dinerId=${dinerId}&page=0&size=1`;
+        const approvedRes = await fetchJson(approvedUrl);
+
+        if (approvedRes?.content?.length > 0) {
+            // 가져온 예약이 미래인지 확인 (간단한 체크)
+            const bookDate = new Date(approvedRes.content[0].bookingDate);
+            const now = new Date();
+            if (bookDate > now) {
+                return true; // 미래의 확정된 예약 있음
+            }
+        }
+        return false;
+    } catch (e) {
+        console.error("예약 확인 중 오류 발생" + e);
+        return true;
+    }
+}
+//식당 추가 모달 열기
+function openModal() {
+    const addDinerModal = new bootstrap.Modal(document.getElementById('addDinerModal'));
+    addDinerModal.show();
+}
+
+//식당 추가를 위한 사업자 번호 조회
+let isBizNumValid = false;
+//사업자 번호로 조회
+const bizNumBtn = document.getElementById("bizNumBtn");
+if (bizNumBtn) {
+    bizNumBtn.addEventListener("click", () => {
+        const bizNum = document.getElementById("bizNum").value.trim();
+        const reg = /^\d{10}$/;
+        if (bizNum === "") {
+            alert("사업자 번호를 입력해주세요.");
+            return false;
+        } else if(bizNum.length !== 10 || !reg.test(bizNum)){
+            alert("올바른 사업자 번호 형식이 아닙니다. 숫자 10자리로 입력해주세요.");
+            return false;
+        } else if(reg.test(bizNum) && bizNum !== "" ) {
+            fetchBizNum(bizNum);
+        }
+    });
+}
+// 사업자 번호 조회로 등록된 상호명과 db의 상호명 매칭
+async function fetchBizNum(bizNum) {
+    try {
+        // Controller의 경로(@RequestMapping + @GetMapping)에 맞춰 수정
+        const url = `/api/owner/proxy/business-info?query=${bizNum}`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data);
+            const items = data.items || data.data;
+            if (items && items.length > 0) {
+                const info = items[0];
+
+                // 받아온 상호명을 공백 제거
+                const cleanDinerName = info.company.replace(/\s+/g, '');
+                document.getElementById("ownerDinerName").value = cleanDinerName;
+                isBizNumValid = true;
+                document.getElementById("bizNum").readOnly = true;
+                alert("사업자 정보가 정상적으로 조회되었습니다.");
+            } else {
+                alert("유효한 사업자 번호가 아닙니다.");
+            }
+        } else {
+            const error = await res.text();
+            alert("사업자 정보 조회에 실패했습니다." + error);
+        }
+    } catch (err) {
+        console.error("사업자 정보 조회 오류:", err);
+        alert("사업자 정보 조회 중 오류가 발생했습니다.");
+    }
+}
+
+// owner가 식당을 추가할 경우
+async function addDiner() {
+    if (!isBizNumValid) {
+        alert("사업자 번호를 조회해주세요.")
+    }
+    const dinerData = {
+        dinerName: document.getElementById("ownerDinerName").value,
+        businessNum: document.getElementById("bizNum").value
+    };
+
+    try {
+        const url = `api/owner/add/diner`;
+        const res = await fetchJson(url, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json" // JSON을 보낸다고 명시
+            },
+            body: JSON.stringify(dinerData) // 객체를 문자열로 변환하여 전송
+        });
+        alert("식당 추가가 완료되었습니다.");
+        window.location.reload(); // 페이지 새로고침하여 목록 갱신
+    } catch (e) {
+        console.error(e);
+        alert(`식당 추가 실패\n상태코드: ${e.status}\n메시지: ${e.message}`);
+    }
+}
+
+// owner 계정 삭제
+async function deleteOwner() {
+    const hasDiner = await hasOwnerDiner();
+    const password = document.getElementById("deletePassword").value;
+    if(!password) {
+        alert("비밀번호를 입력해주세요.");
+        return;
+    }
+    if(hasDiner) {
+        alert("식당이 존재하는 경우 탈퇴하실 수 없습니다. \n 식당 삭제를 먼저 진행해주세요.");
+        return;
+    }
+    const answer = confirm("계정을 삭제하면 복구하실 수 없습니다. 그래도 탈퇴하시겠습니까?")
+    if (answer) {
+        try {
+            const url = `/api/owner/delete/owner`;
+            const res = await fetchJson(url, {
+                method: "DELETE",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify({password: password})
+            });
+            alert("계정삭제가 완료되었습니다.");
+            window.location.replace(`/`);
+        } catch (err) {
+            console.error(err);
+            if (err.message) {
+                alert("오류: " + err.message);
+            } else {
+                alert("계정 삭제 중 오류가 발생했습니다.");
+            }
+        }
+    }
+}
+
+async function hasOwnerDiner() {
+    const url = `/api/owner/diners`;
+    const dinerList = await fetchJson(url);
+    if (Array.isArray(dinerList) && dinerList.length > 0) {
+        return true;
+    }
+    return false;
+}
+

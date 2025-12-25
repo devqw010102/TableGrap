@@ -11,4 +11,6 @@ public interface OwnerService {
   boolean existsByUsername(String username);
   Optional<OwnerDto> findByOwnerId(Long id);
   void updateOwner(Long id, OwnerUpdateDto ownerUpdateDto);
+  //void deleteOwnerById(Long id);
+  boolean deleteOwner(Long ownerId, String checkPassword);
 }
