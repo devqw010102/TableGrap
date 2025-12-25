@@ -27,7 +27,7 @@
                     </form>
                 </li>
                 <!-- Owner -->
-                <li class = "nav-item" sec:authorize="hasAuthority('ROLE_OWNER')">
+                <li class = "nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')">
                     <a class = "nav-link" th:href = "@{/ownerPage}">Owner Page</a>
                 </li>
                 <!-- Admin -->
