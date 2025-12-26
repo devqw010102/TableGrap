@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.data.dto.ReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.model.Owner;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 
@@ -23,5 +24,5 @@ public interface ReviewService {
 
     
     // OwnerPage 리뷰
-    Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size);
+    Page<OwnerReviewDto> getOwnerReviews(Owner owner, Long dinerId, int page, int size);
 }

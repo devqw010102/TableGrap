@@ -1,16 +1,18 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.ReviewDto;
+import com.example.demo.data.dto.notification.ReviewWriteEvent;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.model.Owner;
 import com.example.demo.data.model.Review;
 import com.example.demo.data.repository.DinerRepository;
-import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.ReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final DinerRepository dinerRepository;
-    private final MemberRepository memberRepository;
+
+    private final ApplicationEventPublisher eventPublisher;
+
     //식당페이지 리뷰 가져오기
     @Override
     public List<ReviewDto> getTop5Reviews(Long dinerId) {
@@ -90,6 +94,12 @@ public class ReviewServiceImpl implements ReviewService {
         String dinerName = diner.getDinerName();
         Review savedReview = reviewRepository.save(review);
         mapToReviewDto(savedReview, dinerName);
+
+        // Owner Entity 들어오면 수정될수도 있음
+        eventPublisher.publishEvent(new ReviewWriteEvent(
+                diner.getOwner().getId(),
+                diner.getDinerName()
+        ));
     }
 
     //리뷰 삭제
@@ -115,7 +125,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
-    public Page<OwnerReviewDto> getOwnerReviews(Member owner, Long dinerId, int page, int size) {
+    public Page<OwnerReviewDto> getOwnerReviews(Owner owner, Long dinerId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createTime").descending());
 
