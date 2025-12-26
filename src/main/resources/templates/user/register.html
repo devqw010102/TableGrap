@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="registerId" th:field="*{username}" placeholder="아이디" onkeyup="checkUsername(this)">
+                        <input type="text" class="form-control" id="registerId" th:field="*{username}" placeholder="아이디" onkeyup="checkUsername(this, 'member')">
                         <label for="registerId">아이디 <span class="text-danger">*</span></label>
                         <div id="error-registerId" class="small ms-1"></div>
                     </div>
@@ -38,9 +38,9 @@
                         <label class="form-label ms-1">이메일 <span class="text-danger">*</span></label>
                         <input type="hidden" id="totalEmail" th:field="*{email}">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation()">
+                            <input type="text" class="form-control" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation('member')">
                             <span class="input-group-text">@</span>
-                            <input type="text" class="form-control" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation()">
+                            <input type="text" class="form-control" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation('member')">
                             <select class="form-select" id="emailDomainSelect" onchange="selectDomain()">
                                 <option value="">직접 입력</option>
                                 <option value="naver.com">naver.com</option>
