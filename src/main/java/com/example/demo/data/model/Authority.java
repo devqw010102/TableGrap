@@ -17,4 +17,8 @@ public class Authority {
     @ToString.Exclude
     @JoinColumn(name = "member_id")
     private Member member;      // 해당 권한을 가진 member
+    @ManyToOne
+    @ToString.Exclude
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
 }

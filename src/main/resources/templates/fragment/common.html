@@ -18,7 +18,7 @@
                     <a class = "nav-link" th:href = "@{/register}">Register</a>
                 </li>
                 <!-- After login -->
-                <li class = "nav-item" sec:authorize = "isAuthenticated()">
+                <li class = "nav-item" sec:authorize = "hasAnyRole('ADMIN', 'USER')">
                     <a class = "nav-link" th:href = "@{/mypage}">My Page</a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
@@ -27,7 +27,7 @@
                     </form>
                 </li>
                 <!-- Owner -->
-                <li class = "nav-item" sec:authorize="hasAuthority('ROLE_OWNER')">
+                <li class = "nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')">
                     <a class = "nav-link" th:href = "@{/ownerPage}">Owner Page</a>
                 </li>
                 <!-- Admin -->

@@ -22,7 +22,7 @@ public class OwnerRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Owner owner;
     @ManyToOne(fetch = FetchType.LAZY)
     private Diner diner;
     @Enumerated(EnumType.STRING)
