@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DinerService {
-    List<DinerDetailDto> getList();
+
     //예약 페이지에서 식당 내용 출력
     DinerDetailDto getDinerById(Long id);
     Page<DinerListDto> getListByCat(Pageable pageable, String category);
@@ -25,5 +25,5 @@ public interface DinerService {
     Optional<OwnerDinerDto> getOwnerDinerById(Long id, Long ownerId);
     //식당 삭제
     void deleteDiner(Long id, Long ownerId);
-    List<AdminOwnerDto> getAll();
+//    List<AdminOwnerDto> getAll();
 }

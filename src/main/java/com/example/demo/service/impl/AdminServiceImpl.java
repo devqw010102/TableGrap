@@ -4,10 +4,7 @@ import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
 import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.data.enums.RequestStatus;
-import com.example.demo.data.model.Authority;
-import com.example.demo.data.model.Diner;
-import com.example.demo.data.model.Member;
-import com.example.demo.data.model.OwnerRequest;
+import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.AdminService;
 import jakarta.transaction.Transactional;
@@ -65,7 +62,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         Diner diner = request.getDiner();
-        Member member = request.getMember();
+        Owner owner = request.getOwner();
 
         if(diner.getOwner() != null) {
             throw new IllegalStateException("이미 사장이 등록된 식당입니다.");
@@ -73,13 +70,13 @@ public class AdminServiceImpl implements AdminService {
 
         // Status 승인으로, Diner entity 에도 owner 값 추가
         request.setStatus(RequestStatus.APPROVED);
-        diner.setOwner(member);
+        diner.setOwner(owner);
 
         // Authority 에 해당 아이디가 'ROLE_OWNER'를 가지고 있다면 추가 X
-        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(member, "ROLE_OWNER");
+        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(owner, "ROLE_OWNER");
         if(!hasOwnerRole) {
             Authority ownerAuthority = Authority.builder()
-                    .member(member)
+                    .owner(owner)
                     .authority("ROLE_OWNER")
                     .build();
 

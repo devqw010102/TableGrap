@@ -61,10 +61,7 @@
             </ul>
         </div>
     </nav>
-    <script th:inline="javascript" sec:authorize="isAuthenticated()">
-        // 타임리프 변수를 JS 변수로 변환하여 외부 파일에서 쓸 수 있게 함
-        const currentMemberId = [[${#authentication.principal.member.id}]];
-    </script>
+
     <script th:src="@{/js/notification.js}"></script>
 
 </div>
