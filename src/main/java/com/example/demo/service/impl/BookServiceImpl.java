@@ -2,6 +2,9 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
+import com.example.demo.data.dto.notification.ReservationApproveEvent;
+import com.example.demo.data.dto.notification.ReservationCancelEvent;
+import com.example.demo.data.dto.notification.ReservationRejectEvent;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Diner;
@@ -14,6 +17,7 @@ import com.example.demo.data.repository.ReviewRepository;
 import com.example.demo.service.BookService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +37,7 @@ public class BookServiceImpl implements BookService {
     private final MemberRepository memberRepository;
     //review 수정 위해 reviewRepository 주입
     private final ReviewRepository reviewRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public List<BookResponseDto> findMyBooks(Long memberId) {
@@ -86,7 +91,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteBooking(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow();
         bookRepository.deleteById(bookId);
+
+        // Owner Entity 들어오면 수정될수도 있음
+        eventPublisher.publishEvent(new ReservationCancelEvent(
+                book.getMember().getId(),
+                book.getDiner().getDinerName(),
+                book.getMember().getName(),
+                book.getBookingDate()
+        ));
     }
 
     @Override
@@ -130,6 +144,12 @@ public class BookServiceImpl implements BookService {
             throw new IllegalStateException("이미 승인된 예약입니다.");
         }
         book.setSuccess(true);
+
+        eventPublisher.publishEvent(new ReservationApproveEvent(
+                book.getMember().getId(),     // 알림 받을 유저 ID
+                book.getDiner().getDinerName(),     // 식당 이름
+                book.getBookingDate()      // 예약 시간
+        ));
     }
 
     @Override
@@ -137,5 +157,11 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
         bookRepository.delete(book);
+
+        eventPublisher.publishEvent(new ReservationRejectEvent(
+                book.getMember().getId(),
+                book.getDiner().getDinerName(),
+                book.getBookingDate()
+        ));
     }
 }

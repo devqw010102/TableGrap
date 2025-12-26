@@ -1,6 +1,7 @@
 <!-- Header -->
 <div th:fragment="header"
      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+    <link th:href="@{/css/common.css}" rel="stylesheet">
     <nav class = "navbar navbar-expand-lg navbar-light bg-light px-3">
         <a class = "navbar-brand" th:href = "@{/}">TableGrap</a>
 
@@ -34,9 +35,38 @@
                 <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
                     <a class="nav-link" th:href="@{/admin}">Admin Page</a>
                 </li>
+                <!-- Notification -->
+                <li class="nav-item dropdown me-3" sec:authorize="isAuthenticated()">
+                    <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" onclick="loadNotifications()">
+                        🔔
+                        <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
+                            0
+                        </span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" id="notif-list" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                        <li class="dropdown-header">최근 알림
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    style="font-size: 0.7rem;" onclick="deleteAllNotifications(event)">
+                                모두 삭제
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <div id="notif-items">
+                            <li class="dropdown-item text-center text-muted">알림이 없습니다.</li>
+                        </div>
+                    </ul>
+                </li>
             </ul>
         </div>
     </nav>
+    <script th:inline="javascript" sec:authorize="isAuthenticated()">
+        // 타임리프 변수를 JS 변수로 변환하여 외부 파일에서 쓸 수 있게 함
+        const currentMemberId = [[${#authentication.principal.member.id}]];
+    </script>
+    <script th:src="@{/js/notification.js}"></script>
+
 </div>
 
 <!-- Footer -->

@@ -1,0 +1,49 @@
+.notif-list {
+    width: 400px !important;    /* 너비를 300px에서 400px로 확장 */
+    max-height: 500px !important; /* 높이도 조금 더 여유 있게 조정 */
+    padding: 0;                 /* 내부 여백 최적화 */
+    border-radius: 12px;        /* 테두리를 더 부드럽게 */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* 그림자를 주어 입체감 부여 */
+    overflow-x: hidden;         /* 가로 스크롤 방지 */
+}
+
+.notif-item {
+    transition: all 0.2s ease-in-out;
+    border-left: 5px solid transparent;
+    cursor: pointer;
+    padding: 1.25rem !important;
+}
+
+.notif-item p {
+    font-size: 1rem !important; /* 글자 크기 살짝 키움 */
+    line-height: 1.5;           /* 줄 간격 확보 */
+    margin-bottom: 5px;
+}
+
+.notif-item.unread {
+    background-color: #e7f3ff !important;
+    border-left: 5px solid #007bff !important;
+    font-weight: 600;
+    color: #000;
+}
+
+.notif-item.read {
+    background-color: #ffffff !important;
+    color: #6c757d;
+}
+
+.notif-item:hover {
+    background-color: #f1f1f1 !important;
+    transform: translateX(4px);
+}
+
+.fade-out {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: 0.4s ease;
+}
+
+.notif-content {
+    padding-left: 5px;
+    white-space: normal;
+}
