@@ -38,11 +38,16 @@ public class BookController {
     }
     @PostMapping("/reservation")
     public ResponseEntity<?> reservation(BookDto dto, @AuthenticationPrincipal MemberUserDetails userDetails) {
-        try{
+        try {
             dto.setMemberId(userDetails.getMember().getId());
 
+            if (dto.getBookId() != null) {
+                bookService.updateBooking(dto);
+                return ResponseEntity.ok("수정되었습니다.");
+            } else {
             bookService.createBooking(dto);
             return ResponseEntity.ok("Success");
+        }
         } catch (IllegalArgumentException e) {
 
             return ResponseEntity.badRequest().body(e.getMessage());

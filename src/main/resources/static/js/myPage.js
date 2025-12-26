@@ -232,7 +232,7 @@ function loadBooks() {
         document.querySelectorAll(".btn-cancel-booking").forEach(btn => {
             btn.addEventListener("click", function() { cancelBooking(this.getAttribute("data-id")); });
         });
-
+/*
             // 리뷰작성 이벤트 리스너
             document.querySelectorAll(".btn-review").forEach(btn => {
                 btn.addEventListener("click", (e) => {
@@ -258,6 +258,7 @@ function loadBooks() {
                     cancelBooking(this.getAttribute("data-id"));
                 });
             });
+            */
 }
 
 // 회원 정보 불러오기
