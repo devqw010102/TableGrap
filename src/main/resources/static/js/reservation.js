@@ -92,8 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
         const lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
         let liTag = "";
-        const todayObj = new Date();
-        todayObj.setHours(0, 0, 0, 0);
+
+        const now = new Date(); // 현재 시간
+        const todayObj = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const currentHour = now.getHours(); // 현재 시간(시) 추출
 
         for (let i = firstDayofMonth; i > 0; i--) liTag += `<div class="day inactive"></div>`;
 
@@ -103,8 +105,17 @@ document.addEventListener('DOMContentLoaded', function() {
             let statusClass = "";
             const formattedCheck = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(i).padStart(2, '0')}`;
 
-            if (checkDateObj.getTime() === todayObj.getTime()) statusClass = "today";
+            // 오늘 날짜인지 확인
+            if (checkDateObj.getTime() === todayObj.getTime()) {
+                statusClass = "today";
+                // if 현재 시간이 오후 8시(20시) 이상이라면 오늘을 선택 불가하게 설정
+                if (currentHour >= 20) {
+                    statusClass += " inactive out-of-range";
+                }
+            }
+
             if (selectedDate.includes(formattedCheck)) statusClass += " selected";
+            // 오늘 이전 날짜는 비활성화
             if (checkDateObj < todayObj) statusClass += " inactive out-of-range";
 
             const holidayText = HOLIDAYS[checkDateStr] ? `<span class="holiday-name">${HOLIDAYS[checkDateStr]}</span>` : '';

@@ -20,7 +20,7 @@
     <h2 class="page-title mb-4">예약하기</h2>
 
     <form id="bookingForm" th:action="${mode == 'modify' ? '/book/update' : '/book/save'}" method="post">
-        <input type="hidden" name="dinerId" th:value="${dinerId}">
+        <input type="hidden" name="dinerId" th:value="${diner.id}">
         <input type="hidden" name="memberId" th:value="${member.id}">
         <input type="hidden" name="bookId" th:value="${myBooking != null ? myBooking.bookId : ''}">
 

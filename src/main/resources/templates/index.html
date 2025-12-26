@@ -24,6 +24,13 @@
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
+<script th:inline="javascript">
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
