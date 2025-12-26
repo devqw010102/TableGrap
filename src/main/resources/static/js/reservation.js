@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-  loadReviews()
-// api & 중복 수정
+    loadReviews()
+
+// api & 설정값
     const NAVER_CLIENT_ID = "k0np2vmny3";
     const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
     const TIME_SLOTS = [
-        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00",
-        "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"
+        "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00",  // 오전
+        "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"   // 오후
     ];
     const HOLIDAYS = {
         '1-1': '새해',
@@ -14,41 +15,30 @@ document.addEventListener('DOMContentLoaded', function() {
         '12-25': '성탄절'
     };
 
-    // DOM 요소
+    let date = new Date();
+    let currYear = date.getFullYear();
+    let currMonth = date.getMonth();
+
+    // 선택 데이터 상단 (하단 없앰)
+    let selectedDate = "";
+    let selectedTime = "";
+    let selectedPersonnel = document.getElementById("guestCount")?.value || "2";
+
+    // DOM 요소 선택
+    const amSection = document.getElementById("amSlotsContainer");
+    const pmSection = document.getElementById("pmSlotsContainer");
+    const topSummaryBox = document.getElementById("topSummaryBox");
+
+    const daysSection = document.querySelector("#calendar-days");
+    const currentDate = document.querySelector("#currentYearMonth");
+    const inputPersonnel = document.getElementById("guestCount");
+    const bookingForm = document.getElementById("bookingForm");
+
     // 지도
     const latInput = document.getElementById('dinerLat');
     const lngInput = document.getElementById('dinerLng');
     const staticMapImg = document.getElementById('staticMap');
 
-    // 달력 UI
-    const currentDateElem = document.querySelector("#currentYearMonth");
-    const daysContainer = document.querySelector("#calendar-days");
-    const calendarHeader = document.getElementById("calendarHeader");
-    const prevNextIcons = document.querySelectorAll("#prevMonth, #nextMonth");
-
-    // 시간 및 인원 UI
-    const timeContainer = document.getElementById("timeSlotsContainer");
-    const guestInput = document.getElementById("guestCount");
-    const btnMinus = document.getElementById("btnMinus");
-    const btnPlus = document.getElementById("btnPlus");
-
-    // 하단 요약 정보
-    const summaryDate = document.getElementById("displayDate");
-    const summaryTime = document.getElementById("displayTime");
-    const summaryPersonnel = document.getElementById("displayPersonnel");
-
-    // 예약 폼
-    const btnBook = document.getElementById("btnBook");
-    const bookingForm = document.getElementById("bookingForm");
-    const inputCombinedDate = document.getElementById("combinedBookingDate");
-    const inputPersonnel = document.getElementById("inputPersonnel");
-
-    // 상태 변수
-    let date = new Date();
-    let currYear = date.getFullYear();
-    let currMonth = date.getMonth();
-
-    // 초기화
     /* 네이버 지도 (Static Map) 로드 */
     if (latInput && lngInput && staticMapImg) {
         const lat = parseFloat(latInput.value);
@@ -71,236 +61,197 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("지도 표시를 위한 필수 요소가 누락되었습니다.");
     }
 
-    /* 달력 요일 헤더 */
-    if (calendarHeader) {
-        calendarHeader.innerHTML = DAY_NAMES.map((day, index) => {
-            let colorClass = "";
-            if (index === 0) colorClass = "text-danger"; // 일요일
-            else if (index === 6) colorClass = "text-primary"; // 토요일
-            return `<span class="${colorClass}">${day}</span>`;
-        }).join("");
-    }
+    // 상단 요약 업데이트
+    const updateAllSummaries = () => {
+        // 선택된 값
+        const isAllSelected = selectedDate !== "" && selectedTime !== "";
 
-    /* 시간 버튼 생성 */
-    if (timeContainer) {
-        timeContainer.innerHTML = TIME_SLOTS.map(time =>
-            `<button type="button" class="btn btn-outline-secondary btn-sm">${time}</button>`
-        ).join("");
-    }
+        const sumDate = document.getElementById("sumDate");
+        const sumTime = document.getElementById("sumTime");
+        const sumPersonnel = document.getElementById("sumPersonnel");
 
-    // 주요 함수
-    /* 달력 렌더링 함수 */
+        if(sumDate) sumDate.innerText = selectedDate || "-";
+        if(sumTime) sumTime.innerText = selectedTime || "-";
+        if(sumPersonnel) sumPersonnel.innerText = `${selectedPersonnel}명`;
+
+        // 모두 선택하면 뿅
+        if (topSummaryBox) {
+            if (isAllSelected) {
+                topSummaryBox.style.display = "flex";
+                setTimeout(() => topSummaryBox.classList.add("show"), 10);
+            } else {
+                topSummaryBox.classList.remove("show");
+                topSummaryBox.style.display = "none";
+            }
+        }
+    };
+
+    // 달력 오늘부터 1년 뒤까지만 선택 가능하게( 특정 날짜는 아니고 달로 26년 12월까지)
+    // 달력 렌더링
     const renderCalendar = () => {
         const firstDayofMonth = new Date(currYear, currMonth, 1).getDay();
         const lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate();
         let liTag = "";
-
-        // 지난달 빈 날짜 채우기
-        for (let i = firstDayofMonth; i > 0; i--) {
-            liTag += `<div class="day inactive"></div>`;
-        }
-
-        // 이번 달 날짜 채우기
         const todayObj = new Date();
-        todayObj.setHours(0, 0, 0, 0); // 시간 초기화
+        todayObj.setHours(0, 0, 0, 0);
+
+        for (let i = firstDayofMonth; i > 0; i--) liTag += `<div class="day inactive"></div>`;
 
         for (let i = 1; i <= lastDateofMonth; i++) {
             const checkDateObj = new Date(currYear, currMonth, i);
             const checkDateStr = `${currMonth + 1}-${i}`;
-            const checkDay = checkDateObj.getDay();
-
-            // today, holiday
             let statusClass = "";
+            const formattedCheck = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(i).padStart(2, '0')}`;
+
             if (checkDateObj.getTime() === todayObj.getTime()) statusClass = "today";
-            else if (checkDateObj < todayObj) statusClass = "inactive";
+            if (selectedDate.includes(formattedCheck)) statusClass += " selected";
+            if (checkDateObj < todayObj) statusClass += " inactive out-of-range";
 
-            let holidayClass = HOLIDAYS[checkDateStr] ? "holiday" : "";
-            let sundayClass = (checkDay === 0) ? "sunday" : "";
-
-            // 휴일 텍스트
-            const holidayText = HOLIDAYS[checkDateStr]
-                ? `<span class="holiday-name">${HOLIDAYS[checkDateStr]}</span>`
-                : '';
-
-            liTag += `<div class="day ${statusClass} ${holidayClass} ${sundayClass}" data-day="${i}">
-                        <span>${i}</span>
-                        ${holidayText}
-                      </div>`;
+            const holidayText = HOLIDAYS[checkDateStr] ? `<span class="holiday-name">${HOLIDAYS[checkDateStr]}</span>` : '';
+            liTag += `<div class="day ${statusClass}" data-day="${i}"><span>${i}</span>${holidayText}</div>`;
         }
-
-        currentDateElem.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}`;
-        daysContainer.innerHTML = liTag;
-
-        attachDateClickEvents(); // 렌더링 후 클릭 이벤트 재연결
+        currentDate.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}`;
+        daysSection.innerHTML = liTag;
+        attachDateClickEvents();
     };
 
-    /* 날짜 클릭 이벤트 연결 (렌더링 될 때마다 호출) */
+    // 날짜 클릭
     const attachDateClickEvents = () => {
-        const days = document.querySelectorAll(".day");
-        days.forEach(day => {
-            if (day.classList.contains("inactive")) return;
-
+        document.querySelectorAll(".day").forEach(day => {
             day.addEventListener("click", () => {
-                // 기존 선택 제거
+                if (day.classList.contains("out-of-range")) {
+                    alert("예약 가능한 날짜가 아닙니다.(오늘부터 1년 이내만 가능합니다)");
+                    return;
+                }
                 document.querySelector(".day.selected")?.classList.remove("selected");
-                // 새 선택 추가
                 day.classList.add("selected");
 
-                const selectedDay = day.getAttribute("data-day");
-                const dayOfWeek = new Date(currYear, currMonth, selectedDay).getDay();
-
-                // 하단 요약 업데이트
-                if (summaryDate) {
-                    summaryDate.innerText = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(selectedDay).padStart(2, '0')} (${DAY_NAMES[dayOfWeek]})`;
-                    summaryDate.classList.add("text-primary-custom");
-                }
+                const dayVal = day.getAttribute("data-day");
+                const selDate = new Date(currYear, currMonth, dayVal);
+                selectedDate = `${currYear}.${String(currMonth + 1).padStart(2, '0')}.${String(dayVal).padStart(2, '0')} (${DAY_NAMES[selDate.getDay()]})`;
+                // selectedTime = "";
+                renderTimeSlots(selDate.toDateString() === new Date().toDateString());
+                updateAllSummaries();
             });
         });
     };
 
-    /* 인원수 요약 업데이트 함수 */
-    const updateGuestSummary = (count) => {
-        if (summaryPersonnel) {
-            summaryPersonnel.innerText = `${count}명`;
-            summaryPersonnel.classList.add("text-primary-custom");
+    // 시간 오전/오후 분리 및 지난 시간 비활성화
+    // 시간 슬롯 렌더링
+    const renderTimeSlots = (isToday = false) => {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        const createButton = (time) => {
+            const [hour, minute] = time.split(':').map(Number);
+            let isDisabled = isToday && (hour < currentHour || (hour === currentHour && minute <= currentMinute));
+            const isSelected = (time === selectedTime);
+            const activeClass = isSelected ? 'btn-success text-white' : 'btn-outline-secondary';
+
+            return `<button type="button" class="btn ${isDisabled ? 'disabled-time' : activeClass}" ${isDisabled ? 'disabled' : ''}>${time}</button>`;
+        };
+        // 오전 7개 오후 7개
+        if (amSection) amSection.innerHTML = TIME_SLOTS.filter(t => parseInt(t.split(':')[0]) <= 14).map(createButton).join("");
+        if (pmSection) pmSection.innerHTML = TIME_SLOTS.filter(t => parseInt(t.split(':')[0]) >= 17).map(createButton).join("");
+        attachTimeClickEvents();
+    };
+
+    // 시간 클릭 이벤트 분리
+    function attachTimeClickEvents() {
+        document.querySelectorAll(".time-slots-grid .btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                if (this.classList.contains('disabled-time')) return;
+                document.querySelectorAll(".time-slots-grid .btn").forEach(b => {
+                    b.classList.remove("btn-success", "text-white");
+                    b.classList.add("btn-outline-secondary");
+                });
+                this.classList.replace("btn-outline-secondary", "btn-success");
+                this.classList.add("text-white");
+                selectedTime = this.innerText;
+                updateAllSummaries();
+            });
+        });
+    }
+
+    // 인원 클릭
+    document.getElementById("btnMinus")?.addEventListener("click", () => {
+        if (parseInt(inputPersonnel.value) > 1) {
+            inputPersonnel.value = --selectedPersonnel;
+            updateAllSummaries();
         }
-    };
-
-    // 이벤트 리스너
-
-    /* 달력 이전/다음 버튼 */
-    prevNextIcons.forEach(icon => {
+    });
+    // 인원수 맥스 20
+    document.getElementById("btnPlus")?.addEventListener("click", () => {
+        if (parseInt(inputPersonnel.value) < 20) {
+            inputPersonnel.value = ++selectedPersonnel;
+            updateAllSummaries();
+        }
+    });
+    // 달력 클릭
+    document.querySelectorAll("#prevMonth, #nextMonth").forEach(icon => {
         icon.addEventListener("click", () => {
-            currMonth = icon.id === "prevMonth" ? currMonth - 1 : currMonth + 1;
+            const nextMonthDate = icon.id === "prevMonth" ? new Date(currYear, currMonth, - 1) : new Date(currYear, currMonth + 1);
+            const today = new Date();
+            const oneYearLater = new Date();
+            oneYearLater.setFullYear(today.getFullYear() + 1);
 
-            if (currMonth < 0 || currMonth > 11) {
-                date = new Date(currYear, currMonth, new Date().getDate());
-                currYear = date.getFullYear();
-                currMonth = date.getMonth();
-            } else {
-                date = new Date();
-            }
-            renderCalendar();
-        });
+            if (nextMonthDate < new Date(today.getFullYear(), today.getMonth(), 1) ||
+                nextMonthDate > new Date(oneYearLater.getFullYear(), oneYearLater.getMonth(), 1)) {
+            alert("예약은 오늘부터 1년 이내만 가능합니다.");
+            return;
+        }
+        currMonth = nextMonthDate.getMonth();
+        currYear = nextMonthDate.getFullYear();
+        renderCalendar();
     });
+});
 
-    /* 시간 버튼 클릭 */     // 이벤트 위임??
-    const timeButtons = document.querySelectorAll(".time-slots-grid .btn");
-    timeButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            // 초기화
-            timeButtons.forEach(b => {
-                b.classList.remove("btn-success", "text-white");
-                b.classList.add("btn-outline-secondary");
-            });
-            // 활성화
-            this.classList.remove("btn-outline-secondary");
-            this.classList.add("btn-success", "text-white");
-
-            // 요약 업데이트
-            if (summaryTime) {
-                summaryTime.innerText = this.innerText;
-                summaryTime.classList.add("text-primary-custom");
-            }
-        });
-    });
-
-    /* 인원수 조절 버튼 */
-    if (btnMinus && btnPlus && guestInput) {
-        btnMinus.addEventListener("click", () => {
-            let val = parseInt(guestInput.value);
-            if (val > 1) {
-                guestInput.value = --val;
-                updateGuestSummary(val);
-            }
-        });
-
-        btnPlus.addEventListener("click", () => {
-            let val = parseInt(guestInput.value);
-            if (val < 20) {
-                guestInput.value = ++val;
-                updateGuestSummary(val);
-            }
-        });
-
-        // 초기 로드시 반영
-        updateGuestSummary(guestInput.value);
-    }
-
-    /* 예약하기 버튼 (폼 전송) */
-    if (btnBook) {
-        btnBook.addEventListener("click", function() {
-            // 유효성 검사
-            const selectedDateElem = document.querySelector(".day.selected");
-            const selectedTimeElem = document.querySelector(".time-slots-grid .btn-success");
-
-            if (!selectedDateElem) {
-                alert("📅 날짜를 먼저 선택해주세요.");
-                return;
-            }
-            if (!selectedTimeElem) {
-                alert("⏰ 방문하실 시간을 선택해주세요.");
-                return;
-            }
-
-            // 데이터 취합
-            const day = selectedDateElem.getAttribute("data-day");
-            const time = selectedTimeElem.innerText;
-            const guestCount = guestInput.value;
-
-            const formattedMonth = String(currMonth + 1).padStart(2, '0');
-            const formattedDay = String(day).padStart(2, '0');
-            const finalDateTime = `${currYear}-${formattedMonth}-${formattedDay} ${time}`;
-
-            // 폼 데이터 세팅
-            if (inputCombinedDate) inputCombinedDate.value = finalDateTime;
-            if (inputPersonnel) inputPersonnel.value = guestCount;
-
-            // 최종 확인 및 전송
-            if (confirm(`${finalDateTime}에 ${guestCount}명으로 예약하시겠습니까?`)) {
-                bookingForm.submit();
-            }
-        });
-    }
-
-    // 초기 달력 렌더링 실행
-    renderCalendar();
-
-    // 예약 수정
+    // 수정 모드 초기화
     const bookIdInput = document.querySelector('input[name="bookId"]');
-    const oldDateInput = document.getElementById('oldDate');
-    const oldPersonnelInput = document.getElementById('oldPersonnel');
 
     if(bookIdInput && bookIdInput.value) {
-
+        if (topSummaryBox) {
+           topSummaryBox.classList.add("modify-mode");
+        }
+        const oldDateInput = document.getElementById('oldDate');
+        const oldPersonnelInput = document.getElementById('oldPersonnel');
         if (oldPersonnelInput) {
-            const count = oldPersonnelInput.value;
-            if (guestInput) guestInput.value = count;
-            if (inputPersonnel) inputPersonnel.value = count;
-            updateGuestSummary(count);
+            selectedPersonnel = oldPersonnelInput.value;
+            if(inputPersonnel) inputPersonnel.value = selectedPersonnel;
         }
-        if (oldDateInput) {
-            const rawDate = oldDateInput.value;
-            if (inputCombinedDate) inputCombinedDate.value = rawDate;
-
-            const dateParts = rawDate.split('T');
-            const datePart = dateParts[0];
-            const timePart = dateParts[1].substring(0, 5);
-
-            if (summaryDate) {
-                summaryDate.innerText = datePart;
-                summaryDate.classList.add("text-primary-custom")
-            }
-            if (summaryTime) {
-                summaryTime.innerText = timePart;
-                summaryTime.classList.add("text-primary-custom")
-            }
+        if (oldDateInput && oldDateInput.value) {
+            const rawDate = new Date(oldDateInput.value);
+            currYear = rawDate.getFullYear(); currMonth = rawDate.getMonth();
+            selectedDate = `${currYear}.${String(currMonth+1).padStart(2,'0')}.${String(rawDate.getDate()).padStart(2,'0')} (${DAY_NAMES[rawDate.getDay()]})`;
+            selectedTime = `${String(rawDate.getHours()).padStart(2,'0')}:${String(rawDate.getMinutes()).padStart(2,'0')}`;
         }
-
-        if (btnBook) {
+        if (document.getElementById("btnBook")) {
+            const btnBook = document.getElementById("btnBook");
             btnBook.innerText = "수정하기";
-        }
+            btnBook.classList.add("modify-btn");
+        }    }
+
+    // Msg
+    document.getElementById("btnBook")?.addEventListener("click", function() {
+        if (!selectedDate || !selectedTime) { alert("날짜와 시간을 선택해주세요."); return; }
+        const dateOnly = selectedDate.split(' ')[0].replace(/\./g, '-');
+        document.getElementById("combinedBookingDate").value = `${dateOnly} ${selectedTime}`;
+        document.getElementById("inputPersonnel").value = selectedPersonnel;
+        if (confirm("예약하시겠습니까?")) bookingForm.submit();
+    });
+
+    // 실행
+    renderCalendar();
+    if(selectedDate) {
+        const [y, m, d] = selectedDate.split(' ')[0].split('.').map(Number);
+        renderTimeSlots(new Date(y, m-1, d).toDateString() === new Date().toDateString());
+    } else {
+        renderTimeSlots();
     }
+    updateAllSummaries();
+    //loadReviews();
+});
 
     //async 리뷰 불러오기 함수
     async function loadReviews() {
@@ -326,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reviewCnt = data.length;
                 const reviewTab = document.getElementById("review-tab");
                 if(reviewTab){
-                  reviewTab.innerText = `⭐ 후기(${reviewCnt})`;
+                    reviewTab.innerText = `⭐ 후기(${reviewCnt})`;
                 }
             } else {
                 console.error("리뷰 로드 실패 (400/500 에러)");
@@ -358,4 +309,3 @@ document.addEventListener('DOMContentLoaded', function() {
             tbody.insertAdjacentHTML('beforeend', row);
         });
     }
-});

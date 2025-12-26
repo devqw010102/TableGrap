@@ -12,7 +12,6 @@ import com.example.demo.data.repository.BookRepository;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,11 +56,9 @@ public class DinerServiceImpl implements DinerService {
                 .tel(diner.getTel())
                 .dx(diner.getDx())
                 .dy(diner.getDy())
+                .status(diner.getStatus())
+                .ownerPhone(diner.getOwner() != null ? diner.getOwner().getPhone() : null)
                 .build();
-    }
-
-    public List<DinerDetailDto> getList() {
-        return dinerRepository.findAll().stream().map(this::mapToDinerDetailDto).toList();
     }
 
     @Override

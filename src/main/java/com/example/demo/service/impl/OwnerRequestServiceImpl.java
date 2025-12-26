@@ -1,6 +1,5 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.data.enums.RequestStatus;
 import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
