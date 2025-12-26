@@ -327,12 +327,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 데이터를 반복하며 테이블 행(tr) 생성
         data.forEach(review => {
+          //글자 수 초과시 ... 처리
+            if(review.comment.length > 30) {
+                review.comment = review.comment.substring(0, 30) + "...";
+            }
             const row = `
                 <tr>
                     <td>${"⭐".repeat(review.rating)}</td>
-                    <td>${review.comment}</td>
+                    <td>
+                      <a href="#"
+                      style="text-decoration: none"
+                      data-bs-toggle="modal"
+                      data-bs-target="#reviewDetailModal"
+                      onclick="loadReviewDetail(${review.reviewId})">
+                        ${review.comment}
+                      </a>
+                    </td>
                 </tr>
             `;
             tbody.insertAdjacentHTML('beforeend', row);
         });
+    }
+
+    //리뷰모달에 상세 리뷰 출력
+    async function loadReviewDetail(reviewId) {
+        const reviewDetail = document.getElementById("reviewDetail");
+        if(!reviewDetail) {
+          console.error("리뷰 상세 요소를 표시할 영역을 찾을 수 없습니다.");
+          return;
+        }
+        const url = `/api/review/${reviewId}`;
+        try {
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                console.log("상세 리뷰 데이터:", data);
+                reviewDetail.innerHTML = `
+                    <h5>${"⭐".repeat(data.rating)}</h5>
+                    <p>${data.comment}</p>
+                `;
+            } else {
+                const errMsg = await res.text();
+                console.error("서버 에러 메시지:", errMsg);
+                alert("상세 리뷰 로드 실패");
+            }
+        } catch(e) {
+            console.error("오류 발생:", e);
+        }
     }
