@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.CoordinateDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerExcelService;
@@ -46,11 +47,25 @@ public class DinerExcelServiceImpl implements DinerExcelService {
     @Override
     @Transactional
     public void uploadExcel(MultipartFile file) throws IOException {
+
+        // 파일이 엑셀 파일이 아닐때 예외 처리
+        String contentType =  file.getContentType();
+        boolean isExcelMime = "application/vnd.ms-excel".equals(contentType) ||
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equals(contentType);
+
+        if(!isExcelMime){
+            throw new IllegalArgumentException("엑셀 파일이 아닙니다.");
+        }
+
         //try-with-resources 구문으로 saveAll에서 오류 발생 시 자원 자동 해제
         try(InputStream inputStream = file.getInputStream();
         Workbook workbook = new XSSFWorkbook(inputStream);) {
 
             Sheet sheet = workbook.getSheetAt(0);
+            // 엑셀 파일에 데이터가 없을 때
+            if (sheet.getPhysicalNumberOfRows() <= 1) {
+                throw new IllegalArgumentException("엑셀 파일 내에 추가할 데이터가 없습니다.");
+            }
             List<Diner> dinerList = new ArrayList<>();
 
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -92,6 +107,7 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                             .tel(tel.isEmpty() ? null : tel)
                             .dx(coords.getDx())
                             .dy(coords.getDy())
+                            .status(DinerStatus.CLOSED)
                             .build();
 
                     dinerList.add(diner);
@@ -101,6 +117,10 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                 } catch (Exception e) {
                     log.error("Geocoding failed for location [{}]: {}", location, e.getMessage());
                 }
+            }
+
+            if (dinerList.isEmpty()) {
+                throw new IllegalArgumentException("유효한 데이터가 존재하지 않습니다.");
             }
 
             dinerRepository.saveAll(dinerList);

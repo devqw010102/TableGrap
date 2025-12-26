@@ -1,5 +1,6 @@
 package com.example.demo.data.model;
 
+import com.example.demo.data.enums.DinerStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,4 +24,10 @@ public class Diner {
     private String tel;         // 전화번호
     private Double dx;          // x좌표
     private Double dy;          // y좌표
+    @Enumerated(EnumType.STRING)
+    private DinerStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = true)
+    private Owner owner;
+    private String businessNum;  // 사업자 등록번호
 }

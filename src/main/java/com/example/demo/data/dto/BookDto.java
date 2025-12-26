@@ -1,14 +1,11 @@
 package com.example.demo.data.dto;
 
-import com.example.demo.data.model.Diner;
-import com.example.demo.data.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -16,8 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookDto {
-    private Long diner;
-    private String memberId;
+    private Long bookId;    // update
+    private Long dinerId;   // update
+    private Long memberId;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime bookingDate;

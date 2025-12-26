@@ -2,137 +2,188 @@
 <html lang="ko"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="https://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>예약 페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <script th:src="'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + ${naverClientId}"></script>
     <link rel="stylesheet" th:href="@{/css/reservation.css}">
+
+    <script th:src="'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + ${naverClientId}"></script>
 </head>
+
 <body>
+
 <header th:replace="~{fragment/common :: header}"></header>
 
 <div class="container mt-5 mb-5">
     <h2 class="page-title mb-4">예약하기</h2>
 
-    <form id="bookingForm" th:action="@{/book/save}" method="post">
+    <form id="bookingForm" th:action="${mode == 'modify' ? '/book/update' : '/book/save'}" method="post">
+        <input type="hidden" name="dinerId" th:value="${dinerId}">
         <input type="hidden" name="memberId" th:value="${member.id}">
-        <input type="hidden" name="diner" th:value="${dinerId}">
+        <input type="hidden" name="bookId" th:value="${myBooking != null ? myBooking.bookId : ''}">
 
-    <div class="row">
-        <div class="col-lg-7 col-md-12 mb-4">
-            <div class="map-container">
-                <!--<div id="map"></div>-->
-                <img id="staticMap" alt="식당 위치" style="width:750px; height:500px; border:1px solid #ccc; border-radius: 5px">
-                <input type="hidden" id="dinerLat" th:value="${diner.dy}">
-                <input type="hidden" id="dinerLng" th:value="${diner.dx}">
-            </div>
+        <div th:if="${mode == 'modify'}" style="display:none;">
+            <input type="hidden" id="oldDate" th:value="${myBooking.bookingDate}">
+            <input type="hidden" id="oldPersonnel" th:value="${myBooking.personnel}">
+        </div>
+        <input type="hidden" name="bookingDate" id="combinedBookingDate">
+        <input type="hidden" name="personnel" id="inputPersonnel">
 
-            <ul class="nav nav-tabs nav-fill mb-3" id="infoTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab">
-                        식당 정보
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">
-                        ⭐ 후기 (0)
-                    </button>
-                </li>
-            </ul>
+        <input type="hidden" id="dinerLat" th:value="${diner.dy}">
+        <input type="hidden" id="dinerLng" th:value="${diner.dx}">
 
-            <div class="tab-content" id="infoTabContent">
-
-                <div class="tab-pane fade show active" id="detail" role="tabpanel">
-                    <h5>가게 소개</h5>
-                    <h4>
-                        <span class="badge bg-primary me-2" th:text="${diner.category}">카테고리</span>
-                        <span th:text="${diner.dinerName}">식당이름</span>
-                    </h4>
-                    <br>
-
-                    <p class="text-muted" th:if="${diner.tel != null}">
-                        📞 <span th:text="${diner.tel}">052-000-0000</span>
-                    </p>
-
-                    <p class="text-muted">
-                        📍 <span th:text="${diner.location}">울산광역시 중구...</span>
-                    </p>
-                    <hr>
-
-                    <h5>운영 시간</h5> <!--음....뺄까...?-->
-                    <p class="small text-muted mb-0">평일 11:00 ~ 20:00 (Break time: 15:00 ~ 17:00)</p>
-                    <p class="small text-muted">주말 12:00 ~ 23:00</p>
+        <div class="row">
+            <div class="col-lg-7 col-md-12 mb-4 d-flex flex-column">
+                <div class="map-container">
+                    <img id="staticMap" alt="식당 위치"
+                         style="width: 750px; height: 500px; max-width: 100%; border: 1px solid #ccc; border-radius: 5px;">
                 </div>
 
-                <!-- 후기 부분 sample-->
-                <div class="tab-pane fade" id="review" role="tabpanel">
-                    <div class="text-center py-4 text-muted">
-                        아직 후기가 없습니다.
+                <ul class="nav nav-tabs nav-fill mb-3" id="infoTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab">
+                            식당 정보
+                        </button>
+                    </li>
+                    <!-- 후기 개수에 따라 탭 제목 구분 -->
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab">
+                            ⭐ 후기 (0)
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="infoTabContent">
+                    <div class="tab-pane fade show active" id="detail" role="tabpanel">
+                        <h5>가게 소개</h5>
+                        <h4>
+                            <span class="badge bg-primary me-2" th:text="${diner.category}">카테고리</span>
+                            <span th:text="${diner.dinerName}">식당이름</span>
+                        </h4>
+                        <br>
+
+                        <p class="text-muted" th:if="${diner.tel != null}">
+                            📞 <span th:text="${diner.tel}">052-000-0000</span>
+                        </p>
+
+                        <p class="text-muted">
+                            📍 <span th:text="${diner.location}">울산광역시 중구...</span>
+                        </p>
+                        <hr>
+
+                        <h5>예약 가능 여부</h5>
+                        <div th:if="${diner.status != null}">
+                                  <span th:if="${diner.status.name() == 'PUBLIC'}" class="badge bg-success fs-6">예약 가능</span>
+                            <span th:if="${diner.status.name() == 'CLOSED'}" class="badge bg-danger fs-6">영업 종료</span>
+                            <span th:if="${diner.status.name() == 'CLAIMED'}" class="badge bg-warning fs-6">준비 중</span>
+                        </div>
+                        <hr>
+
+                    <h5>사장님 연락처</h5>
+                       <p class="text-muted" th:if="${diner.ownerPhone != null}">
+                            📞 <span th:text="${diner.ownerPhone}">010-0000-0000</span>
+                        </p>
+                        <p class="text-muted" th:unless="${diner.ownerPhone != null}">
+                            📞 등록된 사장님 연락처 정보가 없습니다.
+                        </p>
+                    </div>
+
+                    <div class="tab-pane fade" id="review" role="tabpanel">
+                        <div class="text-center py-4 text-muted">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">별점</th>
+                                    <th scope="col">리뷰 내용</th>
+                                </tr>
+                                </thead>
+                                <tbody id="review-tbody">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-5 col-md-12 d-flex flex-column">
+                <div class="reservation-box">
+                    <div class="summary-wrapper">
+                        <div id="topSummaryBox" class="selected-summary-top">
+                            <div class="summary-item"><strong>선택한 날짜:</strong> <span id="sumDate">-</span></div>
+                            <div class="summary-item"><strong>선택한 시간:</strong> <span id="sumTime">-</span></div>
+                            <div class="summary-item"><strong>선택한 인원:</strong> <span id="sumPersonnel">-</span></div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">
+                        <h5>날짜 선택</h5>
+                        <div class="calendar-controls">
+                            <button id="prevMonth" class="calendar-nav-btn" type="button">&lt;</button>
+                            <span id="currentYearMonth" class="current-month">2025.12</span>
+                            <button id="nextMonth" class="calendar-nav-btn" type="button">&gt;</button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-wrapper">
+                        <div class="calendar-header" id="calendarHeader"></div>
+                        <div id="calendar-days" class="calendar-grid"></div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="fw-bold mb-3">시간 선택</h5>
+                    <div class="time-section">
+                        <div class="time-label">오전</div>
+                        <div id="amSlotsContainer" class="time-slots-grid"></div>
+                    </div>
+
+                    <div class="time-section mt-3">
+                        <div class="time-label">오후</div>
+                        <div id="pmSlotsContainer" class="time-slots-grid"></div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="section-header mb-4">
+                        <h5>인원 선택</h5>
+                        <div class="guest-control-box">
+                            <button class="count-btn" type="button" id="btnMinus">−</button>
+                            <input type="text" id="guestCount" value="2" readonly>
+                            <button class="count-btn" type="button" id="btnPlus">+</button>
+                        </div>
+                    </div>
+                    <button type="button" id="btnBook"> 예약하기 </button>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-5 col-md-12">
-        <div class="reservation-box">
-
-            <div class="section-header">
-                <h5>날짜 선택</h5>
-                <div class="calendar-controls">
-                    <button id="prevMonth" class="calendar-nav-btn">&lt;</button>
-                    <span id="currentYearMonth" class="current-month">2025.12</span>
-                    <button id="nextMonth" class="calendar-nav-btn">&gt;</button>
-                </div>
-            </div>
-
-            <div class="calendar-wrapper">
-                <div class="calendar-header" id="calendarHeader"></div>
-                <div id="calendar-days" class="calendar-grid"></div>
-            </div>
-
-            <hr class="my-4">
-            <h5 class="fw-bold mb-3">시간 선택</h5>
-            <div class="time-slots-grid" id="timeSlotsContainer"></div>
-            <input type="hidden" name="bookingDate" id="combinedBookingDate">
-
-            <hr class="my-4">
-            <div class="section-header mb-4">
-                <h5>인원 선택</h5>
-                <div class="guest-control-box">
-                    <button class="count-btn" type="button" id="btnMinus">−</button>
-                    <input type="text" id="guestCount" value="2" readonly>
-                    <button class="count-btn" type="button" id="btnPlus">+</button>
-                    <input type="hidden" name="personnel" id="inputPersonnel">
-                </div>
-            </div>
-
-            <div class="selected-info">
-                <div class="info-row">
-                    <span class="info-label">날짜</span>
-                    <strong id="displayDate" class="info-value">날짜를 선택하세요</strong>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">시간</span>
-                    <strong id="displayTime" class="info-value text-primary-custom">시간을 선택하세요</strong>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">인원수</span>
-                    <strong id="displayPersonnel" class="info-value text-primary-custom">인원수를 선택하세요</strong>
-                </div>
-            </div>
-
-            <button type="button" id="btnBook"> 예약하기 </button>
-        </div>
-    </div>
-    </div>
     </form>
 </div>
 
-
+<div class="modal fade" tabindex="-1" aria-hidden="true" id="reviewDetailModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">후기 자세히 보기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3" id="reviewDetail">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script th:src="@{/js/reservation.js}"></script>
+
 </body>
 </html>

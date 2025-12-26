@@ -1,51 +1,119 @@
-// 이메일 드롭다운
-function selectDomain() {
-    const domainInput = document.getElementById('emailDomainInput');
-    const domainSelect = document.getElementById('emailDomainSelect');
-    
-    const selectedValue = domainSelect.value;
+document.addEventListener("DOMContentLoaded", () => {
+    const registerForm = document.getElementById("registerForm");
+    const ownerRegisterForm = document.getElementById("ownerRegisterForm");
 
-    if (selectedValue === "") {
-        // 직접 입력창 비우고 쓰기 가능하게 함
-        domainInput.value = "";
-        domainInput.readOnly = false;
-        domainInput.focus(); 
-    } else {
-        // 도메인 선택 시 입력창에 값 넣고 수정 불가능하게 막음
-        domainInput.value = selectedValue;
-        domainInput.readOnly = true;
-    }
-    // 합치기
-    combineEmail();
-}
+    const form = registerForm || ownerRegisterForm;
+    if(!form) return;
 
-// 이메일 합치기
-function combineEmail() {
-    const emailId = document.getElementById('emailId').value;
-    const emailDomain = document.getElementById('emailDomainInput').value;
-    const totalEmail = document.getElementById('totalEmail');
+    const currentPathType = window.location.pathname.includes('owner') ? 'owner' : 'member';
+    let isBusinessNumberValid = false;
 
-    // totalEmail 확인
-    if(totalEmail) {
-        if(emailId && emailDomain) {
-            totalEmail.value = emailId + '@' + emailDomain;
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+            // 모든 검증
+            checkName(document.getElementById("registerName"));
+            checkUsername(document.getElementById("registerId"));
+            EmailValidation();
+            checkPhone(document.getElementById("registerPhone"));
+            checkPwd(document.getElementById("registerPwd"));
+            checkPwdConfirm();
+
+            if (currentPathType === 'owner') {
+                checkBusinessNum(document.getElementById("businessNum"));
+            }
+
+
+        setTimeout(() => {
+                const invalidInputs = form.querySelectorAll(".is-invalid");
+                if (invalidInputs.length > 0) {
+                    alert("입력 항목을 다시 확인해주세요.");
+                    return;
+                }
+                    if(currentPathType === 'owner' && !isBusinessNumberValid){
+                    alert("사업자 번호 조회를 진행해주세요.");
+                    return;
+                }
+
+                const data = {
+                    name: document.getElementById("registerName").value,
+                    username: document.getElementById("registerId").value,
+                    email: document.getElementById("totalEmail").value,
+                    phone: document.getElementById("registerPhone").value,
+                    password: document.getElementById("registerPwd").value,
+                    passwordConfirm: document.getElementById("registerPwdConfirm").value
+                };
+
+                    if(currentPathType === 'owner') {
+                        data.businessNum = document.getElementById("businessNum").value;
+                        data.dinerName =  document.getElementById("ownerDinerName").value;
+                    }
+                fetch(`/api/${currentPathType}/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                })
+                    .then(async res => {
+                        if (res.ok) {
+                            alert("회원가입이 완료되었습니다!");
+                            window.location.href = "/"; // 성공 시 홈으로
+                        } else {
+                            const errorMsg = await res.text();
+                            alert("가입 실패: " + errorMsg);
+                        }
+                    })
+                    .catch(err => console.error("Register Error:", err));
+            }, 600);
+        });
+
+//사업자 번호로 조회
+const businessNumberBtn = document.getElementById("businessNumBtn");
+if (businessNumberBtn) {
+    businessNumberBtn.addEventListener("click", () => {
+        const businessNumber = document.getElementById("businessNum").value.trim();
+        const reg = /^\d{10}$/;
+        if (businessNumber === "") {
+            alert("사업자 번호를 입력해주세요.");
+            return;
+        } else if(businessNumber.length !== 10 || !reg.test(businessNumber)){
+            alert("올바른 사업자 번호 형식이 아닙니다. 숫자 10자리로 입력해주세요.");
+            return;
         } else {
-            totalEmail.value = '';
+            fetchBusinessInfo(businessNumber);
         }
-    }
+    });
 }
 
-// 전화번호 합치기
-function combinePhone() {
-    const p1 = document.getElementById('phone1').value;
-    const p2 = document.getElementById('phone2').value;
-    const p3 = document.getElementById('phone3').value;
-    const totalPhone = document.getElementById('totalPhone');
+async function fetchBusinessInfo(businessNumber) {
 
-    // null도 허용
-    if (!p1 && !p2 && !p3) {
-        totalPhone.value = "";
-    } else {
-        totalPhone.value = p1 + '-' + p2 + '-' + p3;
+    try{
+        // Controller의 경로(@RequestMapping + @GetMapping)에 맞춰 수정
+        const url = `/api/owner/proxy/business-info?query=${businessNumber}`;
+        const res = await fetch(url);
+        if(res.ok){
+            const data = await res.json();
+            console.log(data);
+            const items = data.items || data.data;
+            if(items && items.length > 0){
+                const info = items[0];
+
+                // 받아온 상호명을 공백 제거
+                const cleanDinerName = info.company.replace(/\s+/g, '');
+                document.getElementById("ownerDinerName").value = cleanDinerName;
+                isBusinessNumberValid = true;
+                document.getElementById("businessNum").readOnly = true;
+                alert("사업자 정보가 정상적으로 조회되었습니다.");
+            } else {
+                alert("유효한 사업자 번호가 아닙니다.");
+            }
+        } else{
+            const error = await res.text();
+            alert("사업자 정보 조회에 실패했습니다." + error);
+        }
+    } catch(err){
+        console.error("사업자 정보 조회 오류:", err);
+        alert("사업자 정보 조회 중 오류가 발생했습니다.");
     }
 }
+});

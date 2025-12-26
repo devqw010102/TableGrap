@@ -1,8 +1,8 @@
-package com.example.demo.data.model;
+package com.example.demo.data.userDeatils;
 
-import lombok.Data;
+import com.example.demo.data.model.Authority;
+import com.example.demo.data.model.Member;
 import lombok.Getter;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,35 +11,31 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class MemberUserDetails implements UserDetails {
+public class MemberUserDetails implements UserDetails, IdentifiableUserDetails {
 
-    private final String userName;  // 아이디
-    private final String password;  // 비밀번호
-    private final List<SimpleGrantedAuthority> authorities;     // 권한
-    private final String displayName;   // 이름
-    private final Long memberId;        // 회원 번호(column)
+    private final Member member;
+    private final List<Authority> authorities;
 
     public MemberUserDetails(Member member, List<Authority> authorities) {
-        this.userName = member.getUsername();
-        this.password = member.getPassword();
-        this.displayName = member.getName();
-        this.memberId = member.getId();
-        this.authorities = authorities.stream().map(authority -> new SimpleGrantedAuthority(authority.getAuthority())).toList();
+        this.member = member;
+        this.authorities = authorities;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities; // 권한 반환
+        return authorities.stream()
+                .map(a -> new SimpleGrantedAuthority(a.getAuthority()))
+                .toList();
     }
 
     @Override
     public String getPassword() {
-        return password; // Member의 DB 비밀번호 그대로
+        return member.getPassword(); // Member의 DB 비밀번호 그대로
     }
 
     @Override
     public String getUsername() {
-        return userName; // 로그인에 사용할 username 또는 email
+        return member.getUsername(); // 로그인에 사용할 username 또는 email
     }
 
     @Override
@@ -60,5 +56,10 @@ public class MemberUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true; // 활성화 상태
+    }
+
+    @Override
+    public Long getUserId() {
+        return member.getId();
     }
 }

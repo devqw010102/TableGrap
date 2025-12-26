@@ -1,54 +1,8 @@
-/* key Color: #468de3(main color will be changed)*/
-/* 예약 박스 (우측) */
-.reservation-box {
-    position: sticky;
-    top: 20px;
-    z-index: 10;
-    border: 1px solid #e2e2e2;
-    background-color: #fff;
-    border-radius: 0.375rem;
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-    padding: 1.5rem;
-}
-/* 지도 영역 */
-.map-container {
-    margin-bottom: 1.5rem;
-}
+/* TableGrap Reservation System - Main Theme Color: #468de3 */
 
-.map-container #map {
-    height: 400px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* 탭 박스 */
-.tab-content {
-    min-height: 200px;
-    border: 1px solid #dee2e6;
-    padding: 1.5rem;
-    border-radius: 0.375rem;
-    background-color: #fff;
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
-}
-
-/* 섹션 헤더 (날짜 선택, 인원 선택 등의 제목 줄) */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.section-header h5 {
-    font-weight: 700;
-    margin: 0;
-}
-
-/* 달력 컨트롤 ( < 2025.12 > 부분 ) */
+/* ==========================================================================
+   1. 달력 (Calendar)
+   ========================================================================== */
 .calendar-controls {
     display: flex;
     align-items: center;
@@ -92,6 +46,7 @@
     background-color: #f8f9fa;
     border: 1px solid #f8f9fa;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .day {
@@ -111,9 +66,12 @@
 .day:hover:not(.inactive):not(.selected) {
     background-color: #f1f3f5;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .day.selected {
@@ -132,10 +90,6 @@
     font-weight: 700;
 }
 
-.day.selected::after {
-    display: none;
-}
-
 .day.today span:first-child {
     color: #333;
     font-weight: 800;
@@ -149,7 +103,6 @@
     font-weight: 600;
 }
 
-/* 일요일 및 공휴일 (빨간색) */
 .day.sunday span,
 .day.holiday span {
     color: #ff4d4d;
@@ -162,7 +115,7 @@
     white-space: nowrap;
     letter-spacing: -0.5px;
 }
-/* 지난 날짜들 */
+
 .day.inactive {
     color: #ccc;
     pointer-events: none;
@@ -170,26 +123,140 @@
 
 .day.inactive span,
 .day.inactive .holiday-name {
-    color: #ccc !important; /* 지난 날짜는 일요일/공휴일이라도 무조건 회색 */
+    color: #ccc !important;
 }
 
-/* 시간 선택 */
+
+/* ==========================================================================
+   2. 탭 및 식당 정보 (Tabs & Info)
+   ========================================================================== */
+.tab-content {
+    min-height: 200px;
+    border: 1px solid #dee2e6;
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    background-color: #fff;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.tab-pane h4 {
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+.tab-pane h5 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.map-container {
+    margin-bottom: 1.5rem;
+}
+
+#staticMap {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+/* ==========================================================================
+   3. 상단 요약 (Top Summary)
+   ========================================================================== */
+.summary-wrapper {
+    min-height: 120px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#topSummaryBox {
+    display: none;
+    width: 100%;
+    background-color: #468de3;
+    color: white;
+    border-radius: 12px;
+    padding: 1.2rem;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(70, 141, 227, 0.2);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#topSummaryBox.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+}
+
+.summary-item strong {
+    color: #e2e2e2;
+}
+
+/* 수정 모드일 때 상단 요약 박스 배경색 변경 */
+#topSummaryBox.modify-mode {
+    background-color: #e34695 !important; /* 연한 붉은색/분홍색 계열 (원하는 색상으로 변경 가능) */
+    border: 1px solid #e34695;
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+}
+
+/* 만약 텍스트 색상도 바꾸고 싶다면 */
+#topSummaryBox.modify-mode #displayDate,
+#topSummaryBox.modify-mode #displayTime,
+#topSummaryBox.modify-mode #displayPersonnel {
+    color: #842029; /* 진한 붉은색 텍스트 */
+}
+
+/* 수정 모드일 때 버튼 색상 */
+#btnBook.modify-btn {
+    background-color: #e34695; /* 파란색 (원하는 색상 코드로 변경 가능) */
+    border-color: #e34695;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* 마우스를 올렸을 때 색상 */
+#btnBook.modify-btn:hover {
+    background-color: #e34695;
+    border-color: #e34695;
+}
+/* ==========================================================================
+   4. 시간 선택 (Time Selection)
+   ========================================================================== */
+.time-section {
+    margin-bottom: 1rem;
+}
+
+.time-label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
 .time-slots-grid {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 10px;
+    gap: 4px;
+    margin-top: 8px;
 }
 
 .time-slots-grid .btn {
-    flex: 0 0 auto;
-    width: auto;
-    min-width: 80px;
-    border-radius: 4px;
-    font-size: 14px;
-    padding: 8px 0;
+    flex: 1;
+    padding: 6px 0;
+    font-size: 11px;
+    white-space: nowrap;
 }
 
 .btn-success {
@@ -198,13 +265,30 @@
     font-weight: 600;
 }
 
-.btn-outline-secondary:hover {
-    background-color: #f1f3f5;
-    color: #333;
-    border-color: #ced4da;
+.disabled-time {
+    background-color: #f8f9fa !important;
+    color: #dee2e6 !important;
+    border: 1px solid #eee !important;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
-/* 인원 선택 & 하단 요약*/
+
+/* ==========================================================================
+   5. 인원 선택 (Personnel Selection)
+   ========================================================================== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-header h5 {
+    font-weight: 700;
+    margin: 0;
+}
+
 .guest-control-box {
     display: flex;
     align-items: center;
@@ -216,11 +300,11 @@
 .count-btn {
     font-size: 1.2rem;
     font-weight: bold;
-    text-decoration: none;
     color: #333;
     border: none;
     background: none;
     padding: 0 10px;
+    cursor: pointer;
 }
 
 .count-btn:hover {
@@ -237,50 +321,46 @@
     text-align: center;
 }
 
-/* 하단 선택 요약 박스 */
-.selected-info {
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-    padding: 1rem;
-    border-radius: 0.25rem;
-    margin-bottom: 1rem;
+
+/* ==========================================================================
+   6. 하단 예약 버튼 (Bottom Button)
+   ========================================================================== */
+.reservation-box {
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+    border: 1px solid #e2e2e2;
+    background-color: #fff;
+    border-radius: 0.375rem;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+    padding: 1.5rem;
 }
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.25rem;
-}
+/* 하단 요약(selected-info) 관련 스타일은 삭제했습니다. */
 
-.info-row:last-child {
-    margin-bottom: 0;
-}
-
-.info-label {
-    color: #6c757d;
-    font-size: 0.875rem;
-}
-
-.info-value {
-    font-weight: 600;
-}
-
-.text-primary-custom {
-    color: #0d6efd;
-}
-
-/* 예약하기 버튼 */
 #btnBook {
     background-color: #468de3;
     border: none;
-    transition: background-color 0.2s;
+    color: white;
+    transition: all 0.2s ease;
     width: 100%;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    font-weight: 700;
-    font-size: 1.25rem;
+
+    /* 높이 및 폰트 크기 증가 */
+    padding: 1.25rem; /* 기존 1rem에서 증가 */
+    font-size: 1.3rem;  /* 기존 1.25rem에서 약간 증가 */
+
+    font-weight: 800;
+    border-radius: 12px; /* 버튼을 좀 더 둥글게 만들어 상단 박스와 통일감 부여 */
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(70, 141, 227, 0.2);
 }
 
 #btnBook:hover {
     background-color: #357abd;
+    transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+    box-shadow: 0 6px 12px rgba(70, 141, 227, 0.3);
+}
+
+#btnBook:active {
+    transform: translateY(0);
 }
