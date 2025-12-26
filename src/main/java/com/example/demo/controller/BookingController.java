@@ -106,7 +106,6 @@ public class BookingController {
             bookDto.setMemberId(userDetails.getMember().getId());
         }
 
-
         try {
             bookService.updateBooking(bookDto);
             return "redirect:/mypage";

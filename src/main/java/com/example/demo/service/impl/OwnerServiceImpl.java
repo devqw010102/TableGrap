@@ -1,5 +1,7 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.data.dto.notification.OwnerUpdateEvent;
+import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 import com.example.demo.data.model.Authority;
@@ -11,6 +13,7 @@ import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.OwnerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,7 @@ public class OwnerServiceImpl implements OwnerService {
   private final PasswordEncoder passwordEncoder;
   private final AuthorityRepository authorityRepository;
   private final DinerRepository dinerRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -64,6 +68,13 @@ public class OwnerServiceImpl implements OwnerService {
               // 식당이 존재하지 않을 경우 예외 처리
               throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
             });
+
+    eventPublisher.publishEvent(new RegisterEvent(
+            owner.getId(),
+            owner.getName(),
+            authority.getAuthority()
+    ));
+
     return mapToOwnerDto(owner);
   }
   //이메일 중복확인
@@ -110,6 +121,11 @@ public class OwnerServiceImpl implements OwnerService {
       owner.setPassword(passwordEncoder.encode(dto.getPassword()));
       System.out.println(">> Password Changed"); // 변경 로그
     }
+    eventPublisher.publishEvent(new OwnerUpdateEvent(
+            owner.getId(),
+            owner.getName()
+    ));
+
     ownerRepository.save(owner);
     mapToOwnerDto(owner);
   }

@@ -67,6 +67,39 @@ public class NotificationListener {
         sendAndSave("ROLE_OWNER", event.memberId(), msg);
     }
 
+    @Async
+    @EventListener
+    // 회원가입 성공 시(유저, 사장)
+    public void handleRegisterUser(RegisterEvent event) {
+        String msg = String.format("[%s] 회원가입을 환영합니다.", event.name());
+        sendAndSave(event.role(), event.memberId(), msg);
+    }
+
+    // 회원가입은 통합 Event, 수정은 분리 Event(테스트)
+    @Async
+    @EventListener
+    // 회원 수정 시(유저)
+    public void handleMemberUpdate(MemberUpdateEvent event) {
+        String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
+        sendAndSave("ROLE_USER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 회원 수정 시(사장)
+    public void handleOwnerUpdate(OwnerUpdateEvent event) {
+        String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
+        sendAndSave("ROLE_OWNER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 예약 수정 시
+    public void handleReservationUpdate(ReservationUpdateEvent event) {
+        String msg = String.format("[%s] %s 예약이 수정되었습니다.", event.dinerName(), event.reservationTime());
+        sendAndSave("ROLE_OWNER", event.memberId(), msg);
+    }
+
     // Notification Entity Save + Send
     private void sendAndSave(String role, Long receiveId, String message) {
         Notification notification = Notification.builder()
