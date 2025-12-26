@@ -6,6 +6,7 @@ import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.DinerRepository;
+import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.OwnerService;
 import jakarta.transaction.Transactional;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 public class OwnerServiceImpl implements OwnerService {
   private final OwnerRepository ownerRepository;
+  private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
   private final AuthorityRepository authorityRepository;
   private final DinerRepository dinerRepository;
@@ -67,12 +69,17 @@ public class OwnerServiceImpl implements OwnerService {
   //이메일 중복확인
   @Override
   public Optional<OwnerDto> findByEmail(String email) {
-    return ownerRepository.findByEmail(email).map(this::mapToOwnerDto);
+      Optional<OwnerDto> owner = ownerRepository.findByEmail(email).map(this::mapToOwnerDto);
+              if(owner.isPresent()) return owner;
+
+              return memberRepository.findByEmail(email)
+                      .map(m -> OwnerDto.builder().email(m.getEmail()).build());
   }
+
   //아이디 중복확인
   @Override
   public boolean existsByUsername(String username) {
-    return ownerRepository.existsByUsername(username);
+    return ownerRepository.existsByUsername(username) || memberRepository.existsByUsername(username);
   }
   //Owner 회원정보 출력
   @Override

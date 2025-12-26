@@ -7,6 +7,7 @@ import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
+import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder; //  @Bean 필요- config
     private final AuthorityRepository authorityRepository;
 
@@ -74,13 +76,16 @@ public class MemberServiceImpl implements MemberService {
     // validation check
     @Override
     public Optional<MemberDto> findByEmail(String email) {  // 이메일 확인
-        return memberRepository.findByEmail(email).
-                map(this::mapToMemberDto);
+        Optional<MemberDto> member = memberRepository.findByEmail(email).map(this::mapToMemberDto);
+        if (member.isPresent()) return member;
+
+        return ownerRepository.findByEmail(email)
+                .map(o -> MemberDto.builder().email(o.getEmail()).build());
     }
 
     @Override
     public boolean isUsernameDuplicate(String username) {   // id 확인
-        return memberRepository.existsByUsername(username);
+        return memberRepository.existsByUsername(username) || ownerRepository.existsByUsername(username);
     }
 
 
