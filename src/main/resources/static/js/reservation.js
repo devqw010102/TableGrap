@@ -233,12 +233,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }    }
 
     // Msg
-    document.getElementById("btnBook")?.addEventListener("click", function() {
-        if (!selectedDate || !selectedTime) { alert("날짜와 시간을 선택해주세요."); return; }
-        const dateOnly = selectedDate.split(' ')[0].replace(/\./g, '-');
-        document.getElementById("combinedBookingDate").value = `${dateOnly} ${selectedTime}`;
-        document.getElementById("inputPersonnel").value = selectedPersonnel;
-        if (confirm("예약하시겠습니까?")) bookingForm.submit();
+    document.getElementById("btnBook")?.addEventListener("click", async function () {
+      if(!selectedDate || !selectedTime) {
+          alert("날짜와 시간을 선택해주세요.");
+          return;
+      }
+      const dateOnly = selectedDate.split(' ')[0].replace(/\./g, '-');
+      const fullBookingDate = `${dateOnly} ${selectedTime}`;
+      const dinerName = document.getElementById("dinerName")?.innerText || "식당";
+
+      const formData = new FormData(bookingForm);
+      formData.set("bookingDate", fullBookingDate);
+      formData.set("personnel", selectedPersonnel);
+
+      if(confirm("예약하시겠습니까?")) {
+          try {
+              const response = await fetch("/api/myPage/reservation", {
+                  method: "POST",
+                  body: new URLSearchParams(formData)
+              });
+
+              if(response.ok) {
+                  alert("예약이 완료되었습니다.");
+                  window.location.href = "/mypage";
+              } else {
+                  const errorMsg = await response.text();
+                  console.log("Server Error Message:", errorMsg)
+                  alert(errorMsg);
+              }
+          } catch (error) {
+              console.error("Error:", error);
+              alert("통신 중 오류가 발생했습니다.")
+          }
+      }
     });
 
     // 실행
