@@ -21,6 +21,7 @@ public class Notification {
     private Long id;
     private Long memberId;
     private String message;
+    private String role;
     @Builder.Default
     private boolean isRead = false;
     @CreationTimestamp

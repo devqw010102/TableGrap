@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.OwnerRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

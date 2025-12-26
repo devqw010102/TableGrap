@@ -2,15 +2,13 @@ package com.example.demo.controller;
 
 
 import com.example.demo.data.dto.ReviewDto;
-import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

@@ -4,7 +4,7 @@ import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.model.Member;
-import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.MemberService;

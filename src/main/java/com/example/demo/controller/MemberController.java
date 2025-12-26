@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.MemberUpdateDto;
-import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.userDeatils.MemberUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.support.DefaultMessageSourceResolvable;

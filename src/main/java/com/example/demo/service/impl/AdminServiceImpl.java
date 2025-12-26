@@ -2,8 +2,6 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
-import com.example.demo.data.dto.owner.OwnerRequestDto;
-import com.example.demo.data.enums.RequestStatus;
 import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.AdminService;
@@ -30,6 +28,7 @@ public class AdminServiceImpl implements AdminService {
     private final AuthorityRepository authorityRepository;
     private final ReviewRepository reviewRepository;
     private final OwnerRequestRepository ownerRequestRepository;
+    private final OwnerRepository ownerRepository;
 
     public Page<AdminDinerDto> getList(Pageable pageable) {
         return dinerRepository.findAll(pageable).map(AdminDinerDto::from);
@@ -44,56 +43,6 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public Page<AdminOwnerDto> getOwners(Pageable pageable) {
         return dinerRepository.findOwnerDiners(pageable).map(AdminOwnerDto::from);
-    }
-
-    // 권한 신청 목록
-    @Override
-    public Page<OwnerRequestDto> findAllByStatus(Pageable pageable) {
-        return ownerRequestRepository.findAllByStatus(RequestStatus.PENDING, pageable).map(OwnerRequestDto::from);
-    }
-
-    // 승인 처리
-    @Override
-    public void approve(Long requestId) {
-        OwnerRequest request = ownerRequestRepository.findById(requestId).orElseThrow(() -> new IllegalArgumentException("not found request"));
-
-        if(request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("이미 처리된 신청입니다.");
-        }
-
-        Diner diner = request.getDiner();
-        Owner owner = request.getOwner();
-
-        if(diner.getOwner() != null) {
-            throw new IllegalStateException("이미 사장이 등록된 식당입니다.");
-        }
-
-        // Status 승인으로, Diner entity 에도 owner 값 추가
-        request.setStatus(RequestStatus.APPROVED);
-        diner.setOwner(owner);
-
-        // Authority 에 해당 아이디가 'ROLE_OWNER'를 가지고 있다면 추가 X
-        boolean hasOwnerRole = authorityRepository.existsByMemberAndAuthority(owner, "ROLE_OWNER");
-        if(!hasOwnerRole) {
-            Authority ownerAuthority = Authority.builder()
-                    .owner(owner)
-                    .authority("ROLE_OWNER")
-                    .build();
-
-            authorityRepository.save(ownerAuthority);
-        }
-    }
-
-    // 반려 처리
-    @Override
-    public void reject(Long requestId) {
-        OwnerRequest request = ownerRequestRepository.findById(requestId).orElseThrow(() -> new IllegalArgumentException("not found request"));
-
-        if (request.getStatus() != RequestStatus.PENDING) {
-            throw new IllegalStateException("이미 처리된 신청입니다.");
-        }
-
-        request.setStatus(RequestStatus.REJECTED);
     }
 
     @Override
@@ -115,13 +64,13 @@ public class AdminServiceImpl implements AdminService {
 
         long dinerCount = dinerRepository.countAllDiners();
         long bookingCount = bookRepository.countTodayBookings(start, end);
-        long memberCount = memberRepository.countMembersExceptAdmin();
+        long memberCount = memberRepository.countMembersExceptAdmin() + ownerRepository.countOwnersExceptAdmin();
 
-        Map<String, Long> roleMap = authorityRepository.countByAuthority()
+        Map<String, Long> roleMap = authorityRepository.countByRoleForDashboard()
                 .stream()
                 .collect(Collectors.toMap(
                         o -> (String) o[0],
-                        o -> (Long) o[1]
+                        o -> ((Number) o[1]).longValue()
                 ));
 
         return new AdminDashboardDto(

@@ -38,7 +38,9 @@ public class HomeController {
         return "admin/adminPage";
     }
 
-   @GetMapping("/register/owner")
+    @GetMapping("/register/owner")
     public String getOwnerReg() { return "user/owner-register"; }
 
+    @GetMapping("/mypage")
+    public String getMyPage() { return "user/myPage"; }
 }
