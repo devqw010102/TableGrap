@@ -13,10 +13,6 @@
 <header th:insert="~{fragment/common :: header}"></header>
   <div class="container mt-5 mb-5">
     <h2 class="page-title mb-4" th:text="${categoryName} + ' 맛집을 찾아볼까요?'">식당 찾기</h2>
-    <div class="button">
-      <button type="button" class="btn btn-secondary" id="toggleBtn">혹시 사장님이신가요?</button>
-      <button type="button" class="btn btn-info" id="getOwnerBtn" style="display: none;">선택한 식당 신청하기</button>
-    </div>
     <table class="table">
       <thead>
         <tr>
@@ -28,7 +24,7 @@
         <!-- 해당 카테고리의 맛집이 존재하는 경우 출력하기, th:unless: 반복문안에서 특정 조건에 따라 렌더링 제어,(조건이 거짓일 경우 렌더링) -->
         <tr th:each="diner :${dinerList.content}" th:unless="${dinerList.isEmpty()}">
           <td class="owner-check" style="display: none;"><input type="checkbox" name="selectDiner" th:value="${diner.id}"></td>
-          <td><a th:text="${diner.dinerName}" th:href="@{/reservation(id=${diner.id})}">식당이름</a></td>
+          <td><a th:text="${diner.dinerName}" th:href="@{/diner/reservation(id=${diner.id})}">식당이름</a></td>
         </tr>
         <!-- 해당 카테고리의 식당이 존재하지 않는 경우 -->
         <tr th:if="${dinerList.isEmpty()}">
@@ -71,6 +67,6 @@
   <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/dinerList.js}"></script>
+<!-- <script th:src="@{/js/dinerList.js}"></script>-->
 </body>
 </html>
