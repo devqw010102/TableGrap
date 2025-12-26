@@ -24,19 +24,6 @@ public class NotificationListener {
 
     @Async
     @EventListener
-    @Transactional
-    // 식당 폐업 시
-    public void handleDinerClosed(DinerClosedEvent event) {
-        List<Book> books =  bookRepository.findByDinerId(event.dinerId());
-
-        for(Book book : books){
-            String msg = String.format("[%s] 식당이 폐업하여 예약이 자동 취소되었습니다.", event.dinerName());
-            sendAndSave("ROLE_USER", book.getMember().getId(), msg);
-        }
-    }
-
-    @Async
-    @EventListener
     // 예약 승인 시
     public void handleReservationApprove(ReservationApproveEvent event) {
         String msg = String.format("[%s] %s 예약이 승인되었습니다!", event.dinerName(), event.reservationTime());
@@ -90,6 +77,14 @@ public class NotificationListener {
     public void handleOwnerUpdate(OwnerUpdateEvent event) {
         String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
         sendAndSave("ROLE_OWNER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 새로운 예약이 들어왔을 때
+    public void handleReservationCreate(ReservationCreateEvent event) {
+        String msg = String.format("[%s] %s 예약이 신청되었습니다.", event.dinerName(), event.reservationTime());
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg);
     }
 
     @Async

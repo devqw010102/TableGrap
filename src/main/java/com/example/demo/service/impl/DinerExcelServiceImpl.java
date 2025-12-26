@@ -107,7 +107,7 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                             .tel(tel.isEmpty() ? null : tel)
                             .dx(coords.getDx())
                             .dy(coords.getDy())
-                            .status(DinerStatus.PUBLIC)
+                            .status(DinerStatus.CLOSED)
                             .build();
 
                     dinerList.add(diner);

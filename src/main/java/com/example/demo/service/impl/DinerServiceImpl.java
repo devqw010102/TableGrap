@@ -4,8 +4,7 @@ import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerDto;
 import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
-import com.example.demo.data.dto.admin.AdminOwnerDto;
-import com.example.demo.data.dto.owner.OwnerDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.BookRepository;
@@ -14,6 +13,7 @@ import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,14 +36,6 @@ public class DinerServiceImpl implements DinerService {
                 .id(diner.getId())
                 .dinerName(diner.getDinerName())
                 .category(diner.getCategory())
-                .build();
-    }
-
-    //Diner -> DinerDto 변환 메서드
-    private DinerDto mapToDinerDto(Diner diner){
-        return DinerDto.builder()
-                .owner(diner.getOwner())
-                .businessNum(diner.getBusinessNum())
                 .build();
     }
 
@@ -99,6 +91,7 @@ public class DinerServiceImpl implements DinerService {
                     }
                     diner.setBusinessNum(dto.getBusinessNum());
                     diner.setOwner(owner);
+                    diner.setStatus(DinerStatus.valueOf("PUBLIC"));
                 }, () -> {
                     // 식당이 존재하지 않을 경우 예외 처리
                     throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
@@ -122,7 +115,5 @@ public class DinerServiceImpl implements DinerService {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
         dinerRepository.delete(diner);
-        //실제로 db를 지우는 것이 아닌 diner 테이블의 ownerId만 삭제하는 방법...?
-        //diner.setOwner(null);
     }
 }
