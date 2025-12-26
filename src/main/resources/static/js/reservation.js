@@ -246,7 +246,11 @@ document.addEventListener('DOMContentLoaded', function() {
       formData.set("bookingDate", fullBookingDate);
       formData.set("personnel", selectedPersonnel);
 
-      if(confirm("예약하시겠습니까?")) {
+      const bookIdInput = document.querySelector('input[name="bookId"]');
+      if(bookIdInput && bookIdInput.value) {
+          formData.set("bookId", bookIdInput.value);
+      }
+      if(confirm(bookIdInput?.value ? "수정하시겠습니까?" :"예약하시겠습니까?")) {
           try {
               const response = await fetch("/api/myPage/reservation", {
                   method: "POST",
@@ -254,7 +258,8 @@ document.addEventListener('DOMContentLoaded', function() {
               });
 
               if(response.ok) {
-                  alert("예약이 완료되었습니다.");
+                  const successMsg = await response.text();
+                  alert(successMsg);
                   window.location.href = "/mypage";
               } else {
                   const errorMsg = await response.text();
