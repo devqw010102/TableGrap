@@ -19,6 +19,8 @@ public interface DinerService {
     DinerDetailDto getDinerById(Long id);
     Page<DinerListDto> getListByCat(Pageable pageable, String category);
     List<OwnerDinerDto> getOwnerDiners(Long ownerId);
+    //식당 가져오기
+    Optional<Diner> findByDinerNameBiz(String dinerName);
     //식당 추가
     void addDiner(DinerDto dto, String username);
     //식당 삭제 탭에서 식당 출력

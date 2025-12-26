@@ -72,6 +72,13 @@ public class DinerServiceImpl implements DinerService {
         return dinerRepository.findByOwnerId(ownerId);
     }
 
+    //사업자 조회시 식당 추가
+    @Override
+    public Optional<Diner> findByDinerNameBiz(String dinerName){
+        return dinerRepository.findByDinerNameIgnoreSpace(dinerName);
+    }
+
+
     //식당 추가
     @Override
     @Transactional

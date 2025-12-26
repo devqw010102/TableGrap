@@ -21,7 +21,6 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName")
     Optional<Diner> findByDinerNameIgnoreSpace(@Param("dinerName") String dinerName);
 
-
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(
             d.id,
@@ -55,6 +54,6 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
             @Param("dinerId") Long dinerId,
             @Param("ownerId") Long ownerId
     );
-
+    //식당 삭제할 때 사용
     Optional<Diner> findByIdAndOwnerId(Long dinerId, Long ownerId);
 }
