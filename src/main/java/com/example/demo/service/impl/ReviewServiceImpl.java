@@ -52,6 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
                 })
                 .toList();
     }
+
     //리뷰 수정 모달에 리뷰가져오기
     @Override
     public Optional<ReviewDto> getReview(Long reviewId) {
@@ -63,12 +64,22 @@ public class ReviewServiceImpl implements ReviewService {
                     return mapToReviewDto(review, dinerName);
                 });
     }
+
     //리뷰 수정
     @Override
     @Transactional
     public void updateReview(Long reviewId, ReviewDto reviewDto) {
         Review review = reviewRepository.findById(reviewId).
                 orElseThrow(() -> new IllegalArgumentException("해당하는 리뷰가 없습니다."));
+        if(reviewDto.getComment().isEmpty()) {
+            throw new IllegalArgumentException("리뷰 내용을 입력해주세요.");
+        }
+        if(reviewDto.getRating() == 0 || reviewDto.getRating() > 5) {
+            throw new IllegalArgumentException("별점을 선택해주세요.");
+        }
+        if(reviewDto.getComment().replaceAll("\\s", "").length() > 100) {
+            throw new IllegalArgumentException("리뷰는 100자 이내로 작성해주세요.");
+        }
         review.setRating(reviewDto.getRating());
         review.setComment(reviewDto.getComment());
         reviewRepository.save(review);
@@ -83,6 +94,19 @@ public class ReviewServiceImpl implements ReviewService {
     public void createReview(ReviewDto reviewDto, Long memberId) {
         Diner diner = dinerRepository.findById(reviewDto.getDinerId())
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 식당이 없습니다."));
+        if(reviewRepository.findByBookId(reviewDto.getBookId()).isPresent()) {
+            throw new IllegalArgumentException("이미 작성된 리뷰가 있습니다.");
+        }
+        if(reviewDto.getComment().isEmpty()) {
+            throw new IllegalArgumentException("리뷰 내용을 입력해주세요.");
+        }
+        if(reviewDto.getRating() == 0) {
+            throw new IllegalArgumentException("별점을 선택해주세요.");
+        }
+        if(reviewDto.getComment().replaceAll("\\s", "").length() > 100) {
+            throw new IllegalArgumentException("리뷰는 100자 이내로 작성해주세요.");
+        };
+
         Review review = Review.builder()
                 .memberId(memberId)
                 .bookId(reviewDto.getBookId())

@@ -417,6 +417,21 @@ document.getElementById("editRating").addEventListener("input", e => {
 
 //리뷰 작성 메소드
 function createReview() {
+    if(!document.getElementById("modalRating").value){
+        alert("별점을 입력해주세요.");
+        return;
+    }
+
+    if(!document.getElementById("modalComment").value){
+        alert("후기 내용을 입력해주세요.");
+        return;
+    }
+    const commentValue = document.getElementById("modalComment").value;
+
+    if(commentValue.replace(/\s/g, "").length > 100){
+        alert("후기 내용은 100자 이내로 작성해주세요.");
+        return;
+    }
 
     //후기에 저장하는 값
     const reviewBookId = document.getElementById("modalBookId").value;
@@ -453,6 +468,21 @@ function createReview() {
 
 //리뷰 수정
 function updateReview() {
+    if(!document.getElementById("editRating").value){
+        alert("별점을 입력해주세요.");
+        return;
+    }
+
+    if(!document.getElementById("editComment").value){
+        alert("후기 내용을 입력해주세요.");
+        return;
+    }
+    const editCommentValue = document.getElementById("editComment").value;
+    if(editCommentValue.replace(/\s/g, "").length > 100){
+        alert("후기 내용은 100자 이내로 작성해주세요.");
+        return;
+    }
+
     const reviewId = document.getElementById("editReviewId").value;
     const editRating = document.getElementById("editRating").value;
     const editComment = document.getElementById("editComment").value;
@@ -486,7 +516,7 @@ function deleteReview(){
 
     fetch(`api/review/delete/${reviewId}`, {
         method: "DELETE",
-        headers: {"Content-Type": "application/json"},
+        headers: {"Content-Type": "application/json"}
     })
         .then(res => {
             if(res.ok){

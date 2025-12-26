@@ -36,18 +36,19 @@ public class ReviewRestController {
         reviewService.createReview(reviewDto, user.getMember().getId());
         return ResponseEntity.ok().build();
     }
+
     //리뷰 수정 모달에서 리뷰 내용 출력을 위함
-    @GetMapping("/{reviewId}")
+    @GetMapping("/{reviewId:[0-9]+}")
     public Optional<ReviewDto> getMyReview(@PathVariable Long reviewId) {
         return reviewService.getReview(reviewId);
     }
 
-    @PatchMapping("/update/{reviewId}")
+    @PatchMapping("/update/{reviewId:[0-9]+}")
     public void updateMyReview(@PathVariable Long reviewId, @RequestBody ReviewDto reviewDto) {
         reviewService.updateReview(reviewId, reviewDto);
     }
 
-    @DeleteMapping ("/delete/{reviewId}")
+    @DeleteMapping ("/delete/{reviewId:[0-9]+}")
     public void deleteMyReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
     }

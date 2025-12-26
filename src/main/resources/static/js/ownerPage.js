@@ -461,7 +461,7 @@ async function loadDeleteTab() {
 
     if(!dinerId){
         tbody.innerHTML=`
-            <td colspan =3 >
+            <td colspan="3" >
                삭제할 식당을 선택해주세요
             </td>`
         return;
