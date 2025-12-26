@@ -24,19 +24,6 @@ public class NotificationListener {
 
     @Async
     @EventListener
-    @Transactional
-    // 식당 폐업 시
-    public void handleDinerClosed(DinerClosedEvent event) {
-        List<Book> books =  bookRepository.findByDinerId(event.dinerId());
-
-        for(Book book : books){
-            String msg = String.format("[%s] 식당이 폐업하여 예약이 자동 취소되었습니다.", event.dinerName());
-            sendAndSave("ROLE_USER", book.getMember().getId(), msg);
-        }
-    }
-
-    @Async
-    @EventListener
     // 예약 승인 시
     public void handleReservationApprove(ReservationApproveEvent event) {
         String msg = String.format("[%s] %s 예약이 승인되었습니다!", event.dinerName(), event.reservationTime());
@@ -64,6 +51,47 @@ public class NotificationListener {
     // 리뷰 작성 시
     public void handleReviewWrite(ReviewWriteEvent event) {
         String msg = String.format("[%s] 새로운 리뷰가 작성되었습니다.", event.dinerName());
+        sendAndSave("ROLE_OWNER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 회원가입 성공 시(유저, 사장)
+    public void handleRegisterUser(RegisterEvent event) {
+        String msg = String.format("[%s] 회원가입을 환영합니다.", event.name());
+        sendAndSave(event.role(), event.memberId(), msg);
+    }
+
+    // 회원가입은 통합 Event, 수정은 분리 Event(테스트)
+    @Async
+    @EventListener
+    // 회원 수정 시(유저)
+    public void handleMemberUpdate(MemberUpdateEvent event) {
+        String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
+        sendAndSave("ROLE_USER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 회원 수정 시(사장)
+    public void handleOwnerUpdate(OwnerUpdateEvent event) {
+        String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
+        sendAndSave("ROLE_OWNER", event.memberId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 새로운 예약이 들어왔을 때
+    public void handleReservationCreate(ReservationCreateEvent event) {
+        String msg = String.format("[%s] %s 예약이 신청되었습니다.", event.dinerName(), event.reservationTime());
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg);
+    }
+
+    @Async
+    @EventListener
+    // 예약 수정 시
+    public void handleReservationUpdate(ReservationUpdateEvent event) {
+        String msg = String.format("[%s] %s 예약이 수정되었습니다.", event.dinerName(), event.reservationTime());
         sendAndSave("ROLE_OWNER", event.memberId(), msg);
     }
 

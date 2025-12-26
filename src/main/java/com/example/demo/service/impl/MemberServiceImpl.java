@@ -3,6 +3,8 @@ package com.example.demo.service.impl;
 import com.example.demo.data.dto.MemberDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.MemberUpdateDto;
+import com.example.demo.data.dto.notification.MemberUpdateEvent;
+import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.AuthorityRepository;
@@ -11,6 +13,7 @@ import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,7 @@ public class MemberServiceImpl implements MemberService {
     private final OwnerRepository ownerRepository;
     private final PasswordEncoder passwordEncoder; //  @Bean 필요- config
     private final AuthorityRepository authorityRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
@@ -41,6 +45,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     // Create
+    @Transactional
     @Override
     public MemberDto createMember(MemberDto memberDto) {
         String phoneNumber = memberDto.getPhone();
@@ -69,6 +74,12 @@ public class MemberServiceImpl implements MemberService {
                 .build();
 
         authorityRepository.save(authority);
+
+        eventPublisher.publishEvent(new RegisterEvent(
+                member.getId(),
+                member.getName(),
+                authority.getAuthority()
+        ));
 
         return mapToMemberDto(member);
     }
@@ -131,6 +142,11 @@ public class MemberServiceImpl implements MemberService {
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
+
+        eventPublisher.publishEvent(new MemberUpdateEvent(
+                member.getId(),
+                member.getName()
+        ));
 
         return MemberUpdateDto.builder()
                 .email(member.getEmail())

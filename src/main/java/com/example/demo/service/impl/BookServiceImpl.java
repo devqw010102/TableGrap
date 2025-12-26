@@ -2,9 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
-import com.example.demo.data.dto.notification.ReservationApproveEvent;
-import com.example.demo.data.dto.notification.ReservationCancelEvent;
-import com.example.demo.data.dto.notification.ReservationRejectEvent;
+import com.example.demo.data.dto.notification.*;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Diner;
@@ -87,6 +85,13 @@ public class BookServiceImpl implements BookService {
         book.setBookingDate(dto.getBookingDate());
         book.setPersonnel(dto.getPersonnel());
         book.setSuccess(false);
+
+
+        eventPublisher.publishEvent(new ReservationUpdateEvent(
+                book.getDiner().getOwner().getId(),
+                book.getDiner().getDinerName(),
+                book.getBookingDate()
+        ));
     }
 
     @Override
@@ -94,9 +99,8 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId).orElseThrow();
         bookRepository.deleteById(bookId);
 
-        // Owner Entity 들어오면 수정될수도 있음
         eventPublisher.publishEvent(new ReservationCancelEvent(
-                book.getMember().getId(),
+                book.getDiner().getOwner().getId(),
                 book.getDiner().getDinerName(),
                 book.getMember().getName(),
                 book.getBookingDate()
@@ -125,6 +129,13 @@ public class BookServiceImpl implements BookService {
                     .success(false)
                     .build();
             bookRepository.save(book);
+
+            eventPublisher.publishEvent(new ReservationCreateEvent(
+                    book.getDiner().getOwner().getId(),
+                    book.getDiner().getDinerName(),
+                    book.getMember().getName(),
+                    book.getBookingDate()
+            ));
     }
 
     @Override
