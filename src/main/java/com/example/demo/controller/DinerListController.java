@@ -14,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,22 +37,43 @@ public class DinerListController {
     return "dinerList/dinerList";
   }
 
-  @PreAuthorize("hasAnyRole('USER', 'OWNER')")
-  @GetMapping("/reservation")
-  public String reserveDiner(@RequestParam("id") Long id, Authentication authentication) {
+    // owner면 dinerList에서 home으로
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
+    @GetMapping("/reservation")
+    public String reserveDiner(@RequestParam("id") Long id,
+                               Authentication authentication,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
 
-      if (authentication == null || !authentication.isAuthenticated()) {
-          return "redirect:/login"; // 로그인 안 했으면 로그인 페이지로
-      }
-      boolean isOwner = authentication.getAuthorities().stream()
-              .anyMatch(a -> a.getAuthority().equals("ROLE_OWNER"));
+        // 권한 확인
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
 
-      if(isOwner) {
-          log.info("점주는 권한이 제한됩니다.");
-          return "redirect:/";
-      }
+        // if Owner
+        boolean isOwner = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_OWNER"));
 
-      Member member = memberService.getMember(authentication.getName());
-      return "reservation/reservation";
-  }
+        if (isOwner) {
+            log.info("점주 계정의 예약 접근이 차단되었습니다.");
+            redirectAttributes.addFlashAttribute("errorMessage", "점주 계정으로는 예약을 진행할 수 없습니다.");
+            return "redirect:/";
+        }
+
+        try {
+            // 뷰 렌더링에 데이터 조회
+            DinerDetailDto diner = dinerService.getDinerById(id);
+            Member member = memberService.getMember(authentication.getName());
+
+            model.addAttribute("diner", diner);
+            model.addAttribute("member", member);
+            model.addAttribute("dinerId", id);
+
+            return "reservation/reservation";
+        } catch (Exception e) {
+            log.error("예약 페이지 호출 중 에러 발생: ", e);
+            redirectAttributes.addFlashAttribute("errorMessage", "식당 정보를 불러오는 중 오류가 발생했습니다.");
+            return "redirect:/diner/list?category=전체";
+        }
+    }
 }
