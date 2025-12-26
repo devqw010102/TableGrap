@@ -21,6 +21,11 @@ public class HomeController {
     }
 
     @GetMapping("/register")
+    public String getRegister(){
+        return "user/register-choice";
+    }
+
+    @GetMapping("/register/user")
     public String getMemberAdd(@ModelAttribute("member")MemberDto memberDto){
         return "user/register";
     }
@@ -32,5 +37,8 @@ public class HomeController {
     public String getAdmin() {
         return "admin/adminPage";
     }
+
+   @GetMapping("/register/owner")
+    public String getOwnerReg() { return "user/owner-register"; }
 
 }
