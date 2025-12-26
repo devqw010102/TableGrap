@@ -124,7 +124,7 @@ public class DinerServiceImpl implements DinerService {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
         dinerRepository.delete(diner);
-        //실제로 db를 지우는 것이 아닌 diner 테이블의 ownerId만 삭제하는 방법...?ㄴㄴㄴㄴㄴ
+        //실제로 db를 지우는 것이 아닌 diner 테이블의 ownerId만 삭제하는 방법...?
         //diner.setOwner(null);
     }
 
