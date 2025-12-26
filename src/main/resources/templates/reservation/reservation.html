@@ -100,16 +100,6 @@
                                 </tr>
                                 </thead>
                                 <tbody id="review-tbody">
-                                <tr th:each="review: ${reviews}" th:unless="${#lists.isEmpty(reviews)}">
-                                    <!-- 후기가 있을 경우 -->
-                                    <!-- 별점 5점 만점(| <- 리터럴 대체 문자(타임리프)) -->
-                                    <td th:text="|${review.rating}/5|">별점</td>
-                                    <td th:text="${review.comment}" class="text-start">리뷰 내용</td>
-                                </tr>
-                                <tr th:if="${#lists.isEmpty(reviews)}">
-                                    <!-- 후기가 없을 경우 -->
-                                    <td colspan="2" class="comment-none">작성한 후기가 없습니다.</td>
-                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -171,6 +161,23 @@
     </form>
 </div>
 
+<div class="modal fade" tabindex="-1" aria-hidden="true" id="reviewDetailModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">후기 자세히 보기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3" id="reviewDetail">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
 <footer>
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
