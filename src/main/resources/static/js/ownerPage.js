@@ -433,24 +433,35 @@ function toggleEditMode(isEdit) {
         // 수정 모드일 때
         viewElements.forEach(el => el && (el.style.display = "none"));
         editElements.forEach(el => {
-            if (el) {
-                // 그룹(div)인 경우 flex, 버튼 등은 inline-block 등 상황에 맞게
-                if (el.classList.contains("input-group") || el.classList.contains("edit-mode-row")) {
-                    el.style.display = "flex";
-                } else {
-                    el.style.display = "inline-block";
+                if (el) {
+                    if (el.classList.contains('input-group')) {
+                        el.style.display = "flex";
+                    } else {
+                        el.style.display = "block";
+                    }
                 }
-            }
-        });
+            });
         // 도메인 선택창 활성화 등 추가 로직이 필요하면 여기에 작성
         document.getElementById("emailDomainSelect").disabled = false;
         document.getElementById("emailId").readOnly = false;
         document.getElementById("emailDomainInput").readOnly = false;
 
     } else {
-        // 보기 모드일 때 (취소하거나 저장 후)
+       // 보기 모드일 때 (취소하거나 저장 후)
         viewElements.forEach(el => el && (el.style.display = "block")); // 혹은 원래 스타일대로
         editElements.forEach(el => el && (el.style.display = "none"));
+        //수정 후 초기화 로직
+        const inputs = document.querySelectorAll('.is-valid, .is-invalid');
+        inputs.forEach(input => input.classList.remove('is-valid', 'is-invalid'));
+        const errorIds = ["error-emailId", "error-myPhone", "error-newPassword", "error-pwdConfirm"];
+           errorIds.forEach(id => {
+               const el = document.getElementById(id);
+               if(el) el.innerText = "";
+           });
+       //비밀번호 입력창 값 비우기
+       document.getElementById("newPassword").value = "";
+       document.getElementById("pwdConfirm").value = "";
+
     }
 }
 
