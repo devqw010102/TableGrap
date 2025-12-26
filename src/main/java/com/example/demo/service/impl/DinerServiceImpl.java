@@ -12,6 +12,7 @@ import com.example.demo.data.repository.BookRepository;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -123,22 +124,5 @@ public class DinerServiceImpl implements DinerService {
         dinerRepository.delete(diner);
         //실제로 db를 지우는 것이 아닌 diner 테이블의 ownerId만 삭제하는 방법...?
         //diner.setOwner(null);
-    }
-
-
-    @Transactional
-    @Override
-    public List<AdminOwnerDto> getAll() {
-        return dinerRepository.findOwnerDiners().stream().map(d -> AdminOwnerDto.builder()
-                        .memberId(d.getOwner().getId())
-                        .ownerName(d.getOwner().getName())
-                        .email(d.getOwner().getEmail())
-                        .phone(d.getOwner().getPhone())
-                        .dinerId(d.getId())
-                        .dinerName(d.getDinerName())
-                        .category(d.getCategory())
-                        .status(d.getStatus().toString())
-                        .build())
-                .toList();
     }
 }

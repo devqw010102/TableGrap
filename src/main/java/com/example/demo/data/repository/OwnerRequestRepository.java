@@ -13,6 +13,6 @@ public interface OwnerRequestRepository extends JpaRepository<OwnerRequest, Long
 
     boolean existsByOwnerAndDinerAndStatus(Owner owner, Diner diner, RequestStatus status);
 
-    boolean existsByMemberAndDinerAndStatus(Member member, Diner diner, RequestStatus status);
+//    boolean existsByMemberAndDinerAndStatus(Member member, Diner diner, RequestStatus status);
     Page<OwnerRequest> findAllByStatus(RequestStatus status, Pageable pageable);
 }
