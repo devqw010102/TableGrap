@@ -12,38 +12,40 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NotificationManager {
 
     // because Multithread environment
-    private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     // SSE 연결을 시도 및 사후처리
-    public SseEmitter subscribe(Long memberId) {
+    public SseEmitter subscribe(String role, Long id) {
+        String subscribeKey = role + "_" + id;
         // Timeout : 1Hours
         SseEmitter emitter = new SseEmitter(60L * 1000 * 60);
 
         // Remove from map : connection complete or Timeout(error)
-        emitter.onCompletion(() -> emitters.remove(memberId));
-        emitter.onTimeout(() -> emitters.remove(memberId));
-        emitter.onError((e) -> emitters.remove(memberId));
+        emitter.onCompletion(() -> emitters.remove(subscribeKey));
+        emitter.onTimeout(() -> emitters.remove(subscribeKey));
+        emitter.onError((e) -> emitters.remove(subscribeKey));
 
-        emitters.put(memberId, emitter);
+        emitters.put(subscribeKey, emitter);
 
         try {
             emitter.send(SseEmitter.event().name("connect").data("connected"));
         }
         catch (IOException e) {
-            emitters.remove(memberId);
+            emitters.remove(subscribeKey);
         }
 
         return emitter;
     }
 
-    public void send(Long memberId, String message) {
-        SseEmitter emitter = emitters.get(memberId);
+    public void send(String role, Long id, String message) {
+        String subscribeKey = role + "_" + id;
+        SseEmitter emitter = emitters.get(subscribeKey);
         if(emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name("notification").data(message, MediaType.APPLICATION_JSON));
             }
             catch (IOException e) {
-                emitters.remove(memberId);
+                emitters.remove(subscribeKey);
             }
         }
     }

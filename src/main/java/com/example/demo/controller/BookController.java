@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
-import com.example.demo.data.model.MemberUserDetails;
+import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.MemberService;
 import lombok.RequiredArgsConstructor;

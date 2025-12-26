@@ -1,13 +1,19 @@
 // 페이지 로드 시 SSE 연결 시작
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof currentMemberId !== 'undefined' && currentMemberId) {
+
+        if (typeof currentUserRole !== 'undefined' && currentUserRole === 'ROLE_ADMIN') {
+            console.log("관리자 계정: 알림 기능을 활성화하지 않습니다.");
+            return;
+        }
+
         connectSSE(currentMemberId);
-        initializeBadgeCount()
+        initializeBadgeCount();
     }
 });
 
 function connectSSE(memberId) {
-    const eventSource = new EventSource('/api/notifications/subscribe/' + memberId);
+    const eventSource = new EventSource(`/api/notifications/subscribe/${memberId}?role=${currentUserRole}`);
 
     eventSource.addEventListener("notification", (event) => {
         updateBadgeCount(1);
@@ -16,12 +22,14 @@ function connectSSE(memberId) {
     eventSource.onerror = () => {
         console.log("SSE 연결 끊김, 재연결 시도 중...");
         eventSource.close();
+        // 5초우 연결 재시도
+        setTimeout(() => connectSSE(memberId), 5000);
     };
 }
 
 async function loadNotifications() {
     try {
-        const response = await fetch('/api/notifications/' + currentMemberId);
+        const response = await fetch(`/api/notifications/${currentMemberId}?role=${currentUserRole}`);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -72,7 +80,8 @@ async function markAsRead(id, element) {
     if (element.classList.contains('read')) return;
 
     try {
-        const response = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
+        const url = `/api/notifications/${id}/read?memberId=${currentMemberId}&role=${currentUserRole}`;
+        const response = await fetch(url, { method: 'PATCH' });
 
         if(response.ok) {
             element.classList.remove('unread');
@@ -91,6 +100,9 @@ async function markAsRead(id, element) {
                 badge.style.display = 'none';
             }
         }
+        else if(response.status === 403) {
+            console.error("본인의 알림만 읽음 처리할 수 있습니다.");
+        }
         element.style.backgroundColor = 'transparent';
     } catch (e) {
         console.error("읽음 처리 실패", e);
@@ -105,7 +117,7 @@ async function deleteAllNotifications(event) {
     }
 
     try {
-        const response = await fetch(`/api/notifications/all/${currentMemberId}`, {
+        const response = await fetch(`/api/notifications/all/${currentMemberId}?role=${currentUserRole}`, {
             method: 'DELETE'
         });
 
@@ -128,7 +140,7 @@ async function deleteAllNotifications(event) {
 
 async function initializeBadgeCount() {
     try {
-        const response = await fetch('/api/notifications/' + currentMemberId);
+        const response = await fetch(`/api/notifications/${currentMemberId}?role=${currentUserRole}`);
         const notifications = await response.json();
 
         // 안 읽은(read가 false인) 알림의 개수만 필터링

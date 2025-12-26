@@ -1,23 +1,10 @@
-/* Page Status */
-const pageStatus = {
-    // list : 0,
-    // stats : 0,
-    ownerRequestList : 0,
-    // reservationList : 0,
-    // ownerList : 0,
-    // reviewList : 0,
-};
-
 const pageSize = 10;
-// let currentActiveTab = 'create';
-
 
 document.addEventListener("DOMContentLoaded", () => {
     /* Tab event */
     const tabActions = {
         "#list": () => loadDiners(0),
         "#stats": () => loadMembers(0),
-        "#ownerRequestList": () => loadOwnerRequests(0),
         "#reservationList": () => loadReservations(0),
         "#ownerList": () => loadOwners(0),
         "#reviewList": () => loadReviews(0),
@@ -146,63 +133,6 @@ async function loadMembers(page = 0) {
             document.getElementById("memberTable"),
             5,
             "회원 정보를 불러오지 못했습니다."
-        );
-    }
-}
-
-/* 권한 신청 상태 뱃지 */
-function statusBadge(status) {
-    const map = {
-        PENDING: "warning",
-        APPROVED: "success",
-        REJECTED: "secondary"
-    };
-    return `<span class="badge bg-${map[status] ?? "secondary"}">${status}</span>`;
-}
-
-/* 권한 신청 목록 */
-async function loadOwnerRequests(page = 0) {
-    try {
-        const url = `/api/adminPage/owner-requests?page=${page}&size=${pageSize}`;
-        const data = await fetchJson(url);
-
-        if (data.content.length === 0 && page > 0) {
-            await loadOwnerRequests(page - 1);
-            return;
-        }
-
-        pageStatus.ownerRequestList = page;
-
-        renderTable({
-            tbodyId: "ownerRequestTable",
-            colSpan: 6,
-            data: data.content,
-            emptyMessage: "권한 신청 내역이 없습니다.",
-            rowRenderer: r => `
-                <tr>
-                    <td>${r.id}</td>
-                    <td>${r.memberUsername}</td>
-                    <td>${r.dinerName}</td>
-                    <td>${statusBadge(r.status)}</td>
-                    <td>${r.createdAt.substring(0, 10)}</td>
-                    <td>
-                        ${r.status === "PENDING" ? `
-                            <button class="btn btn-success btn-sm"
-                                onclick="approveRequest(${r.id})">승인</button>
-                            <button class="btn btn-danger btn-sm"
-                                onclick="rejectRequest(${r.id})">반려</button>
-                        ` : "-"}
-                    </td>
-                </tr>
-            `
-        });
-
-        renderPagination('ownerRequestList', data, 'loadOwnerRequests');
-    } catch (e) {
-        renderEmptyRow(
-            document.getElementById("ownerRequestTable"),
-            6,
-            e.message || "권한 신청 목록을 불러오지 못했습니다."
         );
     }
 }
@@ -342,54 +272,6 @@ async function loadDashboard() {
     }
 }
 
-
-// 승인, 반려 실행시킬 메소드
-// + url 주소, 성공 메시지를 제외한 나머지코드가 동일하므로 객체화 시킴
-// ++ 승인, 반려 외 대기(인증확인) 등 여러 상태가 추가되도 url, message 만 바꾸어서 이 메소드에 넣으면 정상 작동
-
-/*  승인 / 반려 */
-async function processOwnerRequest({url, successMessage}) {
-    try {
-        const res = await fetch(url, {method : "put"});
-        if(res.ok) {
-            alert(successMessage);
-            await loadOwnerRequests(pageStatus.ownerRequestList);
-            return;
-        }
-
-        const errorMsg = await res.text();
-
-        switch (res.status) {
-            case 400:
-            case 409:
-                alert(errorMsg);
-                break;
-            case 403:
-                alert("권한이 없습니다.");
-                break;
-            default:
-                alert("처리 중 오류가 발생했습니다.");
-        }
-    }
-    catch(e) {
-        console.error(e);
-        alert("서버 통신 오류");
-    }
-}
-
-// 승인 url, message
-async function approveRequest(id) {
-    if(!confirm("승인하시겠습니까?")) return;
-    await processOwnerRequest({url: `/api/adminPage/owner-requests/${id}/approve`, successMessage: "승인 완료"});
-}
-
-// 반려 url, message
-async function rejectRequest(id) {
-    if (!confirm("반려하시겠습니까?")) return;
-    await processOwnerRequest({url: `/api/adminPage/owner-requests/${id}/reject`, successMessage: "반려 처리 완료"});
-}
-
-
 /* Rendering pagination */
 function renderPagination(targetTab, data, loadFunction) {
     const paginationId = targetTab + "Pagination";
@@ -435,9 +317,6 @@ function switchToReviewTab() {
 
     if(reviewTabLink) {
         reviewTabLink.click();
-
-        // const tab = new bootstrap.tab(reviewTabLink);
-        // tab.show();
     }
     else {
         console.error("리뷰 목록 탭을 찾을 수 없습니다.");

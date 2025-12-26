@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
-import com.example.demo.data.dto.owner.OwnerRequestDto;
 import com.example.demo.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,22 +23,6 @@ public class AdminController {
     // 회원 목록 fetch
     @GetMapping("/members")
     public Page<MemberInfoResponseDto> members(@PageableDefault(size = 10, sort = "id") Pageable pageable) { return adminService.getMember(pageable); }
-
-    // 권한 신청 목록 fetch
-    @GetMapping("/owner-requests")
-    public Page<OwnerRequestDto> ownerRequests(@PageableDefault(size = 10, sort = "id") Pageable pageable) { return adminService.findAllByStatus(pageable); }
-
-    // 권한 승인
-    @PutMapping("/owner-requests/{id}/approve")
-    public void approveOwner(@PathVariable Long id) {
-        adminService.approve(id);
-    }
-
-    // 권한 반려
-    @PutMapping("/owner-requests/{id}/reject")
-    public void rejectOwner(@PathVariable Long id) {
-        adminService.reject(id);
-    }
 
     // 예약 목록 fetch
     @GetMapping("/books")

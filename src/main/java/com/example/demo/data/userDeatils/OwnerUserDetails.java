@@ -1,5 +1,7 @@
-package com.example.demo.data.model;
+package com.example.demo.data.userDeatils;
 
+import com.example.demo.data.model.Authority;
+import com.example.demo.data.model.Owner;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,7 +12,7 @@ import java.util.List;
 
 
 @Getter
-public class OwnerUserDetails implements UserDetails {
+public class OwnerUserDetails implements UserDetails, IdentifiableUserDetails {
     private final Owner owner;
     private final List<Authority> authorities;
 
@@ -40,4 +42,9 @@ public class OwnerUserDetails implements UserDetails {
     public boolean isCredentialsNonExpired() {return true;}
     @Override
     public boolean isEnabled() {return true;}
+
+    @Override
+    public Long getUserId() {
+        return owner.getId();
+    }
 }

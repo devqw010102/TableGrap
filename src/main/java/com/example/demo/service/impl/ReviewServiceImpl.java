@@ -4,7 +4,6 @@ import com.example.demo.data.dto.ReviewDto;
 import com.example.demo.data.dto.notification.ReviewWriteEvent;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Diner;
-import com.example.demo.data.model.Member;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.model.Review;
 import com.example.demo.data.repository.DinerRepository;
@@ -95,7 +94,6 @@ public class ReviewServiceImpl implements ReviewService {
         Review savedReview = reviewRepository.save(review);
         mapToReviewDto(savedReview, dinerName);
 
-        // Owner Entity 들어오면 수정될수도 있음
         eventPublisher.publishEvent(new ReviewWriteEvent(
                 diner.getOwner().getId(),
                 diner.getDinerName()

@@ -36,7 +36,7 @@
                     <a class="nav-link" th:href="@{/admin}">Admin Page</a>
                 </li>
                 <!-- Notification -->
-                <li class="nav-item dropdown me-3" sec:authorize="isAuthenticated()">
+                <li class="nav-item dropdown me-3" sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
                     <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false" onclick="loadNotifications()">
                         🔔
@@ -61,7 +61,10 @@
             </ul>
         </div>
     </nav>
-
+    <script th:inline="javascript" sec:authorize="isAuthenticated()">
+        const currentMemberId = [[${#authentication.principal.userId}]];
+        const currentUserRole = [[${#authentication.authorities[0].authority}]];
+    </script>
     <script th:src="@{/js/notification.js}"></script>
 
 </div>

@@ -12,10 +12,10 @@ import java.util.List;
 public class AdminDashboardDto {
     private Long dinerCount;
     private Long todayBookingCount;
-    private Long memberCount;
-
-    private Long ownerCount;
-    private Long userCount;
+    private Long memberCount;       // 총 회원 수
+    
+    private Long ownerCount;        // 사장 수
+    private Long userCount;         // 일반유저 수
 
     private List<AdminReviewDto> todayReviews;
 }

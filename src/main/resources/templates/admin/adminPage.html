@@ -27,7 +27,7 @@
     </li>
     <!-- tab4 -->
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#ownerRequestList">권한 신청 목록</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#ownerList">식당 사장 목록</a>
     </li>
     <!-- tab5 -->
     <li class="nav-item">
@@ -35,13 +35,9 @@
     </li>
     <!-- tab6 -->
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#ownerList">식당 사장 목록</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#reviewList">전체 리뷰 목록</a>
     </li>
     <!-- tab7 -->
-    <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#reviewList">리뷰 목록</a>
-    </li>
-    <!-- tab8 -->
     <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#dashboard">대시 보드</a>
     </li>
@@ -105,22 +101,22 @@
         </div>
     </div>
     <!-- tab4-content -->
-    <div id="ownerRequestList" class="tab-pane fade">
-        <!-- 권한 신청 목록 -->
+    <div id="ownerList" class="tab-pane fade">
+        <!-- 식당 사장 목록 -->
         <div class = "container mt-4">
-            <h2>권한 신청 목록</h2>
+            <h2>식당 사장 목록</h2>
             <table class = "table table-boarded">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>아이디</th>
                     <th>식당 이름</th>
-                    <th>현재 상태</th>
-                    <th>신청 일자</th>
-                    <th>승인 및 반려</th>
+                    <th>카테고리</th>
+                    <th>사장 이름</th>
+                    <th>전화번호</th>
+                    <th>이메일</th>
+                    <th>영업 여부</th>
                 </tr>
                 </thead>
-                <tbody id="ownerRequestTable"></tbody>
+                <tbody id="ownerListTable"></tbody>
             </table>
         </div>
     </div>
@@ -146,30 +142,10 @@
         </div>
     </div>
     <!-- tab6-content -->
-    <div id="ownerList" class="tab-pane fade">
-        <!-- 식당 사장 목록 -->
-        <div class = "container mt-4">
-            <h2>식당 사장 목록</h2>
-            <table class = "table table-boarded">
-                <thead>
-                <tr>
-                    <th>식당 이름</th>
-                    <th>카테고리</th>
-                    <th>사장 이름</th>
-                    <th>전화번호</th>
-                    <th>이메일</th>
-                    <th>영업 여부</th>
-                </tr>
-                </thead>
-                <tbody id="ownerListTable"></tbody>
-            </table>
-        </div>
-    </div>
-    <!-- tab7-content -->
     <div id="reviewList" class="tab-pane fade">
         <!-- 리뷰 목록 -->
         <div class = "container mt-4">
-            <h2>리뷰 목록</h2>
+            <h2>전체 리뷰 목록</h2>
             <table class = "table table-boarded">
                 <thead>
                 <tr>
@@ -185,7 +161,7 @@
             </table>
         </div>
     </div>
-    <!-- tab8-content -->
+    <!-- tab7-content -->
     <div id="dashboard" class="tab-pane fade">
         <!-- 대시보드 -->
         <div class="container mt-4">

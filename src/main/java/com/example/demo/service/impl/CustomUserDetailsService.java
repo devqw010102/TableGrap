@@ -4,6 +4,8 @@ import com.example.demo.data.model.*;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.data.repository.OwnerRepository;
+import com.example.demo.data.userDeatils.MemberUserDetails;
+import com.example.demo.data.userDeatils.OwnerUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

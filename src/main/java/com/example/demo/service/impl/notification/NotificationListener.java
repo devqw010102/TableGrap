@@ -31,7 +31,7 @@ public class NotificationListener {
 
         for(Book book : books){
             String msg = String.format("[%s] 식당이 폐업하여 예약이 자동 취소되었습니다.", event.dinerName());
-            sendAndSave(book.getMember().getId(), msg);
+            sendAndSave("ROLE_USER", book.getMember().getId(), msg);
         }
     }
 
@@ -40,7 +40,7 @@ public class NotificationListener {
     // 예약 승인 시
     public void handleReservationApprove(ReservationApproveEvent event) {
         String msg = String.format("[%s] %s 예약이 승인되었습니다!", event.dinerName(), event.reservationTime());
-        sendAndSave(event.memberId(), msg);
+        sendAndSave("ROLE_USER", event.memberId(), msg);
     }
 
     @Async
@@ -48,7 +48,7 @@ public class NotificationListener {
     // 예약 거부 시
     public void handleReservationReject(ReservationRejectEvent event) {
         String msg = String.format("[%s] %s 예약이 거부되었습니다", event.dinerName(), event.reservationTime());
-        sendAndSave(event.memberId(), msg);
+        sendAndSave("ROLE_USER", event.memberId(), msg);
     }
 
     @Async
@@ -56,20 +56,22 @@ public class NotificationListener {
     // 예약 취소 시
     public void handleReservationCancel(ReservationCancelEvent event) {
         String msg = String.format("[%s] %s 고객님의 %s 예약이 취소되었습니다.", event.dinerName(), event.memberName(), event.reservationTime());
-        sendAndSave(event.ownerId(), msg);
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg);
     }
 
     @Async
     @EventListener
+    // 리뷰 작성 시
     public void handleReviewWrite(ReviewWriteEvent event) {
         String msg = String.format("[%s] 새로운 리뷰가 작성되었습니다.", event.dinerName());
-        sendAndSave(event.memberId(), msg);
+        sendAndSave("ROLE_OWNER", event.memberId(), msg);
     }
 
     // Notification Entity Save + Send
-    private void sendAndSave(Long receiveId, String message) {
+    private void sendAndSave(String role, Long receiveId, String message) {
         Notification notification = Notification.builder()
                 .memberId(receiveId)
+                .role(role)
                 .message(message)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
@@ -77,6 +79,6 @@ public class NotificationListener {
 
         notificationRepository.save(notification);
         // 현재 접속 중인 경우(SSE)
-        notificationManager.send(receiveId, message);
+        notificationManager.send(role, receiveId, message);
     }
 }

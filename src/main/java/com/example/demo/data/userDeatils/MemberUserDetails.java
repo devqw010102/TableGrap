@@ -1,5 +1,7 @@
-package com.example.demo.data.model;
+package com.example.demo.data.userDeatils;
 
+import com.example.demo.data.model.Authority;
+import com.example.demo.data.model.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
-public class MemberUserDetails implements UserDetails {
+public class MemberUserDetails implements UserDetails, IdentifiableUserDetails {
 
     private final Member member;
     private final List<Authority> authorities;
@@ -54,5 +56,10 @@ public class MemberUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true; // 활성화 상태
+    }
+
+    @Override
+    public Long getUserId() {
+        return member.getId();
     }
 }
