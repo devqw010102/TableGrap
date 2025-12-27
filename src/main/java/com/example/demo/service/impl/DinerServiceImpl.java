@@ -72,6 +72,13 @@ public class DinerServiceImpl implements DinerService {
         return dinerRepository.findByOwnerId(ownerId);
     }
 
+    //사업자 조회시 식당 추가
+    @Override
+    public Optional<Diner> findByDinerNameBiz(String dinerName){
+        return dinerRepository.findByDinerNameIgnoreSpace(dinerName);
+    }
+
+
     //식당 추가
     @Override
     @Transactional
@@ -115,5 +122,18 @@ public class DinerServiceImpl implements DinerService {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
         dinerRepository.delete(diner);
+    }
+
+    //식당 상태 변경
+    @Override
+    @Transactional
+    public void changeStatus(Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        if(diner.getStatus().equals(DinerStatus.PUBLIC)) {
+            diner.setStatus(DinerStatus.CLOSED);
+        } else if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            diner.setStatus(DinerStatus.PUBLIC);
+        }
     }
 }

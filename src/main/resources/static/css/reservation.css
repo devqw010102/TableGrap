@@ -364,3 +364,7 @@
 #btnBook:active {
     transform: translateY(0);
 }
+
+.modal #reviewDetail{
+    word-break: break-all;
+}

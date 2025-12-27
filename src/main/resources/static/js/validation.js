@@ -205,6 +205,6 @@ function checkPwdConfirm() {
         if (bizNumReg.test(bizNumVal)) {
             clearError(businessNumber.id);
         } else {
-            showError(businessNumber.id, "사업자 번호는 숫자 10자리여야 합니다.");
+            showError(businessNumber.id, "사업자 번호는 (-)를 제외한 숫자 10자리여야 합니다.");
     }
 }
