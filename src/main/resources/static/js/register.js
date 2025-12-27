@@ -98,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("ownerDinerName").value = diner.dinerName;
                     isBusinessNumberValid = true;
                     document.getElementById("businessNum").readOnly = true;
+                    document.getElementById("businessNumBtn").disabled = true;
                     alert("사업자 번호가 조회되었습니다");
                 } else {
                     alert("식당 데이터가 올바르지 않습니다.")

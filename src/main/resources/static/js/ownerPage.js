@@ -465,7 +465,7 @@ function toggleEditMode(isEdit) {
     }
 }
 
-//식당 삭제 시 식당 목록출력
+//식당 관리 탭 식당 목록출력
 async function loadDinerInfoTab() {
     const dinerId = document.getElementById('dinerSelect')?.value || "";
     const tbody = document.getElementById("owner-diner");
@@ -484,18 +484,17 @@ async function loadDinerInfoTab() {
         if(!dinerData){
             throw new Error("식당정보를 가져올 수 없습니디ㅏ.");
         }
-        let status = dinerData.status;
         let badge;
         if(dinerData.status === "PUBLIC"){
-            badge = "badge bg-success fs-6";
+            badge = `<span class="badge bg-success fs-6">영업 중</span>`;
         } else if(dinerData.status === "CLOSED"){
-            badge = "badge bg-danger fs-6";
+            badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
         }
 
         tbody.innerHTML = `
             <td>${dinerData.id}</td>
             <td>${dinerData.dinerName}</td>
-            <td><span class="${badge}">${status}</span></td>
+            <td>${badge}</td>
             <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
             <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
         `
@@ -527,6 +526,12 @@ async function deleteDiner(dinerId){
         return;
     }
 
+    //식당 영업 상태 확인
+    const dinerStatus = await checkStatus(dinerId);
+    if(!dinerStatus){
+        alert("식당이 영업 중인 상태입니다. \n 식당을 삭제하시려면 영업 종료 상태여야 합니다.")
+        return;
+    }
     const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
     if(answer) {
         const url = `/api/owner/delete/diner/${dinerId}`;
@@ -543,6 +548,23 @@ async function deleteDiner(dinerId){
             console.error(err);
             alert("오류 발생" + err);
         }
+    }
+}
+
+//식당 영업 여부 확인
+async function checkStatus(dinerId){
+    const url = `/api/owner/diner/${dinerId}`
+
+    try{
+        const dinerStatus = await fetchJson(url);
+        if(dinerStatus.status === "PUBLIC"){
+            return false;
+        } else if(dinerStatus.status === "CLOSED"){
+            return true;
+        }
+    } catch(err) {
+        console.error(err);
+        alert("식당 영업 정보를 불러올 수 없습니다.")
     }
 }
 
@@ -592,7 +614,7 @@ if (bizNumBtn) {
             alert("사업자 번호를 입력해주세요.");
             return false;
         } else if(bizNum.length !== 10 || !reg.test(bizNum)){
-            alert("올바른 사업자 번호 형식이 아닙니다. 숫자 10자리로 입력해주세요.");
+            alert("올바른 사업자 번호 형식이 아닙니다.\n(-)를 제외한 숫자 10자리로 입력해주세요.");
             return false;
         } else if(reg.test(bizNum) && bizNum !== "" ) {
             fetchBizNum(bizNum);
@@ -608,18 +630,16 @@ async function fetchBizNum(bizNum) {
         if (res.ok) {
             const data = await res.json();
             console.log(data);
-            const items = data.items || data.data;
-            if (items && items.length > 0) {
-                const info = items[0];
-
-                // 받아온 상호명을 공백 제거
-                const cleanDinerName = info.company.replace(/\s+/g, '');
-                document.getElementById("ownerDinerName").value = cleanDinerName;
+            if(data && data.dinerName){
+                document.getElementById("ownerDinerName").value = data.dinerName;
                 isBizNumValid = true;
                 document.getElementById("bizNum").readOnly = true;
-                alert("사업자 정보가 정상적으로 조회되었습니다.");
+                document.getElementById("bizNumBtn").disabled = true;
+                alert("사업자 번호가 조회되었습니다");
             } else {
-                alert("유효한 사업자 번호가 아닙니다.");
+                alert("식당 데이터가 올바르지 않습니다.");
+                document.getElementById("ownerDinerName").value = "";
+                isBizNumValid = false;
             }
         } else {
             const error = await res.text();

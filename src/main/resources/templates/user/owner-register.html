@@ -28,13 +28,21 @@
             <div id="error-registerName" class="small ms-1"></div>
           </div>
 
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control position-relative" id="businessNum" placeholder="(-)을 제외한 숫자 10자리 입력" onkeyup="checkBusinessNum(this)">
-            <label for="businessNum">사업자 등록번호 <span class="text-danger">*</span></label>
-            <button type="button" class="btn btn-primary position-absolute top-0 end-0" id="businessNumBtn">조회하기</button>
+          <div class="position-relative">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="businessNum" placeholder="사업자번호"
+                     style="padding-right: 90px;"
+                     onkeyup="checkBusinessNum(this)">
+              <label for="businessNum">사업자 등록번호 *</label>
+            </div>
+            <button type="button" class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-2"
+                    id="businessNumBtn"
+                    style="z-index: 5; height: 40px; border-radius: 5px;">
+              조회하기
+            </button>
             <input type="hidden" id="ownerDinerName" name="ownerDinerName">
-            <div id="error-businessNum" class="ms-1"></div>
           </div>
+          <div id="error-businessNum" class="ms-1 small mb-3"></div>
 
           <div class="form-floating mb-3">
             <input type="text" class="form-control" id="registerId" placeholder="아이디" onkeyup="checkUsername(this, 'owner')">

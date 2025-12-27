@@ -43,7 +43,9 @@ public class OwnerRegController {
                 + "&q=" + businessNumber
                 + "&type=json"
                 + "&pagecnt=1";
-        /* 도저히 감이 안잡혀서 GeoCodingService랑 GEMINI를 참고해서 작성함 */
+        /* 도저히 감이 안잡혀서 GeoCodingService랑 GEMINI를 참고해서 작성함
+        * 다른 방법으로 json을 받는 dto를 만드는 방법이 있는데 단순히 db와 식당명과 일치하기 위해 사용하기 때문에
+        * objectMapper를 사용함*/
         try {
             // 스프링 서버가 Bizno에 대신 요청
             String responseBody = restClient.get()
