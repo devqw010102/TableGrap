@@ -123,4 +123,17 @@ public class DinerServiceImpl implements DinerService {
         }
         dinerRepository.delete(diner);
     }
+
+    //식당 상태 변경
+    @Override
+    @Transactional
+    public void changeStatus(Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        if(diner.getStatus().equals(DinerStatus.PUBLIC)) {
+            diner.setStatus(DinerStatus.CLOSED);
+        } else if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            diner.setStatus(DinerStatus.PUBLIC);
+        }
+    }
 }

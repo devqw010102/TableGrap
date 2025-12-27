@@ -61,7 +61,7 @@ const tabLoaders = {
     approve: (page) => loadBookings({ pending: false, page }),
     reviews: (page) => loadReviews(page),
     ownerInfo: (page) => loadMyInfo(page),
-    ownerDiner: (page) => loadDeleteTab(page)
+    ownerDiner: (page) => loadDinerInfoTab(page)
 };
 
 // fetch Method
@@ -466,7 +466,7 @@ function toggleEditMode(isEdit) {
 }
 
 //식당 삭제 시 식당 목록출력
-async function loadDeleteTab() {
+async function loadDinerInfoTab() {
     const dinerId = document.getElementById('dinerSelect')?.value || "";
     const tbody = document.getElementById("owner-diner");
 
@@ -484,14 +484,38 @@ async function loadDeleteTab() {
         if(!dinerData){
             throw new Error("식당정보를 가져올 수 없습니디ㅏ.");
         }
+        let status = dinerData.status;
+        let badge;
+        if(dinerData.status === "PUBLIC"){
+            badge = "badge bg-success fs-6";
+        } else if(dinerData.status === "CLOSED"){
+            badge = "badge bg-danger fs-6";
+        }
+
         tbody.innerHTML = `
             <td>${dinerData.id}</td>
             <td>${dinerData.dinerName}</td>
+            <td><span class="${badge}">${status}</span></td>
+            <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
             <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
         `
     } catch(e) {
         console.error(e);
         alert("오류발생!" + e);
+    }
+}
+// 식당 닫기
+async function changeStatus(dinerId){
+    const url = `/api/owner/status/${dinerId}`
+    try{
+        const res = await fetchJson(url, {
+            method: "PATCH",
+        });
+        alert("식당 상태 변경이 완료되었습니다.");
+        await loadDinerInfoTab();
+    } catch(e) {
+        console.error(e.status, e.message);
+        alert("상태 변경 중 오류가 발생했습니다.")
     }
 }
 
@@ -539,7 +563,7 @@ async function hasActiveBookings(dinerId){
         if (approvedRes?.content?.length > 0) {
             // 가져온 예약이 미래인지 확인 (간단한 체크)
             const bookDate = new Date(approvedRes.content[0].bookingDate);
-            const now = new Date();
+            const now = new Date('2026-01-10');
             if (bookDate > now) {
                 return true; // 미래의 확정된 예약 있음
             }
@@ -600,6 +624,9 @@ async function fetchBizNum(bizNum) {
         } else {
             const error = await res.text();
             alert("사업자 정보 조회에 실패했습니다." + error);
+            // 사업자 번호 입력창 초기화
+            document.getElementById("ownerDinerName").value = "";
+            isBizNumValid = false;
         }
     } catch (err) {
         console.error("사업자 정보 조회 오류:", err);

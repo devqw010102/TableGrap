@@ -28,4 +28,6 @@ public interface DinerService {
     //식당 삭제
     void deleteDiner(Long id, Long ownerId);
 //    List<AdminOwnerDto> getAll();
+    //식당 상태 변경
+    void changeStatus(Long dinerId, Long ownerId);
 }
