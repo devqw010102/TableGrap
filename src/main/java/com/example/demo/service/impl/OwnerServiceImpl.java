@@ -142,6 +142,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
   } */
   @Override
+  @Transactional
   public boolean deleteOwner(Long ownerId, String checkPassword) {
     Owner owner = ownerRepository.findById(ownerId)
             .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));

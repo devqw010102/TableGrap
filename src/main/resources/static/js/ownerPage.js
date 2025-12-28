@@ -469,45 +469,69 @@ function toggleEditMode(isEdit) {
 async function loadDinerInfoTab() {
     const dinerId = document.getElementById('dinerSelect')?.value || "";
     const tbody = document.getElementById("owner-diner");
+    tbody.innerHTML = "";
 
     if(!dinerId){
-        tbody.innerHTML=`
-            <td colspan="3" >
-               삭제할 식당을 선택해주세요
-            </td>`
-        return;
-    }
-    const url = `/api/owner/diner/${dinerId}`
+        const url = "/api/owner/diners";
+        try {
+            const dinerData = await fetchJson(url);
 
-    try{
-        const dinerData = await fetchJson(url)
-        if(!dinerData){
-            throw new Error("식당정보를 가져올 수 없습니디ㅏ.");
+            dinerData.forEach(d => {
+                //식당 영업 상태에 따라 표시 내용 변경
+                let badge;
+                if(d.status === "PUBLIC"){
+                    badge = `<span class="badge bg-success fs-6">영업 중</span>`;
+                } else if(d.status === "CLOSED"){
+                    badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
+                }
+                tbody.innerHTML += `
+                <tr>
+                    <td>${d.id}</td>
+                    <td>${d.dinerName}</td>
+                    <td>${badge}</td>
+                    <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${d.id})">상태 변경</button></td>
+                    <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
+                </tr>`
+            })
+        } catch(e) {
+            console.log(e.status, e.message);
+            alert("식당 목록을 불러오는데 실패 했습니다.")
         }
-        let badge;
-        if(dinerData.status === "PUBLIC"){
-            badge = `<span class="badge bg-success fs-6">영업 중</span>`;
-        } else if(dinerData.status === "CLOSED"){
-            badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
-        }
+    } else if(dinerId) {
+        const url = `/api/owner/diner/${dinerId}`
+        try {
+            const dinerData = await fetchJson(url)
+            if (!dinerData) {
+                throw new Error("식당정보를 가져올 수 없습니디ㅏ.");
+            }
 
-        tbody.innerHTML = `
-            <td>${dinerData.id}</td>
-            <td>${dinerData.dinerName}</td>
-            <td>${badge}</td>
-            <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
-            <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
-        `
-    } catch(e) {
-        console.error(e);
-        alert("오류발생!" + e);
+            //식당 영업 상태에 따라 표시 내용 변경
+            let badge;
+            if (dinerData.status === "PUBLIC") {
+                badge = `<span class="badge bg-success fs-6">영업 중</span>`;
+            } else if (dinerData.status === "CLOSED") {
+                badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
+            }
+
+            tbody.innerHTML = `
+            <tr>
+                <td>${dinerData.id}</td>
+                <td>${dinerData.dinerName}</td>
+                <td>${badge}</td>
+                <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
+                <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
+            </tr>`
+        } catch (e) {
+            console.error(e);
+            alert("오류발생!" + e);
+        }
     }
 }
 // 식당 닫기
 async function changeStatus(dinerId){
     const url = `/api/owner/status/${dinerId}`
     try{
-        const res = await fetchJson(url, {
+         await fetchJson(url, {
             method: "PATCH",
         });
         alert("식당 상태 변경이 완료되었습니다.");
