@@ -764,7 +764,7 @@ function setLoadingState(button, isLoading) {
             `;
         } else {
             button.disabled = false;
-            button.innerHTML = button.dataset.originalText || "가입하기";
+            button.innerHTML = button.dataset.originalText || "조회하기";
         }
     }
 
