@@ -1,9 +1,7 @@
 package com.example.demo.data.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.demo.data.enums.NotificationType;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,4 +24,6 @@ public class Notification {
     private boolean isRead = false;
     @CreationTimestamp
     private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
 }

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -86,11 +87,13 @@ public class BookServiceImpl implements BookService {
         book.setPersonnel(dto.getPersonnel());
         book.setSuccess(false);
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatterDate = book.getBookingDate().format(dtf);
 
         eventPublisher.publishEvent(new ReservationUpdateEvent(
                 book.getDiner().getOwner().getId(),
                 book.getDiner().getDinerName(),
-                book.getBookingDate()
+                formatterDate
         ));
     }
 
@@ -99,11 +102,14 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(bookId).orElseThrow();
         bookRepository.deleteById(bookId);
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatterDate = book.getBookingDate().format(dtf);
+
         eventPublisher.publishEvent(new ReservationCancelEvent(
                 book.getDiner().getOwner().getId(),
                 book.getDiner().getDinerName(),
                 book.getMember().getName(),
-                book.getBookingDate()
+                formatterDate
         ));
     }
 
@@ -130,11 +136,14 @@ public class BookServiceImpl implements BookService {
                     .build();
             bookRepository.save(book);
 
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formatterDate = book.getBookingDate().format(dtf);
+
             eventPublisher.publishEvent(new ReservationCreateEvent(
                     book.getDiner().getOwner().getId(),
                     book.getDiner().getDinerName(),
                     book.getMember().getName(),
-                    book.getBookingDate()
+                    formatterDate
             ));
     }
 
@@ -155,10 +164,13 @@ public class BookServiceImpl implements BookService {
         }
         book.setSuccess(true);
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatterDate = book.getBookingDate().format(dtf);
+
         eventPublisher.publishEvent(new ReservationApproveEvent(
                 book.getMember().getId(),     // 알림 받을 유저 ID
                 book.getDiner().getDinerName(),     // 식당 이름
-                book.getBookingDate()      // 예약 시간
+                formatterDate      // 예약 시간
         ));
     }
 
@@ -168,10 +180,13 @@ public class BookServiceImpl implements BookService {
 
         bookRepository.delete(book);
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formatterDate = book.getBookingDate().format(dtf);
+
         eventPublisher.publishEvent(new ReservationRejectEvent(
                 book.getMember().getId(),
                 book.getDiner().getDinerName(),
-                book.getBookingDate()
+                formatterDate
         ));
     }
 }
