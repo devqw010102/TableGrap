@@ -82,11 +82,11 @@ public class OwnerServiceImpl implements OwnerService {
   //이메일 중복확인
   @Override
   public Optional<OwnerDto> findByEmail(String email) {
-      Optional<OwnerDto> owner = ownerRepository.findByEmail(email).map(this::mapToOwnerDto);
-              if(owner.isPresent()) return owner;
+    Optional<OwnerDto> owner = ownerRepository.findByEmail(email).map(this::mapToOwnerDto);
+    if(owner.isPresent()) return owner;
 
-              return memberRepository.findByEmail(email)
-                      .map(m -> OwnerDto.builder().email(m.getEmail()).build());
+    return memberRepository.findByEmail(email)
+            .map(m -> OwnerDto.builder().email(m.getEmail()).build());
   }
 
   //아이디 중복확인
@@ -151,7 +151,7 @@ public class OwnerServiceImpl implements OwnerService {
       throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
     }
     //식당 존재 여부 확인
-    if (!dinerRepository.findByOwnerId(ownerId).isEmpty()) {
+    if (!dinerRepository.findByOwnerId(ownerId, DinerStatus.DELETED).isEmpty()) {
       throw new IllegalStateException("식당이 존재하는 경우 탈퇴할 수 없습니다.");
     }
     ownerRepository.delete(owner);

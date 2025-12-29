@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.AdminService;
@@ -42,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public Page<AdminOwnerDto> getOwners(Pageable pageable) {
-        return dinerRepository.findOwnerDiners(pageable).map(AdminOwnerDto::from);
+        return dinerRepository.findOwnerDiners(pageable, DinerStatus.DELETED).map(AdminOwnerDto::from);
     }
 
     @Override
