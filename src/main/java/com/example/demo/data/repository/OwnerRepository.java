@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
+
+    // 아이디 찾기, 비번 재설정 용
+    Optional<Owner> findByNameAndEmail(String name, String email);
+    boolean existsByUsernameAndEmail(String username, String email);
+
   Optional<Owner> findByEmail(String email);
   Optional<Owner> findByUsername(String username);
   boolean existsByUsername(String username);

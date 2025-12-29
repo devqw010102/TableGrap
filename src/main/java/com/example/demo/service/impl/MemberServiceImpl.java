@@ -7,6 +7,7 @@ import com.example.demo.data.dto.notification.MemberUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
+import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.AuthorityRepository;
 import com.example.demo.data.repository.MemberRepository;
 import com.example.demo.data.repository.OwnerRepository;
@@ -152,6 +153,43 @@ public class MemberServiceImpl implements MemberService {
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
+    }
+
+    // 아이디 찾기, 비번 재설정
+    // 아이디 찾기
+    @Override
+    public Optional<String> findIdByNameAndEmail(String name, String email) {
+        // Member 테이블에서 검색
+        Optional<String> memberUsername = memberRepository.findByNameAndEmail(name, email)
+                .map(Member::getUsername);
+        if (memberUsername.isPresent()) return memberUsername;
+
+        //  Member에 없으면 Owner 테이블에서 검색
+        return ownerRepository.findByNameAndEmail(name, email)
+                .map(Owner::getUsername);
+    }
+
+    // 비번 재설정
+    @Override
+    public boolean existsByUsernameAndEmail(String username, String email) {
+        return memberRepository.existsByUsernameAndEmail(username, email) ||
+                ownerRepository.existsByUsernameAndEmail(username, email);
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(String username, String newPassword) {
+        // Member에서 찾기
+        Optional<Member> member = memberRepository.findByUsername(username);
+        if (member.isPresent()) {
+            member.get().setPassword(passwordEncoder.encode(newPassword));
+            return;
+        }
+
+        // Member에 없으면 Owner에서 찾기
+        Owner owner = ownerRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        owner.setPassword(passwordEncoder.encode(newPassword));
     }
 
     // Delete member
