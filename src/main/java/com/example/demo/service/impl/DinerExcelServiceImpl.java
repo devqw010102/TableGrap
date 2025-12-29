@@ -6,6 +6,7 @@ import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.DinerRepository;
 import com.example.demo.service.DinerExcelService;
 import com.example.demo.service.GeocodingService;
+import com.example.demo.service.NaverApiService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import java.util.List;
 public class DinerExcelServiceImpl implements DinerExcelService {
     private final DinerRepository dinerRepository;
     private final GeocodingService geocodingService;
+    private final NaverApiService naverApiService;
 
     //getCellValue 메소드 정의
     private String getCellValue(Cell cell) {
@@ -94,15 +96,36 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                     continue; //중복 업로드 방지
                 }
 
-                //출장조리 제외
-                if (category.equals("출장조리")){
+                //출장조리 장례식장 및 일부 식당 아닌 곳 제외 제외
+                if (category.equals("출장조리") || containsKeyword(dinerName, "장례식장", "시스템", "푸드")){
                   continue;
                 }
-                //장례식장 및 일부 식당 아닌 곳 제외 제외
-                if(containsKeyword(dinerName, "장례식장", "시스템")){
-                  continue;
-                }
+
+                //카테고리 재분류
                 String finalCategory = refineCategory(category, dinerName);
+
+                if ("기타".equals(finalCategory)) {
+                    // 검색 정확도를 위해 "주소 앞부분 + 식당이름" 조합 (예: "달동 스타벅스")
+                    String queryAddress = location.length() > 6 ? location.substring(0, 6) : location;
+                    String searchQ = queryAddress + " " + dinerName;
+
+                    String naverCat = naverApiService.searchCategory(searchQ);
+
+                    if (naverCat != null) {
+                        // 네이버 결과를 우리 카테고리로 매핑
+                        finalCategory = mapNaverCategory(naverCat);
+                        log.info("[API 보정] {} -> 네이버: {} -> 결과: {}", dinerName, naverCat, finalCategory);
+
+                        // API 호출 너무 빠르면 차단되므로 딜레이
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            log.warn("API 대기 중 인터럽트 발생, 작업을 중단합니다.");
+                            return;
+                        }
+                    }
+                }
 
                 //인터페이스 메소드 호출
                 try {
@@ -137,38 +160,77 @@ public class DinerExcelServiceImpl implements DinerExcelService {
     }
 
     //카테고리 재분류
-    public String refineCategory(String category, String dinerName) {
-      //null방지
-      if(category == null) category="";
-      if(dinerName == null) dinerName="";
+    private String refineCategory(String category, String dinerName) {
+        if (category == null) category = "";
+        if (dinerName == null) dinerName = "";
 
-      String rawCat = category.trim();
-      String name = dinerName.replaceAll("\\s+", "");//공백제거
-      //하위카테고리를분류
-      if(containsKeyword(rawCat, "한식", "김밥", "냉면집", "분식", "탕류")) return "한식/분식";
-      if(containsKeyword(rawCat, "횟집", "복어취급", "초장집")) return "횟집/해산물";
-      if(containsKeyword(rawCat, "경양식", "패밀리레스토랑", "뷔페식")) return "양식";
-      if(containsKeyword(rawCat, "까페", "라이브카페", "전통찻집", "키즈카페")) return "카페/디저트";
-      if(containsKeyword(rawCat, "감성주점", "정종/대포집/소주방", "호프/통닭")) return "술집/바";
-      
-      if(rawCat.equals("일식")) return "일식";
-      if(rawCat.equals("중국식")) return "중식";
-      if(rawCat.equals("외국음식전문점(인도, 태국 등")) return "아시안";
-      if(rawCat.equals("식육(숯불구이)")) return "고기/구이";
+        String rawCat = category.trim();
+        String name = dinerName.replaceAll("\\s+", ""); // 공백 제거
 
-      //기타부분 식당이름으로 재분류
-      if(rawCat.equals("기타")) {
-        if (containsKeyword(name, "감자탕", "해장국", "식당", "비빔밥", "분식", "떡볶이", "국밥", "칼국수", "국수")) return "한식/분식";
-        if (containsKeyword(name, "일식", "타코야끼", "카츠", "연어")) return "일식";
-        if (containsKeyword(name, "반점", "짜장", "짬뽕", "마라탕")) return "중식";
-        if (containsKeyword(name, "장어", "복집", "매운탕", "쭈구미", "낙지")) return "횟집/해산물";
-        if (containsKeyword(name, "피자", "버거", "스테이크", "치킨")) return "양식";
-        if (containsKeyword(name, "오리", "닭갈비", "뒷고기", "삼겹살", "숯불", "육회", "뭉티기", "식육", "갈비", "곱창", "막창")) return "고기/구이";
-        if (containsKeyword(name, "카레", "미스사이공", "쌀국수")) return "아시안";
-        if (containsKeyword(name, "커피", "케이크", "마카롱", "브레드", "투썸플레이스", "베이커리", "해월당", "베이글", "랑콩뜨레", "파이")) return "카페/디저트";
-        if (containsKeyword(name, "맥주", "선술", "펍", "주점", "처음처럼", "술집", "호프", "투다리", "간이역", "통닭")) return "술집/바";
-      }
-      return "기타"; //식당이름으로도 분류하기 모호한 데이터는 기타로 분류
+        // 1. [최우선] 카페/디저트 (오분류 1순위 해결)
+        // 파일 분석 결과 '에스프레소', '로스팅' 같은 단어도 카페로 분류해야 함
+        if (containsKeyword(name,
+                "카페", "커피", "로스터스", "에스프레소", "베이커리", "빵집", "디저트", "다방",
+                "투썸", "스벅", "스타벅스", "이디야", "메가MGC", "컴포즈", "빽다방", "할리스", "공차", "설빙", "폴바셋",
+                "도넛", "케이크", "와플", "마카롱", "샌드위치", "토스트", "브런치")) {
+            return "카페/디저트";
+        }
+
+        // 2. [이름 우선] 패스트푸드/피자/치킨 -> 양식으로 통합
+        if (containsKeyword(name,
+                "버거", "맥도날드", "버거킹", "롯데리아", "맘스터치", "프랭크",
+                "피자", "도미노", "피자헛",
+                "치킨", "통닭", "비비큐", "bhc", "교촌", "굽네", "처갓집", "강정")) {
+            return "양식";
+        }
+
+        // 3. [이름 우선] 술집
+        if (containsKeyword(name,
+                "호프", "비어", "맥주", "포차", "주막", "주점", "이자카야", "펍", "pub", "bar", "와인", "칵테일", "노래연습장")) {
+            return "술집/바";
+        }
+
+        // 4. [이름 우선] 일식/해산물 보정 ('돈가츠'는 일식으로, '쭈꾸미'는 해산물로)
+        if (containsKeyword(name, "스시", "초밥", "카츠", "가츠", "우동", "소바", "라멘", "참치", "오마카세")) return "일식";
+        if (containsKeyword(name, "횟집", "수산", "어시장", "쭈구미", "낙지", "오징어", "게장", "아구", "해물", "게찜")) return "횟집/해산물";
+
+        // 5. 공공데이터 '카테고리' 컬럼 신뢰
+        if (containsKeyword(rawCat, "김밥", "분식", "한식", "냉면", "국수")) return "한식/분식";
+        if (containsKeyword(rawCat, "횟집", "복어", "해물", "생선회")) return "횟집/해산물";
+        if (containsKeyword(rawCat, "중국식")) return "중식";
+        if (containsKeyword(rawCat, "일식")) return "일식";
+        if (containsKeyword(rawCat, "식육", "숯불", "고기")) return "고기/구이";
+
+        // '경양식'은 위에서 카페를 다 걸러냈으므로, 여기 남은건 진짜 양식(돈가스/파스타)일 확률 높음
+        if (containsKeyword(rawCat, "경양식", "패밀리레스토랑", "뷔페")) return "양식";
+        if (containsKeyword(rawCat, "외국음식")) return "아시안";
+
+        // 6. [마지막 보루] 이름으로 재추론
+        if (containsKeyword(name, "국밥", "해장국", "식당", "밥상", "찌개", "두부", "면옥", "회관", "정식", "밥집")) return "한식/분식";
+        if (containsKeyword(name, "갈비", "삼겹", "고기", "뒷고기", "막창", "곱창", "대패", "한우")) return "고기/구이";
+        if (containsKeyword(name, "반점", "마라", "짬뽕", "짜장", "탕후루")) return "중식";
+        if (containsKeyword(name, "파스타", "스테이크", "키친", "그릴", "레스토랑")) return "양식";
+        if (containsKeyword(name, "쌀국수", "타이", "베트남", "인도", "커리")) return "아시안";
+
+        return "기타"; // 여기까지 오면 진짜 기타이거나 API 검색 대상
+    }
+    // ──────────────────────────────────────────────
+    // [핵심] 2차 분류: 네이버 API 결과를 내 카테고리로 매핑
+    // ──────────────────────────────────────────────
+    private String mapNaverCategory(String naverCat) {
+        if (naverCat == null) return "기타";
+
+        if (naverCat.contains("카페") || naverCat.contains("디저트") || naverCat.contains("베이커리")) return "카페/디저트";
+        if (naverCat.contains("고기") || naverCat.contains("육류") || naverCat.contains("곱창")) return "고기/구이";
+        if (naverCat.contains("회") || naverCat.contains("해물") || naverCat.contains("수산물")) return "횟집/해산물";
+        if (naverCat.contains("일식") || naverCat.contains("초밥")) return "일식";
+        if (naverCat.contains("중식") || naverCat.contains("중국")) return "중식";
+        if (naverCat.contains("이탈리아") || naverCat.contains("양식") || naverCat.contains("피자") || naverCat.contains("햄버거")) return "양식";
+        if (naverCat.contains("술집") || naverCat.contains("주점") || naverCat.contains("포차") || naverCat.contains("바(BAR)")) return "술집/바";
+        if (naverCat.contains("아시아") || naverCat.contains("베트남") || naverCat.contains("태국")) return "아시안";
+        if (naverCat.contains("한식") || naverCat.contains("분식") || naverCat.contains("국밥")) return "한식/분식";
+
+        return "기타";
     }
     public boolean containsKeyword(String target, String... keywords) {
       for (String k : keywords) {
