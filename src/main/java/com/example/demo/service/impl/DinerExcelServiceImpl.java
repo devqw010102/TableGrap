@@ -87,6 +87,13 @@ public class DinerExcelServiceImpl implements DinerExcelService {
                 if (location == null || location.isEmpty()) {
                     continue; // 위치 정보가 없으면 건너뜀
                 }
+
+                //기존 데이터와 중복 확인
+                if(dinerRepository.existsByDinerNameAndLocation(dinerName, location)){
+                    log.info("이미 존재하는 식당 {}/{}, 업로드 건너뜀", dinerName, location);
+                    continue; //중복 업로드 방지
+                }
+
                 //출장조리 제외
                 if (category.equals("출장조리")){
                   continue;

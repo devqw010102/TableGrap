@@ -648,6 +648,7 @@ if (bizNumBtn) {
 // 사업자 번호 조회로 등록된 상호명과 db의 상호명 매칭
 async function fetchBizNum(bizNum) {
     try {
+        setLoadingState(bizNumBtn, true);
         // Controller의 경로(@RequestMapping + @GetMapping)에 맞춰 수정
         const url = `/api/owner/proxy/business-info?query=${bizNum}`;
         const res = await fetch(url);
@@ -657,10 +658,13 @@ async function fetchBizNum(bizNum) {
             if(data && data.dinerName){
                 document.getElementById("ownerDinerName").value = data.dinerName;
                 isBizNumValid = true;
+                setLoadingState(bizNumBtn, false);
                 document.getElementById("bizNum").readOnly = true;
                 document.getElementById("bizNumBtn").disabled = true;
+                document.getElementById("bizNumBtn").innerText = "조회완료";
                 alert("사업자 번호가 조회되었습니다");
             } else {
+                setLoadingState(bizNumBtn, false);
                 alert("식당 데이터가 올바르지 않습니다.");
                 document.getElementById("ownerDinerName").value = "";
                 isBizNumValid = false;
@@ -669,6 +673,7 @@ async function fetchBizNum(bizNum) {
             const error = await res.text();
             alert("사업자 정보 조회에 실패했습니다." + error);
             // 사업자 번호 입력창 초기화
+            setLoadingState(bizNumBtn, false);
             document.getElementById("ownerDinerName").value = "";
             isBizNumValid = false;
         }
@@ -747,4 +752,19 @@ async function hasOwnerDiner() {
     }
     return false;
 }
+
+function setLoadingState(button, isLoading) {
+        if (!button) return;
+        if (isLoading) {
+            button.disabled = true;
+            button.dataset.originalText = button.innerHTML; // 원래 텍스트 저장
+            button.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                조회 중...
+            `;
+        } else {
+            button.disabled = false;
+            button.innerHTML = button.dataset.originalText || "조회하기";
+        }
+    }
 

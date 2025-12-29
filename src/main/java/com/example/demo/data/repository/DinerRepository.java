@@ -22,8 +22,8 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     //Optional<Diner> findById(Long id, DinerStatus status);
 
     //공백을 제거하고 식당이름 가져오기
-    @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName")
-    Optional<Diner> findByDinerNameIgnoreSpace(@Param("dinerName") String dinerName);
+    @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName AND d.status <> :status")
+    Optional<Diner> findByDinerNameIgnoreSpaceStatusNot(@Param("dinerName") String dinerName, @Param("status") DinerStatus status);
 
   /*  @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(
@@ -104,4 +104,7 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
 
     //식당 삭제할 때 사용
     Optional<Diner> findByIdAndOwnerId(Long dinerId, Long ownerId);
+
+    //식당 중복 업로드 방지
+    boolean existsByDinerNameAndLocation(String dinerName, String location);
 }
