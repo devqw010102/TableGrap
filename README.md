@@ -69,11 +69,6 @@ src/
 ## 🔥 Technical Issues & Solutions
 > 직접 겪은 문제 중 하나 이상 종합 필요
 
-
-
-##### Entity
-> Create ERD Diagram ( lucid.app )
-
 ## 🚀 Getting Started
 1. **Clone the repository**
    ```bash
@@ -87,6 +82,101 @@ src/
 4. **Access**
    - Main : <code>http://localhost:8080</code>
    - DB Console : <code>http://localhost:8080/h2-console</code>
+
+### 🗄️ Database ERD
+
+```mermaid
+erDiagram
+    MEMBER ||--o{ AUTHORITY : "assigned"
+    OWNER ||--o{ AUTHORITY : "assigned"
+    
+    OWNER ||--o{ DINER : "manages"
+    OWNER ||--o{ OWNER_REQUEST : "submits"
+    DINER ||--o{ OWNER_REQUEST : "requested"
+    
+    MEMBER ||--o{ BOOK : "reserves"
+    DINER ||--o{ BOOK : "receives"
+    
+    MEMBER ||--o{ REVIEW : "writes"
+    DINER ||--o{ REVIEW : "reviewed_at"
+    BOOK ||--|| REVIEW : "references"
+
+    MEMBER {
+        Long id PK
+        String username UK
+        String password
+        String email UK
+        String name
+        String phone
+    }
+
+    OWNER {
+        Long id PK
+        String username UK
+        String password
+        String name
+        String email
+        String phone
+    }
+
+    DINER {
+        Long id PK
+        Long owner_id FK
+        String dinerName
+        String category
+        String location
+        String tel
+        Double dx "x좌표"
+        Double dy "y좌표"
+        DinerStatus status
+        String businessNum
+    }
+
+    BOOK {
+        Long bookId PK
+        Long member_id FK
+        Long diner_id FK
+        LocalDateTime addDate
+        LocalDateTime bookingDate
+        Integer personnel
+        Boolean success
+    }
+
+    AUTHORITY {
+        Long id PK
+        Long member_id FK
+        Long owner_id FK
+        String authority "Role Name"
+    }
+
+    REVIEW {
+        Long reviewId PK
+        Long memberId FK
+        Long bookId FK
+        Long dinerId FK
+        int rating
+        String comment
+        LocalDateTime createTime
+    }
+
+    OWNER_REQUEST {
+        Long id PK
+        Long owner_id FK
+        Long diner_id FK
+        RequestStatus status
+        LocalDateTime createAt
+    }
+
+    NOTIFICATION {
+        Long id PK
+        Long memberId
+        String message
+        String role
+        boolean isRead
+        LocalDateTime createdAt
+        NotificationType type
+    }
+```
 
 ### 🔄 Data Processing Flow
 > (예시) 데이터 흐름도 Mermaid or Diagram 으로 작성 예정
