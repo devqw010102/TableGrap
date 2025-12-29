@@ -1,3 +1,4 @@
+/*
 document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("toggleBtn");
     const getOwnerBtn = document.getElementById("getOwnerBtn");
@@ -102,3 +103,5 @@ async function ownerRequest() {
         alert("네트워크 오류가 발생했습니다.");
     }
 }
+
+ */

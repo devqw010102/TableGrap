@@ -43,10 +43,10 @@ public class BookController {
 
             if (dto.getBookId() != null) {
                 bookService.updateBooking(dto);
-                return ResponseEntity.ok("수정되었습니다.");
+                return ResponseEntity.ok("예약 수정 되었습니다.");
             } else {
             bookService.createBooking(dto);
-            return ResponseEntity.ok("Success");
+            return ResponseEntity.ok("예약 완료되었습니다.");
         }
         } catch (IllegalArgumentException e) {
 
