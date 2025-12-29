@@ -94,25 +94,36 @@ public class OwnerController {
 
     // 식당 추가
     @PatchMapping("/add/diner")
-    @Transactional
     public void addDiner(@RequestBody DinerDto dto, Principal principal) {
         dinerService.addDiner(dto, principal.getName());
     }
 
-    //식당 삭제 탭에서 식당 출력
+
+    //식당 관리 탭에서 식당 출력
     @GetMapping("/diner/{dinerId}")
     public ResponseEntity<OwnerDinerDto> getOwnerDinerById(
-            @PathVariable Long dinerId,
+            @PathVariable(required = false) Long dinerId,
             @AuthenticationPrincipal OwnerUserDetails userDetails
     ) {
         return dinerService.getOwnerDinerById(dinerId, userDetails.getOwner().getId())
                 .map(ResponseEntity::ok) // 찾았으면 200 OK + 데이터
                 .orElse(ResponseEntity.notFound().build()); // 없으면 404 Not Found
     }
+
+    //식당 상태 변경
+    @PatchMapping("/status/{dinerId}")
+    public ResponseEntity<String> changeStatus(@PathVariable Long dinerId, @AuthenticationPrincipal OwnerUserDetails userDetails) {
+        try{
+            dinerService.changeStatus(dinerId, userDetails.getOwner().getId());
+            return ResponseEntity.ok("식당 상태가 변경되었습니다.");
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body("식당 상태 변경을 실패했습니다." + e.getMessage());
+        }
+    }
+
     //식당 삭제
     @DeleteMapping("/delete/diner/{dinerId}")
-    @Transactional
-    public ResponseEntity<String> deleteOwnerDiner(@PathVariable("dinerId") Long dinerId,  @AuthenticationPrincipal OwnerUserDetails userDetails) {
+    public ResponseEntity<String> deleteOwnerDiner(@PathVariable Long dinerId,  @AuthenticationPrincipal OwnerUserDetails userDetails) {
         try{
             dinerService.deleteDiner(dinerId, userDetails.getOwner().getId());
             return ResponseEntity.ok("식당이 삭제되었습니다.");
@@ -124,9 +135,9 @@ public class OwnerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
     //계정 삭제
     @DeleteMapping("/delete/owner")
-    @Transactional
     public ResponseEntity<?> deleteOwner(
             @RequestBody Map<String, String> request,
             @AuthenticationPrincipal OwnerUserDetails userDetails,

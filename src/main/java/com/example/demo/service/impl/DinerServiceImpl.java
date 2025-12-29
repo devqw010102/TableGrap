@@ -72,6 +72,13 @@ public class DinerServiceImpl implements DinerService {
         return dinerRepository.findByOwnerId(ownerId);
     }
 
+    //사업자 조회시 식당 추가
+    @Override
+    public Optional<Diner> findByDinerNameBiz(String dinerName){
+        return dinerRepository.findByDinerNameIgnoreSpace(dinerName);
+    }
+
+
     //식당 추가
     @Override
     @Transactional
@@ -110,10 +117,32 @@ public class DinerServiceImpl implements DinerService {
     public void deleteDiner(Long dinerId, Long ownerId) {
         Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId).orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
         //삭제신청일 이후의 예약이 존재하는 지 확인
-        boolean hasFutureBookings = bookRepository.existsByDiner_IdAndBookingDateAfter(dinerId, LocalDateTime.now());
+        //예약일자가 지나고 실제로 삭제되는 확인: LocalDateTime.now() -> LocalDateTime.of()로 변경하고 테스트
+        boolean hasFutureBookings = bookRepository.existsByDiner_IdAndBookingDateAfter(dinerId, LocalDateTime.of(2026, 1, 10, 0, 0));
         if (hasFutureBookings) {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
+        // 식당을 삭제하기 전에, 이 식당의 '과거 예약 내역'들을 먼저 모두 삭제해야 함(Hard Delete)
+        bookRepository.deleteAllByDiner_Id(dinerId);
         dinerRepository.delete(diner);
+
+        /*// enum활용하여 status를 delete로 변경(soft delete)
+        diner.setStatus(DinerStatus.valueOf("DELETED"));
+        식당목록을 불러오는 메소드 변경 필요
+        List<*/
+
+    }
+
+    //식당 상태 변경
+    @Override
+    @Transactional
+    public void changeStatus(Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        if(diner.getStatus().equals(DinerStatus.PUBLIC)) {
+            diner.setStatus(DinerStatus.CLOSED);
+        } else if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            diner.setStatus(DinerStatus.PUBLIC);
+        }
     }
 }
