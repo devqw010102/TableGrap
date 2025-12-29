@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
-    Page<Diner> findByCategory(Pageable pageable, String category);
-    //Page<Diner> findByCategoryAndStatusNot(Pageable pageable, String category, DinerStatus status);
+   // Page<Diner> findByCategory(Pageable pageable, String category);
+    Page<Diner> findByCategoryAndStatusNot(Pageable pageable, String category, DinerStatus status);
+
+
     Optional<Diner> findById(Long id);
     //Optional<Diner> findById(Long id, DinerStatus status);
 
