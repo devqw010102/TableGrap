@@ -47,3 +47,16 @@
     padding-left: 5px;
     white-space: normal;
 }
+
+#notif-items {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#notif-items .dropdown-item {
+    width: 100%;          /* 부모 너비에 맞춤 */
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+    white-space: normal;  /* 텍스트 줄바꿈 허용 */
+    overflow-wrap: break-word; /* 긴 텍스트 강제 줄바꿈 */
+}

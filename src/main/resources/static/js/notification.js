@@ -54,11 +54,17 @@ async function loadNotifications() {
             const li = document.createElement('li');
             const statusClass = n.read ? 'read' : 'unread';
 
+            const formattedDate = n.createdAt.replace('T', ' ').split('.')[0];
+
             li.className = `dropdown-item p-3 border-bottom notif-item ${statusClass}`;
             li.innerHTML = `
-                <div style="white-space: normal; cursor: pointer;">
-                    <p class="mb-1" style="font-size: 0.9rem;">${n.message}</p>
-                    <small class="text-muted">${new Date(n.createdAt).toLocaleString()}</small>
+                <div style="white-space: normal; word-break: keep-all; cursor: pointer;">
+                    <p class="mb-1" style="font-size: 1rem; line-height: 1.4; color: #333;">
+                        ${n.message}
+                    </p>
+                    <small class="text-muted" style="display: block; margin-top: 5px;">
+                        ${formattedDate}
+                    </small>
                 </div>
             `;
             li.onclick = () => markAsRead(n.id, li);

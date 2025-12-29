@@ -45,16 +45,18 @@
                         </span>
                     </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" id="notif-list" style="width: 300px; max-height: 400px; overflow-y: auto;">
-                        <li class="dropdown-header">최근 알림
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0"
+                        aria-labelledby="notifDropdown"
+                        id="notif-list"
+                        style="min-width: 450px; max-height: 500px; overflow-y: auto; padding: 0; overflow-x: hidden;">
+
+                        <li class="dropdown-header d-flex justify-content-between align-items-center p-3">
+                            <span style="font-size: 1.1rem; font-weight: bold; color: #212529;">최근 알림</span>
                             <button type="button" class="btn btn-sm btn-outline-danger"
-                                    style="font-size: 0.7rem;" onclick="deleteAllNotifications(event)">
-                                모두 삭제
-                            </button>
+                                    onclick="deleteAllNotifications(event)">모두 삭제</button>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li><hr class="dropdown-divider m-0"></li>
                         <div id="notif-items">
-                            <li class="dropdown-item text-center text-muted">알림이 없습니다.</li>
                         </div>
                     </ul>
                 </li>
