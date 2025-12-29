@@ -75,7 +75,7 @@ public class DinerServiceImpl implements DinerService {
     //사업자 조회시 식당 추가
     @Override
     public Optional<Diner> findByDinerNameBiz(String dinerName){
-        return dinerRepository.findByDinerNameIgnoreSpace(dinerName);
+        return dinerRepository.findByDinerNameIgnoreSpaceStatusNot(dinerName, DinerStatus.DELETED);
     }
 
 
@@ -90,7 +90,7 @@ public class DinerServiceImpl implements DinerService {
         Owner owner = ownerRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         //식당이름으로 기존 owner가 존재하는지 확인
-        dinerRepository.findByDinerNameIgnoreSpace(strippedDinerName)
+        dinerRepository.findByDinerNameIgnoreSpaceStatusNot(strippedDinerName, DinerStatus.DELETED)
                 .ifPresentOrElse(diner -> {
                     //이미 식당 주인이 있는 경우 예외 처리
                     if(diner.getOwner() != null) {

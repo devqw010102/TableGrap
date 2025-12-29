@@ -57,7 +57,7 @@ public class OwnerServiceImpl implements OwnerService {
     String dinerName = ownerDto.getDinerName();
     String strippedDinerName = dinerName.replace(" ", "");
     //공백 제외하고 식당이름 조회
-    dinerRepository.findByDinerNameIgnoreSpace(strippedDinerName)
+    dinerRepository.findByDinerNameIgnoreSpaceStatusNot(strippedDinerName, DinerStatus.DELETED)
             .ifPresentOrElse(diner -> {
               //이미 식당 주인이 있는 경우 예외 처리
               if(diner.getOwner() != null) {
