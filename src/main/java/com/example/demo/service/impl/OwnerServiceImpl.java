@@ -65,7 +65,7 @@ public class OwnerServiceImpl implements OwnerService {
               }
               diner.setBusinessNum(ownerDto.getBusinessNum());
               diner.setOwner(owner);
-              diner.setStatus(DinerStatus.PUBLIC);
+                diner.setStatus(DinerStatus.valueOf("PUBLIC"));
             }, () -> {
               // 식당이 존재하지 않을 경우 예외 처리
               throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
@@ -142,6 +142,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
   } */
   @Override
+  @Transactional
   public boolean deleteOwner(Long ownerId, String checkPassword) {
     Owner owner = ownerRepository.findById(ownerId)
             .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));

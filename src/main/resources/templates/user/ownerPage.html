@@ -37,7 +37,7 @@
         <a class = "nav-link" data-bs-toggle="tab" href = "#tab5">내 정보</a>
     </li>
     <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab6">식당 삭제</a>
+        <a class = "nav-link" data-bs-toggle="tab" href = "#tab6">식당 관리</a>
     </li>
 </ul>
 
@@ -205,13 +205,15 @@
     <!-- tab6-content -->
     <div id = "tab6" class = "tab-pane fade">
         <div class = "container mt-4">
-            <h2>식당 삭제</h2>
+            <h2>식당 관리</h2>
             <table class = "table table-boarded">
                 <thead>
                 <tr>
                     <th>식당 번호</th>
                     <th>식당 이름</th>
-                    <th>삭제하기</th>
+                    <th>영업 상태</th>
+                    <th>상태 변경</th>
+                    <th>삭제 하기</th>
                 </tr>
                 </thead>
                 <tbody id = "owner-diner"></tbody>
@@ -248,9 +250,18 @@
                 <form>
                     <p>사업자등록번호를 입력하여 식당을 추가할 수 있습니다.</p>
                     <p>현재 TableGrab 내부 DB에 존재하는 식당만 추가할 수 있습니다.</p>
-                    <label for="bizNum" class="form-label">사업자 번호 입력</label>
-                    <input type="text" id="bizNum" class="form-control position-relative" placeholder="사업자번호를 (-)를 제외하고 입력해주세요.">
-                    <button type="button" class="btn btn-primary position-absolute top-0 end-0" id="bizNumBtn">조회하기</button>
+                    <div class="position-relative mb-3">
+                        <div class="form-floating">
+                            <input type="text" id="bizNum" class="form-control"
+                               placeholder="사업자번호를 (-)를 제외하고 입력해주세요.">
+                            <label for = "bizNum">사업자 번호</label>
+                        <button type="button" class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-2"
+                                id="bizNumBtn"
+                                style="z-index: 5; height: 40px; border-radius: 5px;">
+                            조회하기
+                        </button>
+                        </div>
+                    </div>
                     <input type="hidden" id="ownerDinerName" name="ownerDinerName">
                 </form>
             </div>
