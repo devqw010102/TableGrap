@@ -1,77 +1,73 @@
-<!-- Header -->
-<div th:fragment="header"
-     xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="header" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
     <link th:href="@{/css/common.css}" rel="stylesheet">
-    <nav class = "navbar navbar-expand-lg navbar-light bg-light px-3">
-        <a class = "navbar-brand" th:href = "@{/}">TableGrap</a>
 
-        <div class = "collapse navbar-collapse">
-            <ul class = "navbar-nav ms-auto">
-                <!-- Always -->
-                <li class = "nav-item" sec:authorize="isAnonymous()">
-                    <a class = "nav-link" th:href = "@{/}">Home</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light px-3 border-bottom">
+        <a class="navbar-brand fw-bold fs-2" th:href="@{/}">TableGrap</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto align-items-center"> <li class="nav-item">
+                <a class="nav-link" th:href="@{/}">Home</a>
+            </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
                 </li>
-                <!-- Not login -->
-                <li class = "nav-item" sec:authorize="isAnonymous()">
-                    <a class = "nav-link" th:href = "@{/login}">Login</a>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/register}">Register</a>
                 </li>
-                <li class = "nav-item" sec:authorize="isAnonymous()">
-                    <a class = "nav-link" th:href = "@{/register}">Register</a>
+                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN', 'USER')">
+                    <a class="nav-link" th:href="@{/mypage}">My Page</a>
                 </li>
-                <!-- After login -->
-                <li class = "nav-item" sec:authorize = "hasAnyRole('ADMIN', 'USER')">
-                    <a class = "nav-link" th:href = "@{/mypage}">My Page</a>
+                <li class="nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')">
+                    <a class="nav-link" th:href="@{/ownerPage}">Owner Page</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post">
-                        <button class="nav-link btn btn-link">Logout</button>
-                    </form>
-                </li>
-                <!-- Owner -->
-                <li class = "nav-item" sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_OWNER')">
-                    <a class = "nav-link" th:href = "@{/ownerPage}">Owner Page</a>
-                </li>
-                <!-- Admin -->
                 <li class="nav-item" sec:authorize="hasAuthority('ROLE_ADMIN')">
                     <a class="nav-link" th:href="@{/admin}">Admin Page</a>
                 </li>
-                <!-- Notification -->
-                <li class="nav-item dropdown me-3" sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
-                    <a class="nav-link position-relative" href="#" id="notifDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false" onclick="loadNotifications()">
-                        🔔
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button class="nav-link btn btn-link py-0" style="text-decoration: none;">Logout</button>
+                    </form>
+                </li>
+
+                <li class="nav-item me-2 ms-1" sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
+                    <a class="nav-link position-relative p-2" href="#" role="button"
+                       data-bs-toggle="offcanvas" data-bs-target="#offcanvasNotif" aria-controls="offcanvasNotif"
+                       onclick="loadNotifications()">
+                        <span style="font-size: 1.2rem;">🔔</span>
                         <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">
                             0
                         </span>
                     </a>
-
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0"
-                        aria-labelledby="notifDropdown"
-                        id="notif-list"
-                        style="min-width: 450px; max-height: 500px; overflow-y: auto; padding: 0; overflow-x: hidden;">
-
-                        <li class="dropdown-header d-flex justify-content-between align-items-center p-3">
-                            <span style="font-size: 1.1rem; font-weight: bold; color: #212529;">최근 알림</span>
-                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                    onclick="deleteAllNotifications(event)">모두 삭제</button>
-                        </li>
-                        <li><hr class="dropdown-divider m-0"></li>
-                        <div id="notif-items">
-                        </div>
-                    </ul>
                 </li>
+
+
             </ul>
         </div>
     </nav>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotif"
+         aria-labelledby="offcanvasNotifLabel"
+         sec:authorize="isAuthenticated() and !hasRole('ROLE_ADMIN')">
+        <div class="offcanvas-header border-bottom bg-light justify-content-between">
+            <h5 class="offcanvas-title fw-bold" id="offcanvasNotifLabel">최근 알림</h5>
+            <div class="d-flex align-items-center ">
+                <button type="button" class="btn btn-sm btn-outline-danger me-2" onclick="deleteAllNotifications(event)">전체 삭제</button>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="offcanvas-body p-0">
+            <div id="notif-items">
+            </div>
+        </div>
+    </div>
+
     <script th:inline="javascript" sec:authorize="isAuthenticated()">
         const currentMemberId = [[${#authentication.principal.userId}]];
         const currentUserRole = [[${#authentication.authorities[0].authority}]];
     </script>
     <script th:src="@{/js/notification.js}"></script>
-
 </div>
 
-<!-- Footer -->
 <footer th:fragment="footer" class="text-center text-muted py-3">
     2025 TableGrap Team Project. All Rights Reserved.
 </footer>
