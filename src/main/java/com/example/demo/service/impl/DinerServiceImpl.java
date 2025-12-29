@@ -69,7 +69,7 @@ public class DinerServiceImpl implements DinerService {
 
     @Override
     public List<OwnerDinerDto> getOwnerDiners(Long ownerId) {
-        return dinerRepository.findByOwnerId(ownerId);
+        return dinerRepository.findByOwnerId(ownerId, DinerStatus.DELETED);
     }
 
     //사업자 조회시 식당 추가
@@ -123,13 +123,13 @@ public class DinerServiceImpl implements DinerService {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
         // 식당을 삭제하기 전에, 이 식당의 '과거 예약 내역'들을 먼저 모두 삭제해야 함(Hard Delete)
-        bookRepository.deleteAllByDiner_Id(dinerId);
-        dinerRepository.delete(diner);
+        //bookRepository.deleteAllByDiner_Id(dinerId);
+        //dinerRepository.delete(diner);
 
-        /*// enum활용하여 status를 delete로 변경(soft delete)
-        diner.setStatus(DinerStatus.valueOf("DELETED"));
-        식당목록을 불러오는 메소드 변경 필요
-        List<*/
+        //enum활용하여 status를 delete로 변경(soft delete)
+        diner.setStatus(DinerStatus.DELETED);
+        //식당목록을 불러오는 메소드 변경 필요
+
 
     }
 

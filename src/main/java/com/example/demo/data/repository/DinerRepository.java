@@ -1,6 +1,7 @@
 package com.example.demo.data.repository;
 
 import com.example.demo.data.dto.owner.OwnerDinerDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,7 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName")
     Optional<Diner> findByDinerNameIgnoreSpace(@Param("dinerName") String dinerName);
 
-    @Query("""
+  /*  @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(
             d.id,
             d.dinerName,
@@ -31,8 +32,8 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
         from Diner d
         where d.owner.id = :ownerId
     """)
-    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId);
-    /*
+    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId); */
+
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(
             d.id,
@@ -43,8 +44,18 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
         where d.owner.id = :ownerId
         And d.status <> :status
     """)
-    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId, @Param("status") DinerStatus status;
-    */
+    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId, @Param("status") DinerStatus status);
+
+
+  /*  @Query("""
+        select d
+        from Diner d
+        join fetch d.owner m
+        join fetch m.authorities a
+        where a.authority = 'ROLE_OWNER'
+    """)
+    Page<Diner> findOwnerDiners(Pageable pageable); */
+
 
     @Query("""
         select d
@@ -52,27 +63,17 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
         join fetch d.owner m
         join fetch m.authorities a
         where a.authority = 'ROLE_OWNER'
-    """)
-    Page<Diner> findOwnerDiners(Pageable pageable);
-
-    /*
-     @Query("""
-        select d
-        from Diner d
-        join fetch d.owner m
-        join fetch m.authorities a
-        where a.authority = 'ROLE_OWNER'
         And d.status <> :status
     """)
-    Page<Diner> findOwnerDiners(Pageable pageable, @Param("status") DinerStatus status;
-     */
+    Page<Diner> findOwnerDiners(Pageable pageable, @Param("status") DinerStatus status);
 
-    @Query("select count(d) from Diner d")
+
+    /*@Query("select count(d) from Diner d")
+    Long countAllDiners(); */
+
+
+    @Query("select count(d) from Diner d where d.status <> 'DELETED'")
     Long countAllDiners();
-
-    /*
-    *  @Query("select count(d) from Diner d where d.status <> :status")
-    Long countAllDiners(@Param("status) DinerStatus status;*/
 
     List<Diner> findAllByOwner(Owner owner);
     //List<Diner> findAllByOwnerAndStatusNot(Owner owner, DinerStatus status);
