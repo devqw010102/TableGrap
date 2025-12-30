@@ -13,4 +13,5 @@ public class DinerDto {
   private String dinerName;
   private String businessNum;
   private String tel;
+  private int defaultMaxCapacity;
 }

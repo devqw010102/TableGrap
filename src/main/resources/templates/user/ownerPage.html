@@ -284,9 +284,15 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="limitReservationCnt" class="form-label">시간 당 예약 가능 수</label>
-                    <input type="password" class="form-control" id="limitReservationCnt" disabled>
-                    <label for="dinerTel">식당 전화번호</label>
-                    <input type="text" class="form-control" id="dinerTel">
+                    <input type="number"
+                           id="limitReservationCnt"
+                           min="1"
+                           max="100"
+                           step="1"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                           placeholder="최대 인원 입력" class = "form-control mb-3">
+                    <label for="dinerTel" class = "form-label">식당 전화번호</label>
+                    <input type="text" class="form-control" id="dinerTel" oninput="autoHyphen(this)" maxlength="13" placeholder="02-1234-5678">
                 </div>
             </div>
             <div class="modal-footer">

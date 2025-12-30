@@ -230,12 +230,48 @@ document.addEventListener("DOMContentLoaded", () => {
             catch(e) {
                 console.error("오류 발생:", e);
             }
+        },
+
+        initModifyMode() {
+            if(!state.isModifyMode) return;
+
+            if (el.summaryBox) {
+                el.summaryBox.classList.add("modify-mode");
+                el.summaryBox.style.backgroundColor = "#fff3cd"; // 수정 모드용 배경색 (예시)
+            }
+
+            if (el.btnBook) {
+                el.btnBook.innerText = "예약 수정하기";
+                el.btnBook.classList.replace("btn-primary", "btn-warning"); // 파란색 -> 노란색
+            }
+
+            const oldDateVal = document.getElementById('oldDate')?.value; // "2025-12-30 18:30:00" 형태라고 가정
+            const oldPersonnel = document.getElementById('oldPersonnel')?.value;
+
+            if (oldDateVal) {
+                const rawDate = new Date(oldDateVal);
+                state.currYear = rawDate.getFullYear();
+                state.currMonth = rawDate.getMonth();
+
+                // 전송용 데이터 ("2025-12-30")
+                state.selectedDate = `${state.currYear}-${String(state.currMonth + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`;
+                // 시간 ("18:30")
+                state.selectedTime = `${String(rawDate.getHours()).padStart(2, '0')}:${String(rawDate.getMinutes()).padStart(2, '0')}`;
+                // 화면 표시용
+                state.displayDate = `${state.selectedDate.replace(/-/g, '.')} (${config.DAY_NAMES[rawDate.getDay()]})`;
+            }
+
+            if (oldPersonnel) {
+                state.selectedPersonnel = parseInt(oldPersonnel);
+                if (el.guestCount) el.guestCount.value = state.selectedPersonnel;
+            }
         }
     };
 
     // Event Handlers
     const Handlers = {
         init() {
+            UI.initModifyMode();
             UI.renderStaticMap();
 
             el.calendarDays.onclick = (e) => {
@@ -247,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.displayDate = `${state.selectedDate.replace(/-/g, '.')} (${config.DAY_NAMES[d.getDay()]})`;
 
                 UI.renderCalendar();
-                API.fetchAvailability();
+                if(state.selectedDate) API.fetchAvailability();
                 UI.updateSummary();
             };
 
