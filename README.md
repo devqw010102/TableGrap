@@ -67,13 +67,21 @@ src/
 ```
 
 ## 🔥 Technical Issues & Solutions
-> 직접 겪은 문제 중 하나 이상 종합 필요
+> 직접 겪은 문제 중 하나 이상 종합 필요  
+> 
+#### ⚡ 복합 데이터 조회 시 성능 병목 해결 (Performance Optimization)
 
+* **Issue (문제)**
+    * 마이페이지 및 관리자 대시보드 진입 시, 예약 내역·리뷰·식당 정보 등 **다량의 DB 조회가 단일 시점에 집중**되어 초기 페이지 렌더링 속도가 현저히 저하되는 현상 발생.
+* **Solution (해결)**
+    * **UI/UX 모듈화**: 화면 구조를 기능별 탭(Tab) 단위로 분리하여 시각적 복잡도 해소 및 데이터 호출 시점 분산.
+    * **비동기 지연 로딩 (Lazy Loading)**: 전체 데이터를 한 번에 가져오는 기존 방식 대신, 사용자가 특정 탭을 클릭하는 시점에만 **JavaScript Fetch API**를 호출하여 해당 데이터를 비동기적으로 로드.
+    * **RESTful API 설계**: 각 탭에 필요한 데이터만 반환하는 경량 API 엔드포인트를 구축하여 데이터 전송 효율 극대화.
+* **Result (결과)**
+    * **초기 로딩 시간 단축**: 불필요한 초기 쿼리 실행을 방지하여 첫 화면 진입 속도 및 사용자 체감 응답 속도 대폭 개선.
+    * **서버 리소스 최적화**: 사용자가 실제로 확인하는 탭의 데이터에 대해서만 서버 자원을 소모하도록 설계하여 불필요한 DB 부하 절감.
 
-
-##### Entity
-> Create ERD Diagram ( lucid.app )
-
+---
 ## 🚀 Getting Started
 1. **Clone the repository**
    ```bash
@@ -87,6 +95,101 @@ src/
 4. **Access**
    - Main : <code>http://localhost:8080</code>
    - DB Console : <code>http://localhost:8080/h2-console</code>
+
+### 🗄️ Database ERD
+
+```mermaid
+erDiagram
+    MEMBER ||--o{ AUTHORITY : "assigned"
+    OWNER ||--o{ AUTHORITY : "assigned"
+    
+    OWNER ||--o{ DINER : "manages"
+    OWNER ||--o{ OWNER_REQUEST : "submits"
+    DINER ||--o{ OWNER_REQUEST : "requested"
+    
+    MEMBER ||--o{ BOOK : "reserves"
+    DINER ||--o{ BOOK : "receives"
+    
+    MEMBER ||--o{ REVIEW : "writes"
+    DINER ||--o{ REVIEW : "reviewed_at"
+    BOOK ||--|| REVIEW : "references"
+
+    MEMBER {
+        Long id PK
+        String username UK
+        String password
+        String email UK
+        String name
+        String phone
+    }
+
+    OWNER {
+        Long id PK
+        String username UK
+        String password
+        String name
+        String email
+        String phone
+    }
+
+    DINER {
+        Long id PK
+        Long owner_id FK
+        String dinerName
+        String category
+        String location
+        String tel
+        Double dx "x좌표"
+        Double dy "y좌표"
+        DinerStatus status
+        String businessNum
+    }
+
+    BOOK {
+        Long bookId PK
+        Long member_id FK
+        Long diner_id FK
+        LocalDateTime addDate
+        LocalDateTime bookingDate
+        Integer personnel
+        Boolean success
+    }
+
+    AUTHORITY {
+        Long id PK
+        Long member_id FK
+        Long owner_id FK
+        String authority "Role Name"
+    }
+
+    REVIEW {
+        Long reviewId PK
+        Long memberId FK
+        Long bookId FK
+        Long dinerId FK
+        int rating
+        String comment
+        LocalDateTime createTime
+    }
+
+    OWNER_REQUEST {
+        Long id PK
+        Long owner_id FK
+        Long diner_id FK
+        RequestStatus status
+        LocalDateTime createAt
+    }
+
+    NOTIFICATION {
+        Long id PK
+        Long memberId
+        String message
+        String role
+        boolean isRead
+        LocalDateTime createdAt
+        NotificationType type
+    }
+```
 
 ### 🔄 Data Processing Flow
 > (예시) 데이터 흐름도 Mermaid or Diagram 으로 작성 예정
