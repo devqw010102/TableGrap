@@ -491,7 +491,10 @@ async function loadDinerInfoTab() {
                 tbody.innerHTML += `
                 <tr>
                     <td>${d.id}</td>
-                    <td>${d.dinerName}</td>
+                    <td><a href="#" style="text-decoration: none;"
+                        data-bs-toggle="modal"
+                        onclick="openDinerDetailModal(${d.id}, '${d.tel ? d.tel : ''}')">
+                        ${d.dinerName}</a></td>
                     <td>${badge}</td>
                     <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${d.id})">상태 변경</button></td>
                     <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
@@ -531,6 +534,49 @@ async function loadDinerInfoTab() {
         }
     }
 }
+
+function openDinerDetailModal(id, currentTel) {
+    document.getElementById("dinerTel").value = currentTel;
+
+    //수정 버튼에 클릭 이벤트 핸들러 등록
+    const editBtn = document.getElementById("editDiner");
+    editBtn.onclick = function() {
+        updateDiner(id); // 클로저를 통해 id 전달
+    };
+
+    // 모달 열기
+    const modalEl = document.getElementById('dinerDetailModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+//식당 정보 수정
+async function updateDiner(dinerId) {
+    const dinerTel = document.getElementById("dinerTel").value.trim();
+
+    if(!dinerTel) {
+            alert("전화번호를 입력해주세요.");
+            return;
+        }
+
+    try{
+        const url = `/api/owner/update/${dinerId}`;
+        const res = await fetchJson(url, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({tel: dinerTel})
+        });
+        alert("식당 정보 수정이 완료되었습니다.");
+        await loadDinerInfoTab();
+    } catch (e) {
+        console.error(e.status, e.message);
+        alert("식당 정보 수정 중 오류가 발생했습니다.")
+    }
+}
+
+
 // 식당 닫기
 async function changeStatus(dinerId){
     const url = `/api/owner/status/${dinerId}`

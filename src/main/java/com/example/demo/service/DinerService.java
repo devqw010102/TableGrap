@@ -30,4 +30,7 @@ public interface DinerService {
 //    List<AdminOwnerDto> getAll();
     //식당 상태 변경
     void changeStatus(Long dinerId, Long ownerId);
+
+    //식당 정보 변경
+    void updateDinerInfo(DinerDto dto, Long dinerId, Long ownerId);
 }

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.data.dto.DinerDto;
 import com.example.demo.data.dto.owner.*;
+import com.example.demo.data.model.Diner;
 import com.example.demo.data.userDeatils.OwnerUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.DinerService;
@@ -118,6 +119,17 @@ public class OwnerController {
             return ResponseEntity.ok("식당 상태가 변경되었습니다.");
         } catch (Exception e){
             return ResponseEntity.badRequest().body("식당 상태 변경을 실패했습니다." + e.getMessage());
+        }
+    }
+
+    //식당 정보 수정
+    @PatchMapping("/update/{dinerId}")
+    public ResponseEntity<String> updateOwner(@PathVariable Long dinerId, @RequestBody DinerDto dto, @AuthenticationPrincipal OwnerUserDetails userDetails) {
+        try{
+            dinerService.updateDinerInfo( dto, dinerId, userDetails.getOwner().getId());
+            return ResponseEntity.ok("식당 정보가 수정되었습니다.");
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("식당 정보 수정을 실패했습니다." + e.getMessage());
         }
     }
 

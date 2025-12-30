@@ -106,6 +106,9 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     //식당 삭제할 때 사용
     Optional<Diner> findByIdAndOwnerId(Long dinerId, Long ownerId);
 
+    //식당 수정 할 때 사용
+    Optional<Diner> findByIdAndOwnerIdAndStatus(Long dinerId, Long ownerId, DinerStatus status);
+
     //식당 중복 업로드 방지
     boolean existsByDinerNameAndLocation(String dinerName, String location);
 }
