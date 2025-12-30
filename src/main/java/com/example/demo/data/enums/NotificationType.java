@@ -5,10 +5,10 @@ public enum NotificationType {
     RESERVATION_CREATE("/ownerPage"),
     RESERVATION_UPDATE("/ownerPage"),
     REVIEW_WRITE("/ownerPage"),
+    RESERVATION_CANCEL("/ownerPage"),
 
     // USER 케이스: 예약 승인, 취소, 거절 시 마이페이지로
     RESERVATION_APPROVE("/mypage"),
-    RESERVATION_CANCEL("/mypage"),
     RESERVATION_REJECT("/mypage"),
 
     // 이동이 필요 없는 일반 알림

@@ -67,9 +67,7 @@ async function loadNotifications() {
                 // OWNER 케이스
                 case 'RESERVATION_CREATE':
                 case 'RESERVATION_UPDATE':
-                    targetUrl = '/ownerPage';
-                    buttonText = '사장페이지로';
-                    break;
+                case 'RESERVATION_CANCEL':
                 case 'REVIEW_WRITE':
                     targetUrl = '/ownerPage';
                     buttonText = '사장페이지로';
@@ -77,7 +75,6 @@ async function loadNotifications() {
 
                 // USER 케이스 (유저에게도 버튼을 보여줌)
                 case 'RESERVATION_APPROVE':
-                case 'RESERVATION_CANCEL':
                 case 'RESERVATION_REJECT':
                     targetUrl = '/mypage';
                     buttonText = '예약확인';
