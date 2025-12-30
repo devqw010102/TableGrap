@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class DinerDto {
   private String dinerName;
   private String businessNum;
+  private String tel;
 }

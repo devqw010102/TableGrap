@@ -273,9 +273,33 @@
     </div>
 </div>
 
+<!-- 식당 상세 수정 모달-->
+<div class="modal fade" id="dinerDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">식당 상세 수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="limitReservationCnt" class="form-label">시간 당 예약 가능 수</label>
+                    <input type="password" class="form-control" id="limitReservationCnt" disabled>
+                    <label for="dinerTel">식당 전화번호</label>
+                    <input type="text" class="form-control" id="dinerTel">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-success" id="editDiner" onclick="updateDiner(dinerId)">수정하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 탈퇴 모달 -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">회원 탈퇴</h5>

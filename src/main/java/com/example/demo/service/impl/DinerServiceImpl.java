@@ -146,4 +146,13 @@ public class DinerServiceImpl implements DinerService {
             diner.setStatus(DinerStatus.PUBLIC);
         }
     }
+
+    //식당 정보 변경
+    @Override
+    @Transactional
+    public void updateDinerInfo(DinerDto dto, Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerIdAndStatus(dinerId, ownerId, DinerStatus.PUBLIC)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        diner.setTel(dto.getTel());
+    }
 }

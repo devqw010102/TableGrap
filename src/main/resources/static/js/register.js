@@ -112,12 +112,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if(res.ok){
                 const diner = await res.json();
-
+                //ppt 시각 자료 활용위해서 console log 남겨둠
+                console.log("조회된 식당 정보:", diner);
                 if(diner && diner.dinerName){
                     document.getElementById("ownerDinerName").value = diner.dinerName;
                     isBusinessNumberValid = true;
-                    //ppt 시각 자료 활용위해서 console log 남겨둠
-                    console.log(diner);
+
                     setLoadingState(businessNumberBtn, false);
 
                     document.getElementById("businessNum").readOnly = true;
