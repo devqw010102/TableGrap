@@ -553,11 +553,39 @@ function openDinerDetailModal(id, currentTel) {
 //식당 정보 수정
 async function updateDiner(dinerId) {
     const dinerTel = document.getElementById("dinerTel").value.trim();
+    const limitInput = document.getElementById("limitReservationCnt");
 
-    if(!dinerTel) {
-            alert("전화번호를 입력해주세요.");
+    // 수용 인원
+    let limitValue = limitInput.value.trim();
+
+    if (limitValue === "") {
+        if(confirm("최대 인원이 입력되지 않았습니다. 기본값 10으로 설정할까요?")) {
+            limitInput.value = 10;
+            return;
+        } else {
+            limitInput.focus();
             return;
         }
+    }
+    const limitCount = parseInt(limitValue, 10);
+
+    if (isNaN(limitCount) || limitCount < 1) {
+        alert("최대 수용 인원은 1명 이상의 숫자여야 합니다.");
+        limitInput.focus();
+        return;
+    }
+    
+    // 전화번호
+    const telRegex = /^(01[016789]|02|0[3-9]{1}[0-9]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+
+    if(!dinerTel) {
+        alert("전화번호를 입력해주세요.");
+        return;
+    }
+    if (!telRegex.test(dinerTel)) {
+        alert("올바른 전화번호 형식이 아닙니다.\n(예: 02-123-4567 또는 010-1234-5678)");
+        return;
+    }
 
     try{
         const url = `/api/owner/update/${dinerId}`;
@@ -566,9 +594,15 @@ async function updateDiner(dinerId) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({tel: dinerTel})
+            body: JSON.stringify({tel: dinerTel, defaultMaxCapacity: limitCount})
         });
         alert("식당 정보 수정이 완료되었습니다.");
+
+        // Modal 닫기
+        const modalEl = document.getElementById('dinerDetailModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
         await loadDinerInfoTab();
     } catch (e) {
         console.error(e.status, e.message);
@@ -817,4 +851,10 @@ function setLoadingState(button, isLoading) {
             button.innerHTML = button.dataset.originalText || "조회하기";
         }
     }
-
+// 식당 수정 전화번호 자동 하이픈
+function autoHyphen(target) {
+    target.value = target.value
+        .replace(/[^0-9]/g, '') // 숫자만 남기기
+        .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`) // 10~11자리 대응
+        .replace(/^(\d{2,3})(\d{3,4})(\d{1,3})$/, `$1-$2-$3`); // 입력 중인 상태 대응
+}

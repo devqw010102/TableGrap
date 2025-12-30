@@ -154,5 +154,6 @@ public class DinerServiceImpl implements DinerService {
         Diner diner = dinerRepository.findByIdAndOwnerIdAndStatus(dinerId, ownerId, DinerStatus.PUBLIC)
                 .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
         diner.setTel(dto.getTel());
+        diner.setDefaultMaxCapacity(dto.getDefaultMaxCapacity());
     }
 }
