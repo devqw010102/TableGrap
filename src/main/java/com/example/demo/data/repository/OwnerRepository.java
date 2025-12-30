@@ -1,5 +1,6 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.model.Owner;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,13 +10,13 @@ import java.util.Optional;
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
 
     // 아이디 찾기, 비번 재설정 용
-    Optional<Owner> findByNameAndEmail(String name, String email);
-    boolean existsByUsernameAndEmail(String username, String email);
+    Optional<Owner> findByNameAndEmailAndStatus(String name, String email, AccountStatus status);
+    boolean existsByUsernameAndEmailAndStatus(String username, String email, AccountStatus status);
 
-  Optional<Owner> findByEmail(String email);
+  Optional<Owner> findByEmailAndStatus(String email, AccountStatus status);
   Optional<Owner> findByUsername(String username);
-  boolean existsByUsername(String username);
-  Optional<Owner> findById(Long id);
+  boolean existsByUsername(String usernamem, AccountStatus status);
+  Optional<Owner> findByIdAndStatus(Long id, AccountStatus status);
 
   @Query("""
    SELECT count(DISTINCT o)

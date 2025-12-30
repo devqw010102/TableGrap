@@ -191,7 +191,6 @@
                 </table>
 
                 <div class="d-flex justify-content-end gap-2">
-                    <button type="button" id="addDiner" class="btn btn-info" onclick="openModal()">식당추가</button>
                     <button type="button" id="btnEdit" class="btn btn-primary">수정하기</button>
 
                     <button type="button" id="btnCancel" class="btn btn-secondary" style="display:none;">취소</button>
@@ -205,7 +204,8 @@
     <!-- tab6-content -->
     <div id = "tab6" class = "tab-pane fade">
         <div class = "container mt-4">
-            <h2>식당 관리</h2>
+            <h2 style="display: inline-block; position: relative">식당 관리</h2>
+            <button type="button" id="addDiner" class="btn btn-info" style="position: absolute; right: 310px;" onclick="openModal()">식당추가</button>
             <table class = "table table-boarded">
                 <thead>
                 <tr>

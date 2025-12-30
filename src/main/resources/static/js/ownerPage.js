@@ -469,7 +469,10 @@ function toggleEditMode(isEdit) {
 async function loadDinerInfoTab() {
     const dinerId = document.getElementById('dinerSelect')?.value || "";
     const tbody = document.getElementById("owner-diner");
-    tbody.innerHTML = "";
+    tbody.innerHTML = `
+    <tr>
+        <td colspan="5" class="text-center">식당이 없습니다.</td>
+    `;
 
     if(!dinerId){
         const url = "/api/owner/diners";
@@ -484,6 +487,7 @@ async function loadDinerInfoTab() {
                 } else if(d.status === "CLOSED"){
                     badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
                 }
+                tbody.innerHTML = '';
                 tbody.innerHTML += `
                 <tr>
                     <td>${d.id}</td>
@@ -512,7 +516,7 @@ async function loadDinerInfoTab() {
             } else if (dinerData.status === "CLOSED") {
                 badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
             }
-
+            tbody.innerHTML = '';
             tbody.innerHTML = `
             <tr>
                 <td>${dinerData.id}</td>

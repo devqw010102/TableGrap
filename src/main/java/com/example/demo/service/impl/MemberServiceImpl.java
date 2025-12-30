@@ -5,6 +5,7 @@ import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.MemberUpdateDto;
 import com.example.demo.data.dto.notification.MemberUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
+import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.model.Owner;
@@ -91,13 +92,13 @@ public class MemberServiceImpl implements MemberService {
         Optional<MemberDto> member = memberRepository.findByEmail(email).map(this::mapToMemberDto);
         if (member.isPresent()) return member;
 
-        return ownerRepository.findByEmail(email)
+        return ownerRepository.findByEmailAndStatus(email, AccountStatus.ACTIVE)
                 .map(o -> MemberDto.builder().email(o.getEmail()).build());
     }
 
     @Override
     public boolean isUsernameDuplicate(String username) {   // id 확인
-        return memberRepository.existsByUsername(username) || ownerRepository.existsByUsername(username);
+        return memberRepository.existsByUsername(username) || ownerRepository.existsByUsername(username, AccountStatus.DELETED);
     }
 
 
@@ -165,7 +166,7 @@ public class MemberServiceImpl implements MemberService {
         if (memberUsername.isPresent()) return memberUsername;
 
         //  Member에 없으면 Owner 테이블에서 검색
-        return ownerRepository.findByNameAndEmail(name, email)
+        return ownerRepository.findByNameAndEmailAndStatus(name, email, AccountStatus.ACTIVE)
                 .map(Owner::getUsername);
     }
 
@@ -173,7 +174,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean existsByUsernameAndEmail(String username, String email) {
         return memberRepository.existsByUsernameAndEmail(username, email) ||
-                ownerRepository.existsByUsernameAndEmail(username, email);
+                ownerRepository.existsByUsernameAndEmailAndStatus(username, email, AccountStatus.ACTIVE);
     }
 
     @Transactional

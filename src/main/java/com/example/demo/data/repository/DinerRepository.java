@@ -83,11 +83,12 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     @Query("""
         SELECT new com.example.demo.data.dto.owner.OwnerDinerDto(d.id, d.dinerName, d.status)
         FROM Diner d
-        WHERE d.id = :dinerId AND d.owner.id = :ownerId
+        WHERE d.id = :dinerId AND d.owner.id = :ownerId And d.status <> :status
     """)
     Optional<OwnerDinerDto> findDinerByOwner(
             @Param("dinerId") Long dinerId,
-            @Param("ownerId") Long ownerId
+            @Param("ownerId") Long ownerId,
+            @Param("status") DinerStatus status
     );
 
     /* @Query("""
