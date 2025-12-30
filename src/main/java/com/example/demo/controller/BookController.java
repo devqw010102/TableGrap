@@ -34,10 +34,16 @@ public class BookController {
     public MemberInfoResponseDto myInfo(@AuthenticationPrincipal MemberUserDetails userDetails) {
         return memberService.findMyInfo(userDetails.getMember().getId());
     }
-    @DeleteMapping("/book/delete/{bookId}")
-    public void deleteBooking(@PathVariable Long bookId) {
-            bookService.deleteBooking(bookId);
 
+    @DeleteMapping("/book/delete/{bookId}")
+    public ResponseEntity<?> deleteBooking(@PathVariable Long bookId) {
+        try {
+            bookService.deleteBooking(bookId); // 여기서 RuntimeException 발생 시 catch로 이동
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            // 에러 메시지를 응답 본문에 담아 400 에러를 보냄
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @PostMapping("/reservation")
     public ResponseEntity<?> reservation(BookDto dto, @AuthenticationPrincipal MemberUserDetails userDetails) {

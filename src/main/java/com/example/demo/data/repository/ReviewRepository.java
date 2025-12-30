@@ -6,6 +6,7 @@ import com.example.demo.data.model.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -92,4 +93,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     """)
     Page<OwnerReviewDto> findReviewByDinerIds(@Param("dinerIds") List<Long> dinerIds, Pageable pageable);
 
+    // delete member for dummy data
+    @Modifying
+    @Query("UPDATE Review r SET r.memberId= :dummyId WHERE r.memberId = :memberId")
+    void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
 }
