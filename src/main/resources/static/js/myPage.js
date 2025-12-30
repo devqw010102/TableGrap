@@ -324,9 +324,7 @@ function deleteMember() {
                 location.href="/";
                 location.href="/";
             } else {
-                // 서버에서 보낸 에러 메시지(text)를 비동기로 읽어옵니다.
                 const errorMsg = await res.text();
-                // 서버가 보낸 구체적인 메시지("승인 대기 중인...")를 alert으로 띄웁니다.
                 alert(errorMsg || "오류가 발생했습니다.");
             }
         })
