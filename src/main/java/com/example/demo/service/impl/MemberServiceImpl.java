@@ -165,7 +165,7 @@ public class MemberServiceImpl implements MemberService {
                 .map(Member::getUsername);
         if (memberUsername.isPresent()) return memberUsername;
 
-        //  Member에 없으면 Owner 테이블에서 검색
+        //  Member에 없으면 Owner 테이블에서 검색, 상태가 ACTIVE인 계정만 가져오기
         return ownerRepository.findByNameAndEmailAndStatus(name, email, AccountStatus.ACTIVE)
                 .map(Owner::getUsername);
     }
