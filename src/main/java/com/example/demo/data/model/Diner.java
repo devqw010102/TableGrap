@@ -30,4 +30,7 @@ public class Diner {
     @JoinColumn(name = "owner_id", nullable = true)
     private Owner owner;
     private String businessNum;  // 사업자 등록번호
+    @Builder.Default
+    @Column(nullable = false)
+    private Integer defaultMaxCapacity = 10;
 }

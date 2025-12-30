@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
+import com.example.demo.data.dto.SlotResponseDto;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import org.springframework.data.domain.Page;
 
@@ -23,4 +24,6 @@ public interface BookService {
     void approveBooking(Long bookId);
 
     void rejectBooking(Long bookId);
+
+    List<SlotResponseDto> getDailyAvailability(LocalDate date, int requestedPersonnel, Long dinerId);
 }
