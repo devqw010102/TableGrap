@@ -24,4 +24,11 @@ public interface MemberService {
     // myPage edit
     MemberUpdateDto updateMember(Long memberId, MemberUpdateDto dto); // update
     boolean deleteMember(Long memberId, String checkPassword);
+
+    // 아이디 찾기
+    Optional<String> findIdByNameAndEmail(String name, String email);
+    // 비밀번호 재설정 전
+    boolean existsByUsernameAndEmail(String username, String email);
+    // 비밀번호 업데이트
+    void updatePassword(String username, String newPassword);
 }
