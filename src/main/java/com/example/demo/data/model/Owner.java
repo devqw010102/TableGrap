@@ -1,5 +1,6 @@
 package com.example.demo.data.model;
 
+import com.example.demo.data.enums.AccountStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -25,6 +26,8 @@ public class Owner {
     @Column(nullable = false)
     private String email;
     private String phone;
+    @Enumerated(EnumType.STRING)
+    private AccountStatus status;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Authority> authorities;

@@ -116,7 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if(diner && diner.dinerName){
                     document.getElementById("ownerDinerName").value = diner.dinerName;
                     isBusinessNumberValid = true;
-
+                    //ppt 시각 자료 활용위해서 console log 남겨둠
+                    console.log(diner);
                     setLoadingState(businessNumberBtn, false);
 
                     document.getElementById("businessNum").readOnly = true;
@@ -156,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.dataset.originalText = button.innerHTML; // 원래 텍스트 저장
             button.innerHTML = `
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                가입 중...
+                조회 중...
             `;
         } else {
             button.disabled = false;

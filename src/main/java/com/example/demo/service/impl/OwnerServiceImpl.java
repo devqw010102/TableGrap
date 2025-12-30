@@ -4,6 +4,7 @@ import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
+import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Owner;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class OwnerServiceImpl implements OwnerService {
             .password(passwordEncoder.encode(ownerDto.getPassword()))
             .phone(ownerDto.getPhone())
             .email(ownerDto.getEmail())
+            .status(AccountStatus.ACTIVE)
             .build();
     ownerRepository.save(owner);
 
@@ -82,7 +85,7 @@ public class OwnerServiceImpl implements OwnerService {
   //이메일 중복확인
   @Override
   public Optional<OwnerDto> findByEmail(String email) {
-    Optional<OwnerDto> owner = ownerRepository.findByEmail(email).map(this::mapToOwnerDto);
+    Optional<OwnerDto> owner = ownerRepository.findByEmailAndStatus(email, AccountStatus.ACTIVE).map(this::mapToOwnerDto);
     if(owner.isPresent()) return owner;
 
     return memberRepository.findByEmail(email)
@@ -92,19 +95,19 @@ public class OwnerServiceImpl implements OwnerService {
   //아이디 중복확인
   @Override
   public boolean existsByUsername(String username) {
-    return ownerRepository.existsByUsername(username) || memberRepository.existsByUsername(username);
+    return ownerRepository.existsByUsername(username, AccountStatus.DELETED) || memberRepository.existsByUsername(username);
   }
   //Owner 회원정보 출력
   @Override
   public Optional<OwnerDto> findByOwnerId(Long id) {
-    return ownerRepository.findById(id).map(this::mapToOwnerDto);
+    return ownerRepository.findByIdAndStatus(id, AccountStatus.ACTIVE).map(this::mapToOwnerDto);
   }
 
   //Owner 회원 정보 수정
   @Override
   @Transactional
   public void updateOwner(Long ownerId, OwnerUpdateDto dto) {
-    Owner owner = ownerRepository.findById(ownerId)
+    Owner owner = ownerRepository.findByIdAndStatus(ownerId, AccountStatus.ACTIVE)
             .orElseThrow(() -> new IllegalArgumentException("해당하는 오너가 없습니다."));
     System.out.println("=== UPDATE REQUEST ===");
     System.out.println("Email: " + dto.getEmail());
@@ -144,7 +147,7 @@ public class OwnerServiceImpl implements OwnerService {
   @Override
   @Transactional
   public boolean deleteOwner(Long ownerId, String checkPassword) {
-    Owner owner = ownerRepository.findById(ownerId)
+    Owner owner = ownerRepository.findByIdAndStatus(ownerId, AccountStatus.ACTIVE)
             .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
     // 비밀번호 검증
     if (!passwordEncoder.matches(checkPassword, owner.getPassword())) {
@@ -154,7 +157,19 @@ public class OwnerServiceImpl implements OwnerService {
     if (!dinerRepository.findByOwnerId(ownerId, DinerStatus.DELETED).isEmpty()) {
       throw new IllegalStateException("식당이 존재하는 경우 탈퇴할 수 없습니다.");
     }
-    ownerRepository.delete(owner);
+
+    // [추가] 개인정보 마스킹 (재가입 방지 및 개인정보 보호)
+    String trashKey = UUID.randomUUID().toString().substring(0, 8); // 랜덤 문자열 생성
+
+    // 아이디/이메일이 Unique라면 충돌나지 않게 랜덤값 mix
+    // 예: user123 -> deleted_user123_a1b2c3d4
+    owner.setUsername("deleted_" + owner.getUsername() + "_" + trashKey);
+    owner.setEmail("deleted_" + trashKey + "@masked.com");
+
+    owner.setName("탈퇴회원"); // 이름은 식별 불가능하게
+    owner.setPhone("000-0000-0000"); // 전화번호 초기화
+    owner.setPassword(""); // 비밀번호 삭제 (혹은 임의의 값으로 변경)
+    owner.setStatus(AccountStatus.DELETED);
     return true;
   }
 

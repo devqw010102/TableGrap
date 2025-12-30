@@ -4,6 +4,7 @@ import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerDto;
 import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
+import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
@@ -108,7 +109,7 @@ public class DinerServiceImpl implements DinerService {
     //식당 삭제 탭에서 선택한 식당 출력
     @Override
     public Optional<OwnerDinerDto> getOwnerDinerById(Long dinerId, Long ownerId) {
-        return dinerRepository.findDinerByOwner(dinerId, ownerId);
+        return dinerRepository.findDinerByOwner(dinerId, ownerId, DinerStatus.DELETED);
     }
 
     //식당 삭제
