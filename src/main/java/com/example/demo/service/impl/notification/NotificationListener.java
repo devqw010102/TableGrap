@@ -98,8 +98,11 @@ public class NotificationListener {
 
     // Notification Entity Save + Send
     private void sendAndSave(String role, Long receiveId, String message, NotificationType type) {
+        boolean isOwner = "ROLE_OWNER".equals(role);
+
         Notification notification = Notification.builder()
-                .memberId(receiveId)
+                .memberId(isOwner ? null : receiveId)
+                .ownerId(isOwner ? receiveId : null)
                 .role(role)
                 .message(message)
                 .isRead(false)
