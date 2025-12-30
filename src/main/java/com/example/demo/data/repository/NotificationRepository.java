@@ -13,4 +13,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Transactional
     void deleteByMemberIdAndRole(Long memberId, String role);
+
+    //사장님이 받는 알림
+    List<Notification> findByOwnerIDOrderByCreatedAtDesc(Long id);
 }
