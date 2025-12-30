@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -65,4 +66,13 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     // 특정 식당의 모든 예약 삭제
     void deleteAllByDiner_Id(Long dinerId);
+
+    @Query("SELECT b.bookingDate, SUM(b.personnel) " +
+            "FROM Book b " +
+            "WHERE b.diner.id = :dinerId " +
+            "AND b.bookingDate >= :start " +
+            "AND b.bookingDate <= :end " +
+            "GROUP BY b.bookingDate")
+    List<Object[]> findBookingStatus(@Param("dinerId") Long dinerId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end
+    );
 }
