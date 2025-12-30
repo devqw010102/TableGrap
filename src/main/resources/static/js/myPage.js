@@ -166,11 +166,13 @@ function loadBooks() {
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
                 // 예약 취소 | 후기 작성 버튼 변환
                 //const date = new Date();
+
                 //테스트용 시간 설정 (미래) -> 예약 대기 상태에서는 버튼 출력x
                 const date = new Date("2026-01-01");
                 //테스트용 시간 설정 (과거)
                 //const date = new Date("2025-01-01");
                 //const now = new Date();
+
                 const bookDate = new Date(book.bookingDate);
                 const isPast = date > bookDate;
 
@@ -315,16 +317,23 @@ function deleteMember() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: password })
     })
-        .then(res => {
+        .then(async res => {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
                 // location.reload();
                 location.href="/";
+                location.href="/";
             } else {
-                alert("비밀번호가 일치하지 않거나 오류가 발생했습니다.");
+                // 서버에서 보낸 에러 메시지(text)를 비동기로 읽어옵니다.
+                const errorMsg = await res.text();
+                // 서버가 보낸 구체적인 메시지("승인 대기 중인...")를 alert으로 띄웁니다.
+                alert(errorMsg || "오류가 발생했습니다.");
             }
         })
-        .catch(err => console.error("Delete Error:", err));
+        .catch(err => {
+            console.error("Delete Error:", err);
+            alert("서버 통신 오류가 발생했습니다.");
+        });
 }
 
 // 예약 취소
@@ -337,7 +346,7 @@ function cancelBooking(bookId) {
                 alert("예약이 취소되었습니다.");
                 loadBooks(); // 목록 갱신
             } else {
-                alert("취소 실패: 이미 취소되었거나 오류가 있습니다.");
+                alert("예약 24시간 전 취소 불가합니다, 가게로 연락 부탁드립니다.");
             }
         })
         .catch(() => alert("서버 통신 오류"));

@@ -140,8 +140,10 @@ public class MemberController {
             }
             return ResponseEntity.ok().body("회원 탈퇴가 완료되었습니다.");
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
         }
     }
 }

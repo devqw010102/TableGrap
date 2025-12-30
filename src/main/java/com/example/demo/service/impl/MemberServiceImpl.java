@@ -9,9 +9,7 @@ import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.model.Owner;
-import com.example.demo.data.repository.AuthorityRepository;
-import com.example.demo.data.repository.MemberRepository;
-import com.example.demo.data.repository.OwnerRepository;
+import com.example.demo.data.repository.*;
 import com.example.demo.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -30,6 +29,11 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder; //  @Bean 필요- config
     private final AuthorityRepository authorityRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final BookRepository bookRepository;
+    private final ReviewRepository reviewRepository;
+    private final Long DUMMY_MEMBER_ID = 0L;
+
+
 
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
@@ -200,11 +204,40 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
 
+        if (bookRepository.existsPendingBookings(memberId)) {
+            throw new IllegalStateException("승인 대기 중인 예약이 있어 탈퇴할 수 없습니다. 예약 취소 후 다시 시도해주세요.");
+        }
+        // 미래의 확정된 예약이 하나라도 있으면 탈퇴 차단
+        if (bookRepository.existsByMember_IdAndSuccessAndBookingDateAfter(memberId, true, LocalDateTime.now())) {
+            throw new IllegalStateException("방문 예정인 확정 예약이 있습니다. 예약 취소 후 탈퇴가 가능합니다.");
+        }
+
         // 비밀번호 검증
         if (!passwordEncoder.matches(checkPassword, member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
+        // 더미(탈퇴용) 회원 정보
+        Member dummyMember = memberRepository.findByUsername("unknown_user")
+                .orElseGet(() -> {
+                    Member newDummy = Member.builder()
+                            .username("unknown_user")
+                            .password(passwordEncoder.encode("dummy_password_non_usable"))
+                            .email("unknown@tablegrap.com")
+                            .name("알수 없음")
+                            .build();
+                    return memberRepository.save(newDummy);
+                });
+        Long dummyId = dummyMember.getId();
+
+        // 권한 삭제
+        authorityRepository.deleteByMember_Id(memberId);
+        //예약 삭제(null = 알수 없음)
+        bookRepository.updateMemberToDummy(memberId, dummyId);
+        // 리뷰 삭제(null = 알수 없음)
+        reviewRepository.updateMemberToDummy(memberId, dummyId);
+
+        // 최종 삭제
         memberRepository.delete(member);
         return true;
     }

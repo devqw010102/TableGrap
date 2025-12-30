@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ public class BookServiceImpl implements BookService {
     private final ReviewRepository reviewRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final DinerAvailabilityRepository availabilityRepository;
+    private ChronoLocalDateTime<?> limit;
 
     @Override
     public List<BookResponseDto> findMyBooks(Long memberId) {
@@ -109,7 +111,6 @@ public class BookServiceImpl implements BookService {
         book.setPersonnel(dto.getPersonnel());
         book.setSuccess(false);
 
-        // 알람 이벤트
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatterDate = book.getBookingDate().format(dtf);
 
@@ -120,9 +121,18 @@ public class BookServiceImpl implements BookService {
         ));
     }
 
+    // cancel booking
     @Override
     public void deleteBooking(Long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime bookingDate = book.getBookingDate();
+        LocalDateTime limit = bookingDate.minusHours(24);
+
+        if(Boolean.TRUE.equals(book.getSuccess()) && now.isAfter(limit)) {
+            throw new RuntimeException("이미 확정된 예약은 방문 24시간 이내에 취소할 수 없습니다, 가게로 연락 부탁드립니다.");
+        }
 
         // 미래의 예약이면 예약 가능인원 증가
         if(book.getBookingDate().isAfter(LocalDateTime.now())) {
@@ -132,7 +142,7 @@ public class BookServiceImpl implements BookService {
 
         // 예약 삭제
         bookRepository.deleteById(bookId);
-        
+
         // 알람 이벤트
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatterDate = book.getBookingDate().format(dtf);
@@ -155,7 +165,7 @@ public class BookServiceImpl implements BookService {
 
         Diner diner = dinerRepository.findById(dto.getDinerId())
                 .orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
-        
+
         // 시간대별 최대 인원 제한을 위해 구현
         LocalDate date = dto.getBookingDate().toLocalDate();
         LocalTime time = dto.getBookingDate().toLocalTime();
@@ -208,12 +218,16 @@ public class BookServiceImpl implements BookService {
     public void approveBooking(Long bookId) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
+        if ("unknown_user".equals(book.getMember().getUsername())) {
+            throw new IllegalStateException("탈퇴한 회원의 예약은 승인할 수 없습니다.");
+        }
+
         if(Boolean.TRUE.equals(book.getSuccess())) {
             throw new IllegalStateException("이미 승인된 예약입니다.");
         }
         book.setSuccess(true);
 
-        
+
         // 알람 이벤트
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatterDate = book.getBookingDate().format(dtf);

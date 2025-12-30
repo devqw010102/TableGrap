@@ -5,6 +5,7 @@ import com.example.demo.data.model.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -75,4 +76,14 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "GROUP BY b.bookingDate")
     List<Object[]> findBookingStatus(@Param("dinerId") Long dinerId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end
     );
+
+    @Query("SELECT COUNT(b) > 0 FROM Book b WHERE b.member.id = :memberId AND (b.success = false OR b.success IS NULL)")
+    boolean existsPendingBookings(@Param("memberId") Long memberId);
+
+    boolean existsByMember_IdAndSuccessAndBookingDateAfter(Long memberId, Boolean success, LocalDateTime now);
+
+    // delete member for dummy data
+    @Modifying
+    @Query("UPDATE Book b SET b.member.id= :dummyId WHERE b.member.id = :memberId")
+    void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
 }
