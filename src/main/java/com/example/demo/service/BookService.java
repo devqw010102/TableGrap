@@ -10,8 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BookService {
+
     List<BookResponseDto> findMyBooks(Long memberId);
+
     BookResponseDto getBooking(Long bookId);
+
     void updateBooking(BookDto dto);
 
     void deleteBooking(Long bookId);

@@ -4,7 +4,6 @@ import com.example.demo.data.dto.DinerDetailDto;
 import com.example.demo.data.dto.DinerDto;
 import com.example.demo.data.dto.DinerListDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
-import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
@@ -14,7 +13,6 @@ import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,7 @@ public class DinerServiceImpl implements DinerService {
                 .build();
     }
 
-    //Diner -> DinerDetailDto 변환 메서드
+    // Diner -> DinerDetailDto 변환 메서드
     private DinerDetailDto mapToDinerDetailDto(Diner diner){
         return DinerDetailDto.builder()
                 .id(diner.getId())
@@ -123,9 +121,6 @@ public class DinerServiceImpl implements DinerService {
         if (hasFutureBookings) {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
-        // 식당을 삭제하기 전에, 이 식당의 '과거 예약 내역'들을 먼저 모두 삭제해야 함(Hard Delete)
-        //bookRepository.deleteAllByDiner_Id(dinerId);
-        //dinerRepository.delete(diner);
 
         //enum활용하여 status를 delete로 변경(soft delete)
         diner.setStatus(DinerStatus.DELETED);

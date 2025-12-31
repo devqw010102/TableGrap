@@ -2,14 +2,13 @@ package com.example.demo.data.repository;
 
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import com.example.demo.data.model.Book;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
       and (:start is null or b.bookingDate >= :start)
       and (:end is null or b.bookingDate < :end)
     order by b.bookingDate asc, b.personnel asc
-""")
+    """)
     Page<BookOwnerResponseDto> findBookings(
             @Param("ownerId") Long ownerId,
             @Param("dinerId") Long dinerId,
@@ -53,7 +52,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     from Book b
     where b.addDate >= :start
       and b.addDate < :end
-""")
+    """)
     long countTodayBookings(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
@@ -62,13 +61,8 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     boolean existsByMember_IdAndBookingDate(Long memberId, LocalDateTime bookingDate);
 
     // Notification
-    List<Book> findByDinerId(Long dinerId);
-
     //식당 삭제전 해당 식당의 예약 존재 확인
     boolean existsByDiner_IdAndBookingDateAfter(Long dinerId, LocalDateTime now);
-
-    // 특정 식당의 모든 예약 삭제
-    void deleteAllByDiner_Id(Long dinerId);
 
     @Query("SELECT b.bookingDate, SUM(b.personnel) " +
             "FROM Book b " +
@@ -90,7 +84,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
 
     @Query("""
-        SELECT COUNT(b) > 0 
+        SELECT COUNT(b) > 0
             FROM Book b
                 WHERE b.member.id = :memberId
                     AND b.bookingDate > :start

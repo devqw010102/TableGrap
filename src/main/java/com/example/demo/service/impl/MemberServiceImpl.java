@@ -6,6 +6,7 @@ import com.example.demo.data.dto.MemberUpdateDto;
 import com.example.demo.data.dto.notification.MemberUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.enums.AccountStatus;
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.model.Owner;
@@ -31,10 +32,8 @@ public class MemberServiceImpl implements MemberService {
     private final ApplicationEventPublisher eventPublisher;
     private final BookRepository bookRepository;
     private final ReviewRepository reviewRepository;
-    private final Long DUMMY_MEMBER_ID = 0L;
 
-
-
+    // Member -> MemberDto 변환 메서드
     private MemberDto mapToMemberDto(Member member) {
         return MemberDto.builder()
                 .id(member.getId())
@@ -43,11 +42,6 @@ public class MemberServiceImpl implements MemberService {
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
-    }
-
-    @Override
-    public MemberDto getMemberById(Long id) {
-        return memberRepository.findById(id).map(this::mapToMemberDto).orElseThrow();
     }
 
     // Create
@@ -59,7 +53,7 @@ public class MemberServiceImpl implements MemberService {
             phoneNumber = null;
 
             String email = memberDto.getEmail();
-            if (email == null || email.trim().isEmpty() || email.equals("@")) {
+            if (email.trim().isEmpty() || email.equals("@")) {
                email = null;
             }
         }
@@ -75,7 +69,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
         Authority authority = Authority.builder()
-                .authority("ROLE_USER")
+                .authority(AuthorityStatus.ROLE_USER.getCode())
                 .member(member)
                 .build();
 
@@ -105,12 +99,9 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.existsByUsername(username) || ownerRepository.existsByUsername(username, AccountStatus.DELETED);
     }
 
-
-
     @Override
     public MemberInfoResponseDto findMyInfo(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
 
         return new MemberInfoResponseDto(
                 member.getId(),
@@ -160,43 +151,6 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    // 아이디 찾기, 비번 재설정
-    // 아이디 찾기
-    @Override
-    public Optional<String> findIdByNameAndEmail(String name, String email) {
-        // Member 테이블에서 검색
-        Optional<String> memberUsername = memberRepository.findByNameAndEmail(name, email)
-                .map(Member::getUsername);
-        if (memberUsername.isPresent()) return memberUsername;
-
-        //  Member에 없으면 Owner 테이블에서 검색, 상태가 ACTIVE인 계정만 가져오기
-        return ownerRepository.findByNameAndEmailAndStatus(name, email, AccountStatus.ACTIVE)
-                .map(Owner::getUsername);
-    }
-
-    // 비번 재설정
-    @Override
-    public boolean existsByUsernameAndEmail(String username, String email) {
-        return memberRepository.existsByUsernameAndEmail(username, email) ||
-                ownerRepository.existsByUsernameAndEmailAndStatus(username, email, AccountStatus.ACTIVE);
-    }
-
-    @Transactional
-    @Override
-    public void updatePassword(String username, String newPassword) {
-        // Member에서 찾기
-        Optional<Member> member = memberRepository.findByUsername(username);
-        if (member.isPresent()) {
-            member.get().setPassword(passwordEncoder.encode(newPassword));
-            return;
-        }
-
-        // Member에 없으면 Owner에서 찾기
-        Owner owner = ownerRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        owner.setPassword(passwordEncoder.encode(newPassword));
-    }
-
     // Delete member
     @Override
     @Transactional
@@ -240,5 +194,42 @@ public class MemberServiceImpl implements MemberService {
         // 최종 삭제
         memberRepository.delete(member);
         return true;
+    }
+
+    // 아이디 찾기, 비번 재설정
+    // 아이디 찾기
+    @Override
+    public Optional<String> findIdByNameAndEmail(String name, String email) {
+        // Member 테이블에서 검색
+        Optional<String> memberUsername = memberRepository.findByNameAndEmail(name, email)
+                .map(Member::getUsername);
+        if (memberUsername.isPresent()) return memberUsername;
+
+        //  Member에 없으면 Owner 테이블에서 검색, 상태가 ACTIVE인 계정만 가져오기
+        return ownerRepository.findByNameAndEmailAndStatus(name, email, AccountStatus.ACTIVE)
+                .map(Owner::getUsername);
+    }
+
+    // 비번 재설정
+    @Override
+    public boolean existsByUsernameAndEmail(String username, String email) {
+        return memberRepository.existsByUsernameAndEmail(username, email) ||
+                ownerRepository.existsByUsernameAndEmailAndStatus(username, email, AccountStatus.ACTIVE);
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(String username, String newPassword) {
+        // Member에서 찾기
+        Optional<Member> member = memberRepository.findByUsername(username);
+        if (member.isPresent()) {
+            member.get().setPassword(passwordEncoder.encode(newPassword));
+            return;
+        }
+
+        // Member에 없으면 Owner에서 찾기
+        Owner owner = ownerRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        owner.setPassword(passwordEncoder.encode(newPassword));
     }
 }

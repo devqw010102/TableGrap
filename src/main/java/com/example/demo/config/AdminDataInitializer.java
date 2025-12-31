@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.repository.MemberRepository;
@@ -20,7 +21,6 @@ public class AdminDataInitializer implements CommandLineRunner {
     // 두 개의 리포지토리가 필요합니다.
     private final MemberRepository memberRepository;
     private final AuthorityRepository authorityRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     @Value("${admin.username}")
@@ -60,7 +60,7 @@ public class AdminDataInitializer implements CommandLineRunner {
             // ---------------------------------------------------
             Authority adminAuthority = Authority.builder()
                     .member(savedAdmin)      // 방금 저장한 관리자 객체 연결 (FK 설정)
-                    .authority("ROLE_ADMIN") // ★ 원하시는 "ROLE_ADMIN" 문자열 입력
+                    .authority(AuthorityStatus.ROLE_ADMIN.getCode()) // ★ 원하시는 "ROLE_ADMIN" 문자열 입력
                     .build();
 
             authorityRepository.save(adminAuthority);

@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.model.Diner;
-import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.OwnerService;
 import com.example.demo.service.impl.OwnerServiceImpl;

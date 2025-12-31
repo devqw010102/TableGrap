@@ -27,12 +27,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DinerExcelServiceImpl implements DinerExcelService {
+
     private final DinerRepository dinerRepository;
     private final GeocodingService geocodingService;
     private final NaverApiService naverApiService;
 
     //getCellValue 메소드 정의
-    private String getCellValue(Cell cell) {
+    @Override
+    public String getCellValue(Cell cell) {
         if (cell == null) return "";
         switch (cell.getCellType()) {
             case STRING:
@@ -160,7 +162,8 @@ public class DinerExcelServiceImpl implements DinerExcelService {
     }
 
     //카테고리 재분류
-    private String refineCategory(String category, String dinerName) {
+    @Override
+    public String refineCategory(String category, String dinerName) {
         if (category == null) category = "";
         if (dinerName == null) dinerName = "";
 
@@ -217,7 +220,8 @@ public class DinerExcelServiceImpl implements DinerExcelService {
     // ──────────────────────────────────────────────
     // [핵심] 2차 분류: 네이버 API 결과를 내 카테고리로 매핑
     // ──────────────────────────────────────────────
-    private String mapNaverCategory(String naverCat) {
+    @Override
+    public String mapNaverCategory(String naverCat) {
         if (naverCat == null) return "기타";
 
         if (naverCat.contains("카페") || naverCat.contains("디저트") || naverCat.contains("베이커리")) return "카페/디저트";
@@ -232,6 +236,8 @@ public class DinerExcelServiceImpl implements DinerExcelService {
 
         return "기타";
     }
+
+    @Override
     public boolean containsKeyword(String target, String... keywords) {
       for (String k : keywords) {
         if (target.contains(k)) return true;

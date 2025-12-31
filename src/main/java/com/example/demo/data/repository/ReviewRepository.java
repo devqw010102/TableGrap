@@ -79,11 +79,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Owner 의 식당들 리뷰 전체
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerReviewDto(
-            r.reviewId, 
-            m.username, 
-            d.dinerName, 
-            r.rating, 
-            r.comment, 
+            r.reviewId,
+            m.username,
+            d.dinerName,
+            r.rating,
+            r.comment,
             r.createTime
         )
         from Review r

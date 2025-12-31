@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,6 @@ public class BookServiceImpl implements BookService {
     private final ReviewRepository reviewRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final DinerAvailabilityRepository availabilityRepository;
-    private ChronoLocalDateTime<?> limit;
 
     @Override
     public List<BookResponseDto> findMyBooks(Long memberId) {

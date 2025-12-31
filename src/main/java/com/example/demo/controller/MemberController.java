@@ -86,7 +86,6 @@ public class MemberController {
             @AuthenticationPrincipal MemberUserDetails userDetails,
             @RequestBody MemberUpdateDto memberUpdateDto) {
         memberService.updateMember(userDetails.getMember().getId(), memberUpdateDto);
-
     }
 
     // 아이디 찾기
