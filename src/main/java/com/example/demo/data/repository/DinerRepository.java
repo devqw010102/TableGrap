@@ -1,5 +1,6 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.dto.DinerDto;
 import com.example.demo.data.dto.owner.OwnerDinerDto;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
@@ -19,7 +20,8 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
 
 
     Optional<Diner> findById(Long id);
-    //Optional<Diner> findById(Long id, DinerStatus status);
+    //식당 수정 모달에 사용
+    Optional<Diner> findByIdAndStatusNot(Long id, DinerStatus status);
 
     //공백을 제거하고 식당이름 가져오기
     @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName AND d.status <> :status")

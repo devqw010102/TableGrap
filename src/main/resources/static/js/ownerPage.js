@@ -493,7 +493,7 @@ async function loadDinerInfoTab() {
         const url = "/api/owner/diners";
         try {
             const dinerData = await fetchJson(url);
-
+            tbody.innerHTML = '';
             dinerData.forEach(d => {
                 //식당 영업 상태에 따라 표시 내용 변경
                 let badge;
@@ -502,7 +502,6 @@ async function loadDinerInfoTab() {
                 } else if(d.status === "CLOSED"){
                     badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
                 }
-                tbody.innerHTML = '';
                 tbody.innerHTML += `
                 <tr>
                     <td>${d.id}</td>
@@ -538,9 +537,12 @@ async function loadDinerInfoTab() {
             tbody.innerHTML = `
             <tr>
                 <td>${dinerData.id}</td>
-                <td>${dinerData.dinerName}</td>
+                <td><a href="#" style="text-decoration: none;"
+                    data-bs-toggle="modal"
+                    onclick="openDinerDetailModal(${dinerData.id}, '${dinerData.tel ? dinerData.tel : ''}')">
+                ${dinerData.dinerName}</td>
                 <td>${badge}</td>
-                <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${d.id})">상태 변경</button></td>
+                <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${dinerData.id})">상태 변경</button></td>
                 <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
             </tr>`
         } catch (e) {
@@ -550,9 +552,17 @@ async function loadDinerInfoTab() {
     }
 }
 
-function openDinerDetailModal(id, currentTel) {
+async function openDinerDetailModal(id, currentTel) {
     document.getElementById("dinerTel").value = currentTel;
-
+    try {
+        const url = `/api/owner/get/${id}`;
+        const res = await fetchJson(url);
+        document.getElementById("dinerTel").value = res.tel? res.tel : "";
+        document.getElementById("limitReservationCnt").value = res.defaultMaxCapacity;
+     } catch (e) {
+        console.error(e.status, e.message);
+        alert("식당 정보를 불러오는데 실패 했습니다.");
+     }
     //수정 버튼에 클릭 이벤트 핸들러 등록
     const editBtn = document.getElementById("editDiner");
     editBtn.onclick = function() {
