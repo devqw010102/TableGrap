@@ -18,8 +18,8 @@ import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @RestController
 @RequestMapping("/api/owner")
@@ -66,7 +66,21 @@ public class OwnerRegController {
                 Optional<Diner> dinerOptional = dinerService.findByDinerNameBiz(apiCompanyName);
                 if (dinerOptional.isPresent()) {
                     // 성공 시: Diner 객체 반환
-                    return ResponseEntity.ok(dinerOptional.get());
+                    Diner diner = dinerOptional.get();
+
+                    // [추가된 로직] 이미 주인이 있는 식당인지 확인
+                    if (diner.getOwner() != null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body("이미 소유주가 등록된 식당입니다. (" + apiCompanyName + ")");
+                    }
+
+                    // [핵심 수정] 엔티티(Diner) 대신 필요한 데이터만 담은 Map 반환
+                    // 순환 참조 방지 및 데이터 경량화
+                    Map<String, Object> responseData = new HashMap<>();
+                    responseData.put("id", diner.getId());
+                    responseData.put("dinerName", diner.getDinerName());
+
+                    return ResponseEntity.ok(responseData);
                 } else {
                     // 실패 시: 문자열 메시지 반환
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)

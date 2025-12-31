@@ -1,0 +1,46 @@
+/* 메인 배너 스타일 */
+.hero-section {
+  background-color: #f8f9fa;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* 카테고리 카드 스타일 */
+.category-card {
+  border: 1px solid #dee2e6;
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background-color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none; /* 링크 밑줄 제거 */
+  color: #212529;
+}
+
+/* 마우스 호버 효과 */
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  border-color: #ffc107; /* 강조 색상 */
+  color: #212529;
+}
+
+/* 아이콘 스타일 */
+.category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ff9800; /* 아이콘 색상 */
+}
+
+.category-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}

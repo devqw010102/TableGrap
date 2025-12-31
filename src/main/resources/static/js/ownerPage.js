@@ -782,7 +782,7 @@ async function fetchBizNum(bizNum) {
             }
         } else {
             const error = await res.text();
-            alert("사업자 정보 조회에 실패했습니다." + error);
+            alert(error);
             // 사업자 번호 입력창 초기화
             setLoadingState(bizNumBtn, false);
             document.getElementById("ownerDinerName").value = "";

@@ -124,19 +124,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("businessNumBtn").disabled = true;
                     document.getElementById("businessNumBtn").innerText = "조회완료";
                     alert("사업자 번호가 조회되었습니다");
-
                     return;
-
                 } else {
                     throw new Error("식당 데이터가 올바르지 않습니다.");
                 }
             } else {
+                isBusinessNumberValid = false;
                 const error = await res.text();
-                alert("사업자 정보 조회에 실패했습니다." + error);
-
-                // 사업자 번호 입력창 초기화
-                // document.getElementById("ownerDinerName").value = "";
-                // isBusinessNumberValid = false;
+                alert(error);
             }
         } catch(err){
             console.error("사업자 정보 조회 오류:", err);
