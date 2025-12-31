@@ -165,10 +165,10 @@ function loadBooks() {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
                 // 예약 취소 | 후기 작성 버튼 변환
-                //const date = new Date();
+                const date = new Date();
 
                 //테스트용 시간 설정 (미래) -> 예약 대기 상태에서는 버튼 출력x
-                const date = new Date("2026-01-01");
+                //const date = new Date("2026-01-01");
                 //테스트용 시간 설정 (과거)
                 //const date = new Date("2025-01-01");
                 //const now = new Date();
@@ -321,7 +321,6 @@ function deleteMember() {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
                 // location.reload();
-                location.href="/";
                 location.href="/";
             } else {
                 const errorMsg = await res.text();

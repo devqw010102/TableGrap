@@ -496,7 +496,7 @@ async function loadDinerInfoTab() {
                         onclick="openDinerDetailModal(${d.id}, '${d.tel ? d.tel : ''}')">
                         ${d.dinerName}</a></td>
                     <td>${badge}</td>
-                    <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${d.id})">상태 변경</button></td>
+                    <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${d.id})">상태 변경</button></td>
                     <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
                 </tr>`
             })
@@ -525,7 +525,7 @@ async function loadDinerInfoTab() {
                 <td>${dinerData.id}</td>
                 <td>${dinerData.dinerName}</td>
                 <td>${badge}</td>
-                <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
+                <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${d.id})">상태 변경</button></td>
                 <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
             </tr>`
         } catch (e) {
@@ -640,14 +640,16 @@ async function deleteDiner(dinerId){
         alert("식당이 영업 중인 상태입니다. \n 식당을 삭제하시려면 영업 종료 상태여야 합니다.")
         return;
     }
-    const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
+    // const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
+    const answer = confirm("⚠️ 주의: 삭제 시 복구가 불가능하며, 재등록은 고객센터를 통해서만 가능합니다. 삭제하시겠습니까?")
     if(answer) {
         const url = `/api/owner/delete/diner/${dinerId}`;
         try {
             const res = await fetch(url, {method: "DELETE"});
             if(res.ok){
                 alert("식당이 삭제되었습니다.");
-                window.location.reload();
+                // window.location.reload();
+                location.reload();
             } else {
                 const errMsg = await res.text();
                 alert("식당을 삭제하는 데 실패했습니다." + errMsg);
@@ -787,7 +789,8 @@ async function addDiner() {
             body: JSON.stringify(dinerData) // 객체를 문자열로 변환하여 전송
         });
         alert("식당 추가가 완료되었습니다.");
-        window.location.reload(); // 페이지 새로고침하여 목록 갱신
+        // window.location.reload(); // 페이지 새로고침하여 목록 갱신
+        location.reload();
     } catch (e) {
         console.error(e);
         alert(`식당 추가 실패\n상태코드: ${e.status}\n메시지: ${e.message}`);

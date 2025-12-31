@@ -60,8 +60,10 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     );
 
     boolean existsByMember_IdAndBookingDate(Long memberId, LocalDateTime bookingDate);
+
     // Notification
     List<Book> findByDinerId(Long dinerId);
+
     //식당 삭제전 해당 식당의 예약 존재 확인
     boolean existsByDiner_IdAndBookingDateAfter(Long dinerId, LocalDateTime now);
 
@@ -86,4 +88,22 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     @Modifying
     @Query("UPDATE Book b SET b.member.id= :dummyId WHERE b.member.id = :memberId")
     void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
+
+    @Query("""
+        SELECT COUNT(b) > 0 
+            FROM Book b
+                WHERE b.member.id = :memberId
+                    AND b.bookingDate > :start
+                        AND b.bookingDate < :end
+                            AND (:excludeBookId IS NULL OR b.bookId <> :excludeBookId)
+    """)
+
+    boolean existsConflictBooking(
+            @Param("memberId") Long memberId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("excludeBookId") Long excludeBookId
+
+    );
+
 }
