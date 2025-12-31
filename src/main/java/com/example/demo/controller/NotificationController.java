@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.model.Notification;
 import com.example.demo.data.repository.NotificationRepository;
 import com.example.demo.service.impl.notification.NotificationManager;
@@ -27,9 +28,10 @@ public class NotificationController {
     //권한에 따른 분기 구분
     @GetMapping("/{id}")
     public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long id, @RequestParam String role) {
-       List <Notification> lists;
+
+        List <Notification> lists;
         if("ROLE_OWNER".equals(role)) {
-          lists = notificationRepository.findByOwnerIdOrderByCreatedAtDesc(id);
+            lists = notificationRepository.findByOwnerIdOrderByCreatedAtDesc(id);
         } else {
             lists = notificationRepository.findByMemberIdOrderByCreatedAtDesc(id);
         }
@@ -41,11 +43,11 @@ public class NotificationController {
                                                  @RequestParam(required = false) Long ownerId, @RequestParam String role) {
         Notification notification = notificationRepository.findById(id).orElseThrow();
         boolean isAuthorized=false;
-        if("ROLE_OWNER".equals(role)) {
+        if(AuthorityStatus.ROLE_OWNER.getCode().equals(role)) {
             //owner면 owner db와 구분
             isAuthorized = notification.getOwnerId() != null && notification.getOwnerId().equals(ownerId);
         } else {
-            //user면 memeber db와 구분
+            //user면 member db와 구분
             isAuthorized = notification.getMemberId() != null && notification.getMemberId().equals(memberId);
         }
         if (!isAuthorized || !notification.getRole().equals(role)) {

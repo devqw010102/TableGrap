@@ -5,6 +5,7 @@ import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 import com.example.demo.data.enums.AccountStatus;
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Authority;
 import com.example.demo.data.model.Owner;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 
 public class OwnerServiceImpl implements OwnerService {
+
   private final OwnerRepository ownerRepository;
   private final MemberRepository memberRepository;
   private final PasswordEncoder passwordEncoder;
@@ -51,7 +53,7 @@ public class OwnerServiceImpl implements OwnerService {
     ownerRepository.save(owner);
 
     Authority authority = Authority.builder()
-            .authority("ROLE_OWNER")
+            .authority(AuthorityStatus.ROLE_OWNER.getCode())
             .owner(owner)
             .build();
     authorityRepository.save(authority);
@@ -62,16 +64,16 @@ public class OwnerServiceImpl implements OwnerService {
     //공백 제외하고 식당이름 조회
     dinerRepository.findByDinerNameIgnoreSpaceStatusNot(strippedDinerName, DinerStatus.DELETED)
             .ifPresentOrElse(diner -> {
-              //이미 식당 주인이 있는 경우 예외 처리
-              if(diner.getOwner() != null) {
+                //이미 식당 주인이 있는 경우 예외 처리
+                if(diner.getOwner() != null) {
                 throw new IllegalArgumentException("이미 소유자가 있는 식당입니다");
-              }
-              diner.setBusinessNum(ownerDto.getBusinessNum());
-              diner.setOwner(owner);
+                }
+                diner.setBusinessNum(ownerDto.getBusinessNum());
+                diner.setOwner(owner);
                 diner.setStatus(DinerStatus.valueOf("PUBLIC"));
             }, () -> {
               // 식당이 존재하지 않을 경우 예외 처리
-              throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
+                throw new IllegalArgumentException(dinerName + "해당 식당이 존재하지 않습니다 ");
             });
 
     eventPublisher.publishEvent(new RegisterEvent(
@@ -109,10 +111,6 @@ public class OwnerServiceImpl implements OwnerService {
   public void updateOwner(Long ownerId, OwnerUpdateDto dto) {
     Owner owner = ownerRepository.findByIdAndStatus(ownerId, AccountStatus.ACTIVE)
             .orElseThrow(() -> new IllegalArgumentException("해당하는 오너가 없습니다."));
-    System.out.println("=== UPDATE REQUEST ===");
-    System.out.println("Email: " + dto.getEmail());
-    System.out.println("Phone: " + dto.getPhone());
-    System.out.println("Password: " + dto.getPassword());
 
     if(dto.getEmail() != null && !dto.getEmail().isBlank()) {
       owner.setEmail(dto.getEmail());
@@ -135,15 +133,6 @@ public class OwnerServiceImpl implements OwnerService {
     mapToOwnerDto(owner);
   }
 
-
-  //Owner 계정 삭제
-  /*public void deleteOwnerById(Long id) {
-    if (!dinerRepository.findByOwnerId(id).isEmpty()) {
-      throw new IllegalStateException("식당이 존재하는 경우 탈퇴할 수 없습니다.");
-    } else {
-      ownerRepository.deleteById(id);
-    }
-  } */
   @Override
   @Transactional
   public boolean deleteOwner(Long ownerId, String checkPassword) {
@@ -170,6 +159,11 @@ public class OwnerServiceImpl implements OwnerService {
     owner.setPhone("000-0000-0000"); // 전화번호 초기화
     owner.setPassword(""); // 비밀번호 삭제 (혹은 임의의 값으로 변경)
     owner.setStatus(AccountStatus.DELETED);
+
+    Authority authority = authorityRepository.findByOwner(owner).getFirst();
+    authority.setAuthority(AuthorityStatus.ROLE_DELETED.getCode());
+    authorityRepository.save(authority);
+
     return true;
   }
 

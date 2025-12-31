@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
-//Spring Boot 3.x 이상에서는 tools.jackson.databind.JsonNode 사용
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 

@@ -2,8 +2,9 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
+import com.example.demo.data.enums.AccountStatus;
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.enums.DinerStatus;
-import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.AdminService;
 import jakarta.transaction.Transactional;
@@ -28,7 +29,6 @@ public class AdminServiceImpl implements AdminService {
     private final BookRepository bookRepository;
     private final AuthorityRepository authorityRepository;
     private final ReviewRepository reviewRepository;
-    private final OwnerRequestRepository ownerRequestRepository;
     private final OwnerRepository ownerRepository;
 
     public Page<AdminDinerDto> getList(Pageable pageable) {
@@ -43,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public Page<AdminOwnerDto> getOwners(Pageable pageable) {
-        return dinerRepository.findOwnerDiners(pageable, DinerStatus.DELETED).map(AdminOwnerDto::from);
+        return dinerRepository.findOwnerDiners(pageable, DinerStatus.DELETED, AuthorityStatus.ROLE_USER.name()).map(AdminOwnerDto::from);
     }
 
     @Override
@@ -65,9 +65,9 @@ public class AdminServiceImpl implements AdminService {
 
         long dinerCount = dinerRepository.countAllDiners();
         long bookingCount = bookRepository.countTodayBookings(start, end);
-        long memberCount = memberRepository.countMembersExceptAdmin() + ownerRepository.countOwnersExceptAdmin();
+        long memberCount = memberRepository.countMembersExceptAdmin(AuthorityStatus.ROLE_ADMIN.name()) + ownerRepository.countOwnersExceptAdminAndDeleted(AuthorityStatus.ROLE_ADMIN.name(), AuthorityStatus.ROLE_DELETED.name());
 
-        Map<String, Long> roleMap = authorityRepository.countByRoleForDashboard()
+        Map<String, Long> roleMap = authorityRepository.countByRoleForDashboard(AuthorityStatus.ROLE_ADMIN.name(), AccountStatus.DELETED.name())
                 .stream()
                 .collect(Collectors.toMap(
                         o -> (String) o[0],
@@ -78,8 +78,8 @@ public class AdminServiceImpl implements AdminService {
                 dinerCount,
                 bookingCount,
                 memberCount,
-                roleMap.getOrDefault("ROLE_OWNER", 0L),
-                roleMap.getOrDefault("ROLE_USER", 0L),
+                roleMap.getOrDefault(AuthorityStatus.ROLE_OWNER.name(), 0L),
+                roleMap.getOrDefault(AuthorityStatus.ROLE_USER.name(), 0L),
                 reviewRepository.findTodayReviews(start, end, PageRequest.of(0, 5))
         );
     }
