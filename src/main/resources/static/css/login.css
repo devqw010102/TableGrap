@@ -1,0 +1,88 @@
+/* TableGrap 브랜드 컬러 변수 */
+:root {
+    --main-orange: #FF7E00;
+    --main-amber: #FFB300;
+    --sub-light-orange: #FFBE7F;
+    --sub-deep-orange: #FF6539;
+    --sub-green: #72D1A0;
+}
+/*
+body {
+    background-color: #fcfcfc;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
+*/
+
+/* 메인 페이지의 hero-section 스타일을 그대로 적용 */
+.login-banner {
+    background: linear-gradient(190deg, var(--main-orange), var(--main-amber));
+    color: white;
+    padding: 3rem 0 6rem 0; /* 아래쪽 패딩을 늘려 카드가 겹칠 공간 확보 */
+    margin-bottom: 0;
+    text-align: center;
+}
+
+/* 로그인 카드 레이아웃 */
+.login-wrapper {
+    margin-top: -4rem; /* 배너 영역 위로 카드가 올라오게 배치 */
+    margin-bottom: 5rem;
+}
+
+.login-card {
+    border: 1px solid #dee2e6;
+    border-radius: 15px; /* 카테고리 카드와 동일한 곡률 */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    background-color: white;
+}
+
+.login-title {
+    color: var(--main-orange);
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+/* 입력창 및 포커스 스타일 */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: var(--main-amber);
+    box-shadow: 0 0 0 0.25rem rgba(255, 179, 0, 0.15);
+}
+
+/* 로그인 버튼 - sub-deep-orange (#FF6539) */
+.btn-login-submit {
+    background-color: var(--sub-deep-orange);
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-login-submit:hover {
+    background-color: #e55a32;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 101, 57, 0.3);
+}
+
+/* 하단 링크 스타일 */
+.link-register {
+    color: var(--sub-green) !important;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.find-info-links a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.find-info-links a:hover {
+    color: var(--main-orange);
+}
