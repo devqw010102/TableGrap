@@ -156,4 +156,12 @@ public class DinerServiceImpl implements DinerService {
         diner.setTel(dto.getTel());
         diner.setDefaultMaxCapacity(dto.getDefaultMaxCapacity());
     }
+    // 식당 수정 모달에 정보 가져오기
+    public DinerDto getDinerInfo(Long dinerId) {
+       Diner diner = dinerRepository.findByIdAndStatusNot(dinerId, DinerStatus.DELETED).orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+       return DinerDto.builder()
+               .tel(diner.getTel())
+               .defaultMaxCapacity(diner.getDefaultMaxCapacity())
+               .build();
+    }
 }
