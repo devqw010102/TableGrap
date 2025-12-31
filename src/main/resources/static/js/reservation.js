@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // DOM 요소
     const el = {
+        calendarHeader: document.getElementById("calendarHeader"),
         calendarDays: document.querySelector("#calendar-days"),
         currentYearMonth: document.querySelector("#currentYearMonth"),
         amSlots: document.getElementById("amSlotsContainer"),
@@ -114,13 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const limitDate = new Date();
             limitDate.setMonth(limitDate.getMonth() + 1);
 
+            el.calendarHeader.innerHTML = config.DAY_NAMES
+                .map(day => `<div class="calendar-header-day">${day}</div>`)
+                .join("");
+
             let html = "";
             for (let i = firstDay; i > 0; i--) html += `<div class="day inactive"></div>`;
 
             for (let i = 1; i <= lastDate; i++) {
                 const dateObj = new Date(state.currYear, state.currMonth, i);
+                const dayOfWeek = dateObj.getDay();
                 const dateStr = `${state.currYear}-${String(state.currMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 let classes = "day";
+                if(dayOfWeek == 0) classes += " sunday";
+                if(dayOfWeek == 6) classes += " saturday";
 
                 if (dateObj < today) {
                     classes += " inactive out-of-range";
