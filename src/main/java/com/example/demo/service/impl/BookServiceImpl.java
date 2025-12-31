@@ -148,8 +148,6 @@ public class BookServiceImpl implements BookService {
         // 예약 삭제
         bookRepository.deleteById(bookId);
         OwnerServiceImpl.CancelManager.allowedBookingIds.remove(bookId);
-        OwnerServiceImpl.CancelManager.allowedBookingIds.remove(bookId);
-
         // 알람 이벤트
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatterDate = book.getBookingDate().format(dtf);
