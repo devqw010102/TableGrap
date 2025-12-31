@@ -1,18 +1,3 @@
-/* TableGrap 브랜드 컬러 변수 */
-:root {
-    --main-orange: #FF7E00;
-    --main-amber: #FFB300;
-    --sub-light-orange: #FFBE7F;
-    --sub-deep-orange: #FF6539;
-    --sub-green: #72D1A0;
-}
-/*
-body {
-    background-color: #fcfcfc;
-    font-family: 'Pretendard', -apple-system, sans-serif;
-}
-*/
-
 /* 메인 페이지의 hero-section 스타일을 그대로 적용 */
 .login-banner {
     background: linear-gradient(190deg, var(--main-orange), var(--main-amber));
