@@ -20,10 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -183,5 +180,9 @@ public class OwnerServiceImpl implements OwnerService {
   public OwnerDto mapToOwnerDto(Owner owner) {
     // 식당 이름이 필요 없으므로 빈 리스트를 넘겨서 위의 기존 메서드를 재사용
     return mapToOwnerDto(owner, Collections.emptyList());
+  }
+
+    public static class CancelManager {
+        public static final Set<Long> allowedBookingIds = Collections.synchronizedSet(new HashSet<>());
   }
 }

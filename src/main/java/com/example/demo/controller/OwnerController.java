@@ -121,6 +121,17 @@ public class OwnerController {
         }
     }
 
+    //식당 정보 수정 모달에 정보 가져오기
+    @GetMapping("/get/{dinerId}")
+    public ResponseEntity<DinerDto> getDinerInfo(@PathVariable Long dinerId) {
+        try{
+            DinerDto dto = dinerService.getDinerInfo(dinerId);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     //식당 정보 수정
     @PatchMapping("/update/{dinerId}")
     public ResponseEntity<String> updateOwner(@PathVariable Long dinerId, @RequestBody DinerDto dto, @AuthenticationPrincipal OwnerUserDetails userDetails) {

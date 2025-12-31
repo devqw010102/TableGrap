@@ -196,6 +196,7 @@ function renderApprovedTable(data) {
             <td>${formatDate(b.bookingDate)}</td>
             <td>${b.personnel}</td>
             <td>${b.memberName}</td>
+            <td><button class="btn btn-outline-warning btn-sm" onclick="allowUserCancel(${b.bookId})">취소 허용</button></td>
         </tr>
     `).join("");
 }
@@ -247,6 +248,20 @@ function renderEmptyRow(tbody, col, msg) {
         </tr>
     `;
 }
+
+async function allowUserCancel(bookId) {
+    if(!confirm("사용자가 직접 취소할 수 있도록 허용하시겠습니까?")) return;
+
+    try{
+        await fetchJson(`/api/owner/${bookId}/allow-cancel`,
+            {method: "PATCH"});
+        alert("해당 사용자의 취소 제한이 해제되었습니다.");
+        loadBookings({ pending: false, page: currentPage});
+    } catch(e) {
+        alter("처리에 실패했습니다.")
+    }
+}
+
 // 날짜 출력 스타일
 function formatDate(dt) {
     return dt.replace("T", " ").substring(0, 16);
@@ -478,7 +493,7 @@ async function loadDinerInfoTab() {
         const url = "/api/owner/diners";
         try {
             const dinerData = await fetchJson(url);
-
+            tbody.innerHTML = '';
             dinerData.forEach(d => {
                 //식당 영업 상태에 따라 표시 내용 변경
                 let badge;
@@ -487,7 +502,6 @@ async function loadDinerInfoTab() {
                 } else if(d.status === "CLOSED"){
                     badge = `<span class="badge bg-danger fs-6">영업 종료</span>`;
                 }
-                tbody.innerHTML = '';
                 tbody.innerHTML += `
                 <tr>
                     <td>${d.id}</td>
@@ -496,7 +510,7 @@ async function loadDinerInfoTab() {
                         onclick="openDinerDetailModal(${d.id}, '${d.tel ? d.tel : ''}')">
                         ${d.dinerName}</a></td>
                     <td>${badge}</td>
-                    <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${d.id})">상태 변경</button></td>
+                    <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${d.id})">상태 변경</button></td>
                     <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
                 </tr>`
             })
@@ -523,9 +537,12 @@ async function loadDinerInfoTab() {
             tbody.innerHTML = `
             <tr>
                 <td>${dinerData.id}</td>
-                <td>${dinerData.dinerName}</td>
+                <td><a href="#" style="text-decoration: none;"
+                    data-bs-toggle="modal"
+                    onclick="openDinerDetailModal(${dinerData.id}, '${dinerData.tel ? dinerData.tel : ''}')">
+                ${dinerData.dinerName}</td>
                 <td>${badge}</td>
-                <td><button class = "btn btn-info btn-sm" onclick="changeStatus(${dinerData.id})">상태 변경</button></td>
+                <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${dinerData.id})">상태 변경</button></td>
                 <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
             </tr>`
         } catch (e) {
@@ -535,9 +552,17 @@ async function loadDinerInfoTab() {
     }
 }
 
-function openDinerDetailModal(id, currentTel) {
+async function openDinerDetailModal(id, currentTel) {
     document.getElementById("dinerTel").value = currentTel;
-
+    try {
+        const url = `/api/owner/get/${id}`;
+        const res = await fetchJson(url);
+        document.getElementById("dinerTel").value = res.tel? res.tel : "";
+        document.getElementById("limitReservationCnt").value = res.defaultMaxCapacity;
+     } catch (e) {
+        console.error(e.status, e.message);
+        alert("식당 정보를 불러오는데 실패 했습니다.");
+     }
     //수정 버튼에 클릭 이벤트 핸들러 등록
     const editBtn = document.getElementById("editDiner");
     editBtn.onclick = function() {
@@ -640,14 +665,16 @@ async function deleteDiner(dinerId){
         alert("식당이 영업 중인 상태입니다. \n 식당을 삭제하시려면 영업 종료 상태여야 합니다.")
         return;
     }
-    const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
+    // const answer = confirm("삭제하면 복구할 수 없으며 다시 예약을 원하시면 식당을 재등록 하셔야 합니다. 그대로 삭제하시겠습니까?")
+    const answer = confirm("⚠️ 주의: 삭제 시 복구가 불가능하며, 재등록은 고객센터를 통해서만 가능합니다. 삭제하시겠습니까?")
     if(answer) {
         const url = `/api/owner/delete/diner/${dinerId}`;
         try {
             const res = await fetch(url, {method: "DELETE"});
             if(res.ok){
                 alert("식당이 삭제되었습니다.");
-                window.location.reload();
+                // window.location.reload();
+                location.reload();
             } else {
                 const errMsg = await res.text();
                 alert("식당을 삭제하는 데 실패했습니다." + errMsg);
@@ -787,7 +814,8 @@ async function addDiner() {
             body: JSON.stringify(dinerData) // 객체를 문자열로 변환하여 전송
         });
         alert("식당 추가가 완료되었습니다.");
-        window.location.reload(); // 페이지 새로고침하여 목록 갱신
+        // window.location.reload(); // 페이지 새로고침하여 목록 갱신
+        location.reload();
     } catch (e) {
         console.error(e);
         alert(`식당 추가 실패\n상태코드: ${e.status}\n메시지: ${e.message}`);

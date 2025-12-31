@@ -19,6 +19,9 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
 
     Optional<Diner> findById(Long id);
 
+    //식당 수정 모달에 사용
+    Optional<Diner> findByIdAndStatusNot(Long id, DinerStatus status);
+
     //공백을 제거하고 식당이름 가져오기
     @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName AND d.status <> :status")
     Optional<Diner> findByDinerNameIgnoreSpaceStatusNot(@Param("dinerName") String dinerName, @Param("status") DinerStatus status);

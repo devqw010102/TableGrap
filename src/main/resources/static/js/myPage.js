@@ -165,18 +165,20 @@ function loadBooks() {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
                 // 예약 취소 | 후기 작성 버튼 변환
-                //const date = new Date();
+                const date = new Date();
 
                 //테스트용 시간 설정 (미래) -> 예약 대기 상태에서는 버튼 출력x
-                const date = new Date("2026-01-01");
+                //const date = new Date("2026-01-01");
                 //테스트용 시간 설정 (과거)
                 //const date = new Date("2025-01-01");
                 //const now = new Date();
 
                 const bookDate = new Date(book.bookingDate);
                 const isPast = date > bookDate;
-
                 const timeDiff = date - bookDate; //현재 시간과 예약
+
+                const canCancel = (timeDiff <= 0) || (book.cancelAllowed === true);
+
                 //버튼 변경 로직
                 const changeBtn =
                     (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
@@ -190,7 +192,8 @@ function loadBooks() {
                     data-diner-id="${book.dinerId}"
                     >후기 작성</button>`
                             // 예약 일자 경과 전
-                            : (timeDiff <= 0 && (book.success || !book.success))
+                            //: (timeDiff <= 0 && (book.success || !book.success))
+                            : (canCancel && (book.success || !book.success))
                                 ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
                                 : "";
 
@@ -322,7 +325,6 @@ function deleteMember() {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
                 // location.reload();
                 location.href="/";
-                location.href="/";
             } else {
                 const errorMsg = await res.text();
                 alert(errorMsg || "오류가 발생했습니다.");
@@ -339,11 +341,12 @@ function cancelBooking(bookId) {
     if (!confirm("정말로 예약을 취소하시겠습니까?")) return;
 
     fetch(`/api/myPage/book/delete/${bookId}`, { method: 'DELETE' })
-        .then(res => {
+        .then(async res => {
             if (res.ok) {
                 alert("예약이 취소되었습니다.");
                 loadBooks(); // 목록 갱신
             } else {
+                const errorMsg = await res.text();
                 alert("예약 24시간 전 취소 불가합니다, 가게로 연락 부탁드립니다.");
             }
         })

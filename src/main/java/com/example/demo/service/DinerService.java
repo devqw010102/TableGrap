@@ -37,4 +37,6 @@ public interface DinerService {
 
     //식당 정보 변경
     void updateDinerInfo(DinerDto dto, Long dinerId, Long ownerId);
+    //식당 수정에 활용
+    DinerDto getDinerInfo(Long dinerId);
 }

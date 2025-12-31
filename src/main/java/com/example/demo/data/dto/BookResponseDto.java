@@ -21,4 +21,9 @@ public class BookResponseDto {
     private Boolean success;
     //후기 수정 구현위해 dto에 reviewId추가, 화면 출력만을 위해 필요하므로 entity에 추가x
     private Long reviewId;
+
+    public boolean cancelAllowed;
+    public void setCancelAllowed(boolean cancelAllowed) {
+        this.cancelAllowed = cancelAllowed;
+    }
 }
