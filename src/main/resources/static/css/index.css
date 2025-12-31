@@ -1,10 +1,10 @@
 /* 메인 배너 스타일 */
 .hero-section {
-  background-color: #f8f9fa;
+  background: linear-gradient(190deg, #FF7E00, #FFB300);
+  color: white;
   padding: 3rem 0;
   margin-bottom: 2rem;
   text-align: center;
-  border-bottom: 1px solid #e9ecef;
 }
 
 /* 카테고리 카드 스타일 */

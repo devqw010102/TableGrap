@@ -34,6 +34,8 @@ public class DinerServiceImpl implements DinerService {
         return DinerListDto.builder()
                 .id(diner.getId())
                 .dinerName(diner.getDinerName())
+                .location(diner.getLocation())
+                .status(diner.getStatus())
                 .category(diner.getCategory())
                 .build();
     }

@@ -1,0 +1,97 @@
+.list-header {
+    background: linear-gradient(158deg, #FF7E00 , #FFB300);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* 카드 리스트 스타일 */
+.diner-card {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.diner-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border-color: #ffc107;
+    color: inherit;
+    z-index: 1;
+}
+
+/* 썸네일 아이콘 영역 */
+.diner-icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: #fff3cd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.diner-icon-box i {
+    font-size: 1.5rem;
+    color: #ff9800;
+}
+
+/* 텍스트 정보 영역 */
+.diner-info {
+    flex-grow: 1;
+}
+
+.diner-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #212529;
+}
+
+.diner-addr {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.diner-addr i {
+    margin-right: 4px;
+    color: #adb5bd;
+}
+
+/* 상태 뱃지 및 화살표 */
+.diner-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 1rem;
+}
+
+.status-badge {
+    font-size: 0.8rem;
+    padding: 0.35em 0.65em;
+    border-radius: 50rem;
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.arrow-icon {
+    color: #dee2e6;
+    font-size: 1.2rem;
+}
+
+.diner-card:hover .arrow-icon {
+    color: #ff9800;
+}
