@@ -138,8 +138,11 @@ public class DinerServiceImpl implements DinerService {
         Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
         if(diner.getStatus().equals(DinerStatus.PUBLIC)) {
+            // 식당 수용인원 0명으로 만들어서 예약 불가능하게
+            diner.setDefaultMaxCapacity(0);
             diner.setStatus(DinerStatus.CLOSED);
         } else if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            diner.setDefaultMaxCapacity(10);
             diner.setStatus(DinerStatus.PUBLIC);
         }
     }
@@ -160,5 +163,10 @@ public class DinerServiceImpl implements DinerService {
                .tel(diner.getTel())
                .defaultMaxCapacity(diner.getDefaultMaxCapacity())
                .build();
+    }
+
+    @Override
+    public Optional<Diner> findById(Long id) {
+        return dinerRepository.findById(id);
     }
 }

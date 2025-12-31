@@ -76,6 +76,7 @@ async function loadNotifications() {
                 // USER 케이스 (유저에게도 버튼을 보여줌)
                 case 'RESERVATION_APPROVE':
                 case 'RESERVATION_REJECT':
+                case 'RESERVATION_CANCEL_REQUEST':
                     targetUrl = '/mypage';
                     buttonText = '예약확인';
                     break;

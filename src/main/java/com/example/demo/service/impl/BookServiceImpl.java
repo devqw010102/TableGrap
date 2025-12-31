@@ -5,6 +5,7 @@ import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.SlotResponseDto;
 import com.example.demo.data.dto.notification.*;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.*;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.BookService;
@@ -83,7 +84,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
         checkDuplicateBooking(book.getMember().getId(), dto.getBookingDate(), dto.getBookId());
-
+        
         // 슬롯
         // 1. 기존 슬롯 복구
         availabilityRepository.findByDinerIdAndDateAndTime(book.getDiner().getId(), book.getBookingDate().toLocalDate(), book.getBookingDate().toLocalTime())
@@ -169,6 +170,11 @@ public class BookServiceImpl implements BookService {
 
         Diner diner = dinerRepository.findById(dto.getDinerId())
                 .orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
+
+        // Status 가 Closed, 사장이 식당을 삭제했을 때
+        if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            throw new IllegalStateException("식당 사정으로 예약할 수 없습니다.");
+        }
 
         // 시간대별 최대 인원 제한을 위해 구현
         LocalDate date = dto.getBookingDate().toLocalDate();

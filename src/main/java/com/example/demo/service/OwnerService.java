@@ -18,4 +18,6 @@ public interface OwnerService {
   void updateOwner(Long id, OwnerUpdateDto ownerUpdateDto);
 
   boolean deleteOwner(Long ownerId, String checkPassword);
+
+  void notificationUser(Long bookId);
 }
