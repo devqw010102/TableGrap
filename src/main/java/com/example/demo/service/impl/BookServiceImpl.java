@@ -84,6 +84,8 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(dto.getBookId())
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
+        checkDuplicateBooking(book.getMember().getId(), dto.getBookingDate(), dto.getBookId());
+
         // 슬롯
         // 1. 기존 슬롯 복구
         availabilityRepository.findByDinerIdAndDateAndTime(book.getDiner().getId(), book.getBookingDate().toLocalDate(), book.getBookingDate().toLocalTime())
@@ -158,6 +160,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void createBooking(BookDto dto) {
+        checkDuplicateBooking(dto.getMemberId(), dto.getBookingDate(), null);
         boolean exists = bookRepository.existsByMember_IdAndBookingDate(dto.getMemberId(), dto.getBookingDate());
         if (exists) {
             throw new IllegalArgumentException("날짜를 확인해주세요. 해당 날짜에 이미 예약이 존재합니다.");
@@ -300,5 +303,17 @@ public class BookServiceImpl implements BookService {
                     canBook
             );
         }).collect(Collectors.toList());
+    }
+
+    private void checkDuplicateBooking(Long memberId, LocalDateTime requestedTime, Long currentBookId) {
+
+        LocalDateTime start = requestedTime.minusMinutes(60);
+        LocalDateTime end = requestedTime.plusMinutes(60);
+
+        boolean hasConflict = bookRepository.existsConflictBooking(memberId, start, end, currentBookId);
+
+        if (hasConflict) {
+            throw new IllegalArgumentException("이미 1시간 이내에 다른 예약이 존재합니다.");
+        }
     }
 }
