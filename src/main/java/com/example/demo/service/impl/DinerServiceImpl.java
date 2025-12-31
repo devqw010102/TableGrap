@@ -65,7 +65,7 @@ public class DinerServiceImpl implements DinerService {
     @Override
     //Pagination활용하기 위해 Page타입으로 변경
     public Page<DinerListDto> getListByCat(Pageable pageable, String category){
-        return dinerRepository.findByCategoryAndStatusNot(pageable, category, DinerStatus.DELETED).map(this::mapToDinerListDto);
+        return dinerRepository.findByCategoryAndStatusNotAndOwnerNotNull(pageable, category, DinerStatus.DELETED).map(this::mapToDinerListDto);
     }
 
     @Override
