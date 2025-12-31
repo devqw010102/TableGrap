@@ -196,6 +196,7 @@ function renderApprovedTable(data) {
             <td>${formatDate(b.bookingDate)}</td>
             <td>${b.personnel}</td>
             <td>${b.memberName}</td>
+            <td><button class="btn btn-outline-warning btn-sm" onclick="allowUserCancel(${b.bookId})">취소 허용</button></td>
         </tr>
     `).join("");
 }
@@ -247,6 +248,20 @@ function renderEmptyRow(tbody, col, msg) {
         </tr>
     `;
 }
+
+async function allowUserCancel(bookId) {
+    if(!confirm("사용자가 직접 취소할 수 있도록 허용하시겠습니까?")) return;
+
+    try{
+        await fetchJson(`/api/owner/${bookId}/allow-cancel`,
+            {method: "PATCH"});
+        alert("해당 사용자의 취소 제한이 해제되었습니다.");
+        loadBookings({ pending: false, page: currentPage});
+    } catch(e) {
+        alter("처리에 실패했습니다.")
+    }
+}
+
 // 날짜 출력 스타일
 function formatDate(dt) {
     return dt.replace("T", " ").substring(0, 16);
