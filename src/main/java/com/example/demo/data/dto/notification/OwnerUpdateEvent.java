@@ -5,5 +5,5 @@ package com.example.demo.data.dto.notification;
  */
 
 
-public record OwnerUpdateEvent(Long memberId, String name) {
+public record OwnerUpdateEvent(Long ownerId, String name) {
 }

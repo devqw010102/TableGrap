@@ -67,9 +67,7 @@ async function loadNotifications() {
                 // OWNER 케이스
                 case 'RESERVATION_CREATE':
                 case 'RESERVATION_UPDATE':
-                    targetUrl = '/ownerPage';
-                    buttonText = '사장페이지로';
-                    break;
+                case 'RESERVATION_CANCEL':
                 case 'REVIEW_WRITE':
                     targetUrl = '/ownerPage';
                     buttonText = '사장페이지로';
@@ -77,7 +75,6 @@ async function loadNotifications() {
 
                 // USER 케이스 (유저에게도 버튼을 보여줌)
                 case 'RESERVATION_APPROVE':
-                case 'RESERVATION_CANCEL':
                 case 'RESERVATION_REJECT':
                     targetUrl = '/mypage';
                     buttonText = '예약확인';
@@ -124,7 +121,13 @@ async function markAsRead(id, element) {
     if (element.classList.contains('read')) return;
 
     try {
-        const url = `/api/notifications/${id}/read?memberId=${currentMemberId}&role=${currentUserRole}`;
+        //currentUserRole을 문자열로 인식하게 함 <- IDE가 html의 요소나 jquery 객체로 인식하기 때문
+        const roleStr = String(currentUserRole);
+        //권한에 따라 owner, member 분기
+        //왜 markAsRead만 분기를 나누는가 -> 다른 메소드들은 UserRole에 따라서 owner와 member를 구분함
+        //markAsRead는 url에 쿼리파라미터로 memberId 또는 ownerId를 직접 보내기 때문
+        const idParamName = (roleStr === 'ROLE_OWNER') ? 'ownerId' : 'memberId';
+        const url = `/api/notifications/${id}/read?${idParamName}=${currentMemberId}&role=${currentUserRole}`;
         const response = await fetch(url, { method: 'PATCH' });
 
         if(response.ok) {

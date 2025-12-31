@@ -52,7 +52,7 @@ public class NotificationListener {
     // 리뷰 작성 시
     public void handleReviewWrite(ReviewWriteEvent event) {
         String msg = String.format("[%s] 새로운 리뷰가 작성되었습니다.", event.dinerName());
-        sendAndSave("ROLE_OWNER", event.memberId(), msg, NotificationType.REVIEW_WRITE);
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg, NotificationType.REVIEW_WRITE);
     }
 
     @Async
@@ -77,7 +77,7 @@ public class NotificationListener {
     // 회원 수정 시(사장)
     public void handleOwnerUpdate(OwnerUpdateEvent event) {
         String msg = String.format("[%s] 정보가 수정되었습니다.", event.name());
-        sendAndSave("ROLE_OWNER", event.memberId(), msg, NotificationType.NONE);
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg, NotificationType.NONE);
     }
 
     @Async
@@ -93,13 +93,16 @@ public class NotificationListener {
     // 예약 수정 시
     public void handleReservationUpdate(ReservationUpdateEvent event) {
         String msg = String.format("[%s] %s 예약이 수정되었습니다.", event.dinerName(), event.reservationTime());
-        sendAndSave("ROLE_OWNER", event.memberId(), msg, NotificationType.RESERVATION_UPDATE);
+        sendAndSave("ROLE_OWNER", event.ownerId(), msg, NotificationType.RESERVATION_UPDATE);
     }
 
     // Notification Entity Save + Send
     private void sendAndSave(String role, Long receiveId, String message, NotificationType type) {
+        boolean isOwner = "ROLE_OWNER".equals(role);
+
         Notification notification = Notification.builder()
-                .memberId(receiveId)
+                .memberId(isOwner ? null : receiveId)
+                .ownerId(isOwner ? receiveId : null)
                 .role(role)
                 .message(message)
                 .isRead(false)

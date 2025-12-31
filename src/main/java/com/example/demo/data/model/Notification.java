@@ -18,6 +18,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long memberId;
+    private Long ownerId;
     private String message;
     private String role;
     @Builder.Default
