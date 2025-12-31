@@ -43,7 +43,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     @Override
     public Page<AdminOwnerDto> getOwners(Pageable pageable) {
-        return dinerRepository.findOwnerDiners(pageable, DinerStatus.DELETED, AuthorityStatus.ROLE_USER.name()).map(AdminOwnerDto::from);
+        return dinerRepository.findOwnerDiners(pageable, DinerStatus.DELETED, AuthorityStatus.ROLE_OWNER.name()).map(AdminOwnerDto::from);
     }
 
     @Override
