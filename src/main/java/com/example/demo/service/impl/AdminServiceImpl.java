@@ -65,7 +65,11 @@ public class AdminServiceImpl implements AdminService {
 
         long dinerCount = dinerRepository.countAllDiners();
         long bookingCount = bookRepository.countTodayBookings(start, end);
+
         long memberCount = memberRepository.countMembersExceptAdmin(AuthorityStatus.ROLE_ADMIN.name()) + ownerRepository.countOwnersExceptAdminAndDeleted(AuthorityStatus.ROLE_ADMIN.name(), AuthorityStatus.ROLE_DELETED.name());
+        if(memberRepository.existsByUsername("unknown_user")) {
+            memberCount -= 1;
+        }
 
         Map<String, Long> roleMap = authorityRepository.countByRoleForDashboard(AuthorityStatus.ROLE_ADMIN.name(), AccountStatus.DELETED.name())
                 .stream()
