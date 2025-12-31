@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
-
-    Page<Diner> findByCategoryAndStatusNot(Pageable pageable, String category, DinerStatus status);
+    //사장이 등록되지 않은 식당은 제외
+    Page<Diner> findByCategoryAndStatusNotAndOwnerNotNull(Pageable pageable, String category, DinerStatus status);
 
     Optional<Diner> findById(Long id);
 
