@@ -111,6 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const lastDate = new Date(state.currYear, state.currMonth + 1, 0).getDate();
             const today = new Date(); today.setHours(0,0,0,0);
 
+            const limitDate = new Date();
+            limitDate.setMonth(limitDate.getMonth() + 1);
+
             let html = "";
             for (let i = firstDay; i > 0; i--) html += `<div class="day inactive"></div>`;
 
@@ -119,7 +122,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dateStr = `${state.currYear}-${String(state.currMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 let classes = "day";
 
-                if (dateObj < today) classes += " inactive out-of-range";
+                if (dateObj < today) {
+                    classes += " inactive out-of-range";
+                } else if (dateObj > limitDate){
+                    classes += " future-disabled";
+                }
                 if (state.selectedDate === dateStr) classes += " selected";
                 if (dateObj.getTime() === today.getTime()) classes += " today";
 
@@ -278,6 +285,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dayEl = e.target.closest(".day:not(.inactive)");
                 if (!dayEl) return;
 
+                if(dayEl.classList.contains("future-disabled")) {
+                    alert("원활한 예약 관리를 위해, 오늘부터 한 달 이내의 일정만 예약하실 수 있습니다. 양해 부탁드립니다.")
+                    return;
+                }
+
                 state.selectedDate = dayEl.dataset.date;
                 const d = new Date(state.selectedDate);
                 state.displayDate = `${state.selectedDate.replace(/-/g, '.')} (${config.DAY_NAMES[d.getDay()]})`;
@@ -309,6 +321,15 @@ document.addEventListener("DOMContentLoaded", () => {
             // 최종 예약 버튼
             el.btnBook.onclick = async () => {
                 if (!state.selectedDate || !state.selectedTime) return alert("날짜와 시간을 선택해주세요.");
+
+                const selectedDateObj = new Date(state.selectedDate);
+                const limitDate = new Date();
+                limitDate.setMonth(limitDate.getMonth() + 1);
+
+                if(selectedDateObj > limitDate) {
+                    alert("죄송합니다. 예약은 현재 날짜로부터 한 달 후까지만 가능합니다.");
+                    return;
+                }
                 if (!confirm(state.isModifyMode ? "수정하시겠습니까?" : "예약하시겠습니까?")) return;
 
                 const formData = new FormData(el.bookingForm);
