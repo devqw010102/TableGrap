@@ -177,6 +177,12 @@ function loadBooks() {
                 const isPast = date > bookDate;
                 const timeDiff = date - bookDate; //현재 시간과 예약
 
+                const oneDayInMs = 24 * 60 * 60 * 1000;
+                // 예약까지 남은시간
+                const timeLeft = bookDate - date;
+                // 클릭 차단 조건
+                const isLinkBlocked = timeDiff >= 0 || timeLeft <= oneDayInMs;
+
                 const canCancel = (timeDiff <= 0) || (book.cancelAllowed === true);
 
                 //버튼 변경 로직
@@ -197,10 +203,13 @@ function loadBooks() {
                                 ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
                                 : "";
 
-                //예약 시간이 경과한 후 예약 수정 페이지 진입 차단
-                const changeUrl =
-                    (timeDiff >= 0 && book.success) ? `${book.dinerName}`
-                        : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`
+                //예약 시간이 경과한 후 예약 수정 페이지 진입 차단 + 예약 하루 전 수정 불가능
+                const changeUrl = (isLinkBlocked && book.success)
+                    ? `<a href="javascript:void(0);"
+                          onclick="alert('예약 24시간 전부터는 수정이 불가능합니다. 식당으로 직접 문의해주세요.');"
+                          class="text-secondary text-decoration-none"
+                          style="cursor: not-allowed;">${book.dinerName}</a>`
+                    : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`;
 
                 const rowHtml = `
                     <tr>
@@ -549,4 +558,17 @@ function renderEmptyRow(tbody, colSpan, message) {
                 ${message}
             </td>
         </tr>
-    `}
+    `
+}
+
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'closed') {
+        alert("해당 식당은 현재 예약 서비스를 일시 중단하였습니다. 관련 문의는 식당으로 직접 연락 부탁드립니다.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    if (urlParams.get('error') === 'dinerIdNull') {
+        alert("식당 정보를 불러올 수 없습니다.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}

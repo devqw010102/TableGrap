@@ -92,6 +92,14 @@ public class NotificationListener {
         sendAndSave(AuthorityStatus.ROLE_OWNER.getCode(), event.ownerId(), msg, NotificationType.RESERVATION_UPDATE);
     }
 
+    @Async
+    @EventListener
+    // 예약 취소 요청 시
+    public void handleReservationCancelRequest(ReservationCancelRequestEvent event) {
+        String msg = String.format("[%s] %s 식당 사정으로 예약 취소 요청이 왔습니다.", event.dinerName(), event.reservationTime());
+        sendAndSave(AuthorityStatus.ROLE_USER.getCode(), event.memberId(), msg, NotificationType.RESERVATION_CANCEL_REQUEST);
+    }
+
     // Notification Entity Save + Send
     private void sendAndSave(String role, Long receiveId, String message, NotificationType type) {
         boolean isOwner = AuthorityStatus.ROLE_OWNER.getCode().equals(role);

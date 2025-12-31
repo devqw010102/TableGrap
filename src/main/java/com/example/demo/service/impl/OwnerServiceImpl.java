@@ -2,17 +2,16 @@ package com.example.demo.service.impl;
 
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
+import com.example.demo.data.dto.notification.ReservationCancelRequestEvent;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 import com.example.demo.data.enums.AccountStatus;
 import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Authority;
+import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Owner;
-import com.example.demo.data.repository.AuthorityRepository;
-import com.example.demo.data.repository.DinerRepository;
-import com.example.demo.data.repository.MemberRepository;
-import com.example.demo.data.repository.OwnerRepository;
+import com.example.demo.data.repository.*;
 import com.example.demo.service.OwnerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -32,6 +32,7 @@ public class OwnerServiceImpl implements OwnerService {
   private final PasswordEncoder passwordEncoder;
   private final AuthorityRepository authorityRepository;
   private final DinerRepository dinerRepository;
+  private final BookRepository bookRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   @Override
@@ -174,6 +175,19 @@ public class OwnerServiceImpl implements OwnerService {
             .phone(owner.getPhone())
             .dinerNames(dinerNames)
             .build();
+  }
+
+  @Override
+  public void notificationUser(Long bookId) {
+    Optional<Book> bookOp = bookRepository.findById(bookId);
+    bookOp.ifPresent(book -> {
+      // 이벤트 보내기
+      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+      String formatterDate = book.getBookingDate().format(dtf);
+
+      eventPublisher.publishEvent(new ReservationCancelRequestEvent(book.getMember().getId(), book.getDiner().getDinerName(), formatterDate));
+    });
+
   }
 
   // 중복 확인이나 단순 조회용 (Owner 객체만 있을 때)

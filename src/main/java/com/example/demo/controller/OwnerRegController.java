@@ -139,6 +139,9 @@ public class OwnerRegController {
     public ResponseEntity<String> allowCancel(@PathVariable Long bookId) {
         // static Set에 ID 추가
         OwnerServiceImpl.CancelManager.allowedBookingIds.add(bookId);
+
+        // 알람 보내기
+        ownerService.notificationUser(bookId);
         return ResponseEntity.ok("일시적으로 취소 권한이 부여되었습니다.");
     }
 }

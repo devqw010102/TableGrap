@@ -4,8 +4,6 @@ import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.SlotResponseDto;
-import com.example.demo.data.model.Book;
-import com.example.demo.data.repository.BookRepository;
 import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.MemberService;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +24,6 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
-    private final BookRepository bookRepository;
 
     @GetMapping("/books")
     public List<BookResponseDto> myBooks(@AuthenticationPrincipal MemberUserDetails userDetails) {
@@ -70,8 +66,7 @@ public class BookController {
             bookService.createBooking(dto);
             return ResponseEntity.ok("예약 완료되었습니다.");
         }
-        } catch (IllegalArgumentException e) {
-
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("예약 처리 중 서버 오류가 발생했습니다.");
