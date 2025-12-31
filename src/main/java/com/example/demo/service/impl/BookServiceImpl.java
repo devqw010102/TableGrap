@@ -126,13 +126,16 @@ public class BookServiceImpl implements BookService {
     // cancel booking
     @Override
     public void deleteBooking(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("예약 정보를 찾을 수 없습니다."));
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime bookingDate = book.getBookingDate();
         LocalDateTime limit = bookingDate.minusHours(24);
 
-        if(Boolean.TRUE.equals(book.getSuccess()) && now.isAfter(limit)) {
+        boolean isAllowedByOwner = OwnerServiceImpl.CancelManager.allowedBookingIds.contains(bookId);
+
+        if(Boolean.TRUE.equals(book.getSuccess()) && now.isAfter(limit) && !isAllowedByOwner) {
             throw new RuntimeException("이미 확정된 예약은 방문 24시간 이내에 취소할 수 없습니다, 가게로 연락 부탁드립니다.");
         }
 
@@ -144,7 +147,7 @@ public class BookServiceImpl implements BookService {
 
         // 예약 삭제
         bookRepository.deleteById(bookId);
-
+        OwnerServiceImpl.CancelManager.allowedBookingIds.remove(bookId);
         // 알람 이벤트
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatterDate = book.getBookingDate().format(dtf);

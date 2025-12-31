@@ -5,6 +5,7 @@ import com.example.demo.data.model.Diner;
 import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
 import com.example.demo.service.OwnerService;
+import com.example.demo.service.impl.OwnerServiceImpl;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,8 @@ public class OwnerRegController {
                 + "&type=json"
                 + "&pagecnt=1";
         /* 도저히 감이 안잡혀서 GeoCodingService랑 GEMINI를 참고해서 작성함
-        * 다른 방법으로 json을 받는 dto를 만드는 방법이 있는데 단순히 db와 식당명과 일치하기 위해 사용하기 때문에
-        * objectMapper를 사용함*/
+         * 다른 방법으로 json을 받는 dto를 만드는 방법이 있는데 단순히 db와 식당명과 일치하기 위해 사용하기 때문에
+         * objectMapper를 사용함*/
         try {
             // 스프링 서버가 Bizno에 대신 요청
             String responseBody = restClient.get()
@@ -75,7 +76,7 @@ public class OwnerRegController {
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사업자 번호로 조회된 정보가 없습니다.");
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().body("조회 중 오류 발생: " + e.getMessage());
         }
@@ -86,7 +87,7 @@ public class OwnerRegController {
     @PostMapping("/register")
     @Transactional
     public ResponseEntity<?> register(@Valid @RequestBody OwnerDto ownerDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(","));
@@ -118,5 +119,13 @@ public class OwnerRegController {
     @GetMapping("/check-username")
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
         return ResponseEntity.ok(ownerService.existsByUsername(username));
+    }
+
+    // owner cancel allowed
+    @PatchMapping("/{bookId}/allow-cancel")
+    public ResponseEntity<String> allowCancel(@PathVariable Long bookId) {
+        // static Set에 ID 추가
+        OwnerServiceImpl.CancelManager.allowedBookingIds.add(bookId);
+        return ResponseEntity.ok("일시적으로 취소 권한이 부여되었습니다.");
     }
 }

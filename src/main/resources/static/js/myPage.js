@@ -175,8 +175,10 @@ function loadBooks() {
 
                 const bookDate = new Date(book.bookingDate);
                 const isPast = date > bookDate;
-
                 const timeDiff = date - bookDate; //현재 시간과 예약
+
+                const canCancel = (timeDiff <= 0) || (book.cancelAllowed === true);
+
                 //버튼 변경 로직
                 const changeBtn =
                     (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
@@ -190,7 +192,8 @@ function loadBooks() {
                     data-diner-id="${book.dinerId}"
                     >후기 작성</button>`
                             // 예약 일자 경과 전
-                            : (timeDiff <= 0 && (book.success || !book.success))
+                            //: (timeDiff <= 0 && (book.success || !book.success))
+                            : (canCancel && (book.success || !book.success))
                                 ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
                                 : "";
 
@@ -338,11 +341,12 @@ function cancelBooking(bookId) {
     if (!confirm("정말로 예약을 취소하시겠습니까?")) return;
 
     fetch(`/api/myPage/book/delete/${bookId}`, { method: 'DELETE' })
-        .then(res => {
+        .then(async res => {
             if (res.ok) {
                 alert("예약이 취소되었습니다.");
                 loadBooks(); // 목록 갱신
             } else {
+                const errorMsg = await res.text();
                 alert("예약 24시간 전 취소 불가합니다, 가게로 연락 부탁드립니다.");
             }
         })

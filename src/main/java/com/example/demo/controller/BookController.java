@@ -4,9 +4,12 @@ import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.SlotResponseDto;
+import com.example.demo.data.model.Book;
+import com.example.demo.data.repository.BookRepository;
 import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.BookService;
 import com.example.demo.service.MemberService;
+import com.example.demo.service.impl.OwnerServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +27,20 @@ public class BookController {
 
     private final BookService bookService;
     private final MemberService memberService;
+    private final BookRepository bookRepository;
 
     @GetMapping("/books")
     public List<BookResponseDto> myBooks(@AuthenticationPrincipal MemberUserDetails userDetails) {
         Long memberId = userDetails.getMember().getId();
-        return bookService.findMyBooks(memberId);
+        List<BookResponseDto> myBooks = bookService.findMyBooks(memberId);
+
+        //  DTO에 메모리(Set)에 있는 취소 허용
+        myBooks.forEach(dto -> {
+            boolean isAllowed = OwnerServiceImpl.CancelManager.allowedBookingIds.contains(dto.getBookId());
+            dto.setCancelAllowed(isAllowed);
+        });
+
+        return myBooks;
     }
 
     @GetMapping("/info")
