@@ -1,0 +1,242 @@
+/* TableGrap 브랜드 컬러 변수 */
+:root {
+    --main-orange: #FF7E00;
+    --main-amber: #FFB300;
+    --sub-light-orange: #FFBE7F;
+    --sub-deep-orange: #FF6539;
+    --sub-green: #72D1A0;
+
+    /* 고급스러운 그레이톤 변수 추가 */
+    --bg-light-grey: #F8F9FA;
+    --bg-middle-grey: #E9ECEF;
+    --text-dark: #343A40;
+    --text-muted: #6C757D;
+    --border-color: #DEE2E6;
+    --sidebar-dark: #2D3436;
+}
+
+/* 1. 기본 레이아웃 및 배경 */
+body {
+    background-color: var(--bg-light-grey);
+    color: var(--text-dark);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    line-height: 1.6;
+}
+
+h1, h2, h3 {
+    color: var(--sidebar-dark);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+    margin-top: 2rem;
+}
+
+/* 2. 탭 (Nav Tabs) 디자인 */
+.nav-tabs {
+    border-bottom: 2px solid var(--bg-middle-grey);
+    gap: 5px;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    border-radius: 8px 8px 0 0;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: var(--bg-middle-grey);
+    color: var(--main-orange);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    color: var(--main-orange);
+    border-bottom: 3px solid var(--main-orange);
+    font-weight: 700;
+}
+
+/* 3. 테이블 디자인 */
+.table {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background-color: #495057; /* 다크 그레이 헤더 */
+    color: #fff;
+    font-weight: 500;
+    text-align: center; /* 헤더는 언제나 가운데 정렬 */
+    border: none;
+    padding: 15px;
+}
+
+/* [기본 설정] 모든 테이블 본문은 가운데 정렬 (예약 목록, 식당 관리 등) */
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+/* [예외 설정] '내 정보 수정' 폼 내부의 테이블만 왼쪽 정렬 유지 */
+#myInfoEditForm .table td {
+    text-align: left;
+}
+
+/* 비밀번호 가림 처리(●●)와 입력 필드 내부 텍스트 왼쪽 정렬 유지 */
+#pwdViewRow,
+.table tbody td input {
+    text-align: left !important;
+    padding-left: 10px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 126, 0, 0.03); /* 마우스 호버 시 연한 오렌지빛 */
+}
+
+/* 4. 버튼 디자인 */
+.btn-primary {
+    background-color: var(--main-orange);
+    border-color: var(--main-orange);
+}
+
+.btn-primary:hover {
+    background-color: var(--sub-deep-orange);
+    border-color: var(--sub-deep-orange);
+}
+
+.btn-success {
+    background-color: var(--sub-green);
+    border-color: var(--sub-green);
+}
+
+.btn-info {
+    background-color: var(--main-amber);
+    border-color: var(--main-amber);
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #FF4757;
+    border-color: #FF4757;
+}
+
+.btn-sm {
+    border-radius: 6px;
+    padding: 5px 12px;
+}
+
+/* 5. 대시보드 카드 (Admin전용) */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+}
+
+.card.shadow-sm:hover {
+    transform: translateY(-5px);
+}
+
+#dashboardDinerCount, #dashboardTodayBooking, #dashboardMemberCount {
+    color: var(--main-orange);
+    font-weight: 800;
+    font-size: 2rem;
+}
+
+.list-group-item span {
+    color: var(--main-orange);
+    font-weight: bold;
+}
+
+/* 6. 폼 및 입력창 (MyPage / Info용) */
+.form-control:focus {
+    border-color: var(--main-orange);
+    box-shadow: 0 0 0 0.25rem rgba(255, 126, 0, 0.25);
+}
+
+.bg-light.text-center {
+    background-color: var(--bg-middle-grey) !important;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* 7. 모달 디자인 */
+.modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    background-color: var(--bg-light-grey);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* 8. 페이지네이션 */
+.pagination .page-link {
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--main-orange);
+    border-color: var(--main-orange);
+    color: #fff;
+}
+
+/* 9. 기타 유틸리티 */
+.text-warning {
+    color: var(--main-amber) !important;
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* 내 정보 수정 모드 가독성 강화 */
+input.form-control-plaintext {
+    font-weight: 600;
+    color: var(--sidebar-dark);
+    padding-left: 10px;
+}
+
+/* 식당 선택 셀렉박스 */
+#dinerSelect {
+    max-width: 300px;
+    border: 2px solid var(--bg-middle-grey);
+    border-radius: 10px;
+}
+
+/* 식당추가 버튼만 브랜드 키 컬러(Orange)로 변경 */
+#addDiner {
+    background-color: var(--main-orange) !important;
+    border-color: var(--main-orange) !important;
+    color: #fff !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* 마우스 올렸을 때 효과 (약간 더 짙은 오렌지) */
+#addDiner:hover {
+    background-color: var(--sub-deep-orange) !important;
+    border-color: var(--sub-deep-orange) !important;
+    transform: scale(1.05); /* 버튼이 살짝 커지는 효과 */
+}
