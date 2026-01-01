@@ -49,27 +49,29 @@
 
 /* 가입 유형 선택 버튼 */
 .owner-reg {
-  background-color: var(--sub-deep-orange);
-  border-color: #FF9E3F;
-  font-weight: bold;
+    background-color: var(--sub-deep-orange);
+    color: #fff;
+    border-color: #FF9E3F;
+    font-weight: bold;
 }
 
 .owner-reg:hover {
-  color: var(--sub-deep-orange);
-  background-color: #fff;
-  border-color: var(--sub-light-orange);
+    color: var(--sub-deep-orange);
+    background-color: #fff;
+    border-color: var(--sub-light-orange);
 }
 
 .user-reg {
-  background-color: var(--sub-green);
-  border-color: var(--sub-green);
-  font-weight: bold;
+    background-color: var(--sub-green);
+    color: #fff;
+    border-color: var(--sub-green);
+    font-weight: bold;
 }
 
 .user-reg:hover {
-  color: var(--sub-green);
-  background-color: #fff;
-  border-color: var(--sub-green);
+    color: var(--sub-green);
+    background-color: #fff;
+    border-color: var(--sub-green);
 }
 
 
@@ -99,30 +101,32 @@
     box-shadow: 0 0 0 0.25rem rgba(255, 179, 0, 0.15);
 }
 .owner-reg-btn {
-  background-color: var(--sub-deep-orange);
-  border-color: #FF9E3F;
-  font-weight: bold;
+    background-color: var(--sub-deep-orange);
+    color: #fff;
+    border-color: #FF9E3F;
+    font-weight: bold;
 }
 .owner-reg-btn:hover {
-  color: var(--sub-deep-orange);
-  background-color: #fff;
-  border-color: #FFBE7F;
+    color: var(--sub-deep-orange);
+    background-color: #fff;
+    border-color: #FFBE7F;
 }
 .findBizBtn{
-  background-color: var(--sub-deep-orange);
-  border-color: #FF9E3F;
-  font-weight: bold;
+    background-color: var(--sub-deep-orange);
+    color: #fff;
+    border-color: #FF9E3F;
+    font-weight: bold;
 }
 .findBizBtn:hover {
-  color: var(--sub-deep-orange);
-  background-color: #fff;
-  border-color: #FFBE7F;
+    color: var(--sub-deep-orange);
+    background-color: #fff;
+    border-color: #FFBE7F;
 }
 
 /* ================= user 회원가입 =======================*/
 .user-hero-section {
     background: linear-gradient(192deg, var(--sub-light-orange), var(--sub-green));
-    color: white;
+    color: #fff;
     padding: 4rem 0 6rem 0; /* 상단 여백 확보 */
     text-align: center;
     position: relative;
@@ -140,6 +144,7 @@
 
 .btn-user-reg{
     background-color: var(--sub-green);
+    color: #fff;
     border-color: var(--sub-green);
     font-weight: bold;
 }
