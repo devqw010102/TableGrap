@@ -1,8 +1,9 @@
+/*=================== reg-choice =====================*/
 /* --- 배너 (Hero Section) 스타일 --- */
 .hero-section {
-    background: linear-gradient(135deg, #FF7E00, #FFB300);
+    background: linear-gradient(135deg, var(--main-orange), var(--main-amber));
     color: white;
-    padding: 4rem 0 3rem 0; /* 상단 여백 확보 */
+    padding: 4rem 0 6rem 0; /* 상단 여백 확보 */
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -31,6 +32,10 @@
     z-index: 1;
 }
 
+.reg-choice-wrapper{
+    margin-top: -6rem;
+}
+
 /* --- 카드 및 버튼 스타일 --- */
 .card {
     border: none;
@@ -39,7 +44,7 @@
 }
 
 .fa-user-plus{
-    font-size: 64px;
+    font-size: 48px;
 }
 
 /* 가입 유형 선택 버튼 */
@@ -50,24 +55,37 @@
 }
 
 .owner-reg:hover {
-  color: #FF9E3F;
+  color: var(--sub-deep-orange);
   background-color: #fff;
-  border-color: #FFBE7F;
+  border-color: var(--sub-light-orange);
 }
 
 .user-reg {
-  background-color: #72D1A0;
-  border-color: #72D1A0;
+  background-color: var(--sub-green);
+  border-color: var(--sub-green);
   font-weight: bold;
 }
 
 .user-reg:hover {
-  color: #72D1A0;
+  color: var(--sub-green);
   background-color: #fff;
-  border-color: #72D1A0;
+  border-color: var(--sub-green);
 }
 
-/* owner 회원가입 */
+
+/*================== owner 회원가입 =================*/
+.owner-hero-section {
+    background: linear-gradient(135deg, var(--main-orange), var(--sub-deep-orange));
+    color: white;
+    padding: 4rem 0 6rem 0; /* 상단 여백 확보 */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem; /* 카드와의 간격 */
+}
+.owner-reg-wrapper{
+    margin-top: -6rem !important;
+}
 .owner-title{
     color: var(--sub-deep-orange);
     font-weight: bold;
@@ -101,7 +119,20 @@
   border-color: #FFBE7F;
 }
 
-/* user 회원가입 */
+/* ================= user 회원가입 =======================*/
+.user-hero-section {
+    background: linear-gradient(192deg, var(--sub-light-orange), var(--sub-green));
+    color: white;
+    padding: 4rem 0 6rem 0; /* 상단 여백 확보 */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3rem; /* 카드와의 간격 */
+}
+
+.user-reg-wrapper{
+    margin-top: -6rem !important;
+}
 .user-title{
     color: var(--sub-green);
     font-weight: bold;
@@ -127,4 +158,3 @@
     border-color: var(--sub-green);
     box-shadow: 0 0 0 0.25rem rgba(255, 179, 0, 0.15);
 }
-/* 일반 회원가입 */
