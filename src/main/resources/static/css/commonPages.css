@@ -240,3 +240,71 @@ input.form-control-plaintext {
     border-color: var(--sub-deep-orange) !important;
     transform: scale(1.05); /* 버튼이 살짝 커지는 효과 */
 }
+
+/* 10. 데이터(식당) 추가 탭 전용 스타일 */
+
+/* 컨테이너를 카드 형태로 변형 */
+#create .container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+    /* 전체 너비 설정 */
+    max-width: 100%;      /* 너비 제한 해제 */
+    width: 100%;          /* 가로로 꽉 채움 */
+    margin-left: 0;
+}
+
+/* 제목 및 설명 강조 */
+#create h2 {
+    color: var(--sidebar-dark);
+    margin-bottom: 8px;
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+}
+
+#create .text-muted {
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+    display: block;
+}
+
+/* 업로드 폼 영역 스타일링 */
+#excelUploadForm {
+    max-width: 100%;
+    background-color: var(--bg-light-grey);
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px dashed var(--border-color); /* 점선 테두리로 업로드 영역 강조 */
+    transition: all 0.3s ease;
+}
+
+#excelUploadForm:hover {
+    border-color: var(--main-orange); /* 마우스 올리면 오렌지색으로 변경 */
+    background-color: #fff;
+}
+
+/* 라벨 디자인 */
+#excelUploadForm .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+}
+
+/* 파일 선택 인풋창 */
+#excelUploadForm .form-control {
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+}
+
+/* 업로드 버튼 강조 */
+#excelUploadForm .btn-primary {
+    width: 100%; /* 버튼을 가로로 꽉 채움 */
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 15px;
+    box-shadow: 0 4px 6px rgba(255, 126, 0, 0.2);
+}
