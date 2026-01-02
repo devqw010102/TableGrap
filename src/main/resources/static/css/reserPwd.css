@@ -1,0 +1,112 @@
+/* ==========================================================================
+   1. Body
+   ========================================================================== */
+body {
+    background-color: #F8F9FA;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   2. 카드 레이아웃
+   ========================================================================== */
+.card {
+    border-radius: 20px;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 3rem !important;
+}
+
+h3 {
+    color: #343A40;
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+/* ==========================================================================
+   3. 입력창 디자인 (Floating Label & Input Group)
+   ========================================================================== */
+.form-control:focus, .form-select:focus {
+    border-color: var(--main-orange);
+    box-shadow: 0 0 0 0.25rem rgba(255, 126, 0, 0.1);
+}
+
+.form-floating > .form-control:focus ~ label {
+    color: var(--main-orange);
+}
+
+.input-group-text {
+    background-color: #F8F9FA;
+    color: #6C757D;
+    border-right: none;
+}
+
+/* ==========================================================================
+    4. 버튼 디자인
+   ========================================================================== */
+#verifyPwdForm .btn-primary {
+    background-color: var(--main-orange);
+    border: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+#verifyPwdForm .btn-primary:hover {
+    background-color: var(--sub-deep-orange);
+    transform: translateY(-1px);
+}
+
+#newPwdForm .btn-success {
+    background-color: var(--sub-green) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 14px 0 rgba(114, 209, 160, 0.39);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#newPwdForm .btn-success:hover {
+    background-color: #58C08B !important;
+    filter: brightness(95%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(114, 209, 160, 0.5);
+}
+#newPwdForm .btn-success:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+     5. 에러 메시지 스타일
+   ========================================================================== */
+.small {
+    font-size: 0.82rem;
+    color: #FF4757;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+    6. 폼 전환 애니메이션
+   ========================================================================== */
+#newPwdForm:not(.d-none) {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+    7. 반응형 디자인
+   ========================================================================== */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 2rem !important;
+    }
+}
