@@ -22,12 +22,25 @@ h1, h2, h3 {
 }
 
 h1 {
-    border-left: 5px solid var(--main-orange);
-    padding-left: 15px;
-    margin-top: 2rem;
+    color: white !important;
+    background: linear-gradient(135deg, var(--main-orange), var(--main-amber)) !important;
+    padding: 2.5rem !important;
+    margin: 0 !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    box-shadow: 0 4px 15px rgba(255, 126, 0, 0.25) !important;
+    border: none !important;
+    width: 100%;
+    font-size: 2.5rem; /* 필요에 따라 크기 조절 */
 }
 
 /* 2. 탭 (Nav Tabs) 디자인 */
+
+.nav-tabs .nav-link i {
+    font-size: 1.1rem; /* 아이콘 크기 살짝 키움 */
+    vertical-align: middle;
+}
+
 .nav-tabs {
     border-bottom: 2px solid var(--bg-middle-grey);
     gap: 5px;
