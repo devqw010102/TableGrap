@@ -211,14 +211,17 @@ function loadBooks() {
                           style="cursor: not-allowed;">${book.dinerName}</a>`
                     : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`;
 
+                    const statusBadge = book.success
+                        ? `<span class="badge bg-success-subtle text-success border border-success-subtle">확정</span>`
+                        : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle">대기</span>`;
+
                 const rowHtml = `
                     <tr>
                         <td>${changeUrl}</td>
                         <td>${modifyDate}</td>
                         <td>${book.personnel}</td>
                         <td>${book.memberName}</td>
-                        <td>${book.success ? "확정" : "대기"}</td>
-                        <td>${changeBtn}</td>
+                        <td>${statusBadge}</td> <td>${changeBtn}</td>
                     </tr>
                 `;
 
