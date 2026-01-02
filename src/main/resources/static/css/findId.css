@@ -1,0 +1,111 @@
+/* ==========================================================================
+   1. 배경 설정
+   ========================================================================== */
+body {
+    background-color: #F8F9FA;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
+/* ==========================================================================
+   2. 카드 디자인
+   ========================================================================== */
+.card {
+    border-radius: 20px;
+    background-color: #ffffff;
+}
+
+.card-body {
+    padding: 3rem !important;
+}
+
+h3 {
+    color: #343A40;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+   3. 입력창(Input) 디자인
+   ========================================================================== */
+.form-control:focus {
+    border-color: var(--main-orange);
+    box-shadow: 0 0 0 0.25rem rgba(255, 126, 0, 0.15);
+}
+
+.form-floating > .form-control:focus ~ label {
+    color: var(--main-orange);
+}
+
+.input-group .form-control,
+.input-group .form-select {
+    padding: 0.75rem;
+}
+
+.input-group-text {
+    background-color: #F8F9FA;
+    border-color: #DEE2E6;
+    color: #6C757D;
+}
+
+/* ==========================================================================
+   4. 버튼 디자인
+   ========================================================================== */
+.btn-primary {
+    background-color: var(--main-orange);
+    border-color: var(--main-orange);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--sub-deep-orange);
+    border-color: var(--sub-deep-orange);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: var(--main-orange);
+    border-color: var(--main-orange);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--main-orange);
+    border-color: var(--main-orange);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   5. 결과 영역(Result Box)
+   ========================================================================== */
+#findIdResult {
+    border: 1px solid #DEE2E6;
+    background-color: #FFFAF5 !important; /* 아주 연한 오렌지빛 배경 */
+    border-radius: 15px;
+}
+
+#displayUsername {
+    color: var(--main-orange) !important; /* 아이디 강조 */
+    margin: 10px 0;
+}
+
+/* ==========================================================================
+   6. 에러 메시지 스타일
+   ========================================================================== */
+.small {
+    font-size: 0.85rem;
+    color: #FF4757; /* 에러는 붉은색 계열 */
+    margin-top: 4px;
+}
+
+/* ==========================================================================
+   7. 반응형 조정
+   ========================================================================== */
+@media (max-width: 576px) {
+    .col-md-5 {
+        width: 90%;
+    }
+    .card-body {
+        padding: 2rem !important;
+    }
+}
