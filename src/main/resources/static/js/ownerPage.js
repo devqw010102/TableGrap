@@ -187,7 +187,7 @@ function renderApprovedTable(data) {
     const tbody = document.getElementById("approveBookListTable");
 
     if(!data.length) {
-        return renderEmptyRow(tbody, 4, "승인 완료 예약 없음");
+        return renderEmptyRow(tbody, 5, "승인 완료 예약 없음");
     }
 
     tbody.innerHTML = data.map(b => `

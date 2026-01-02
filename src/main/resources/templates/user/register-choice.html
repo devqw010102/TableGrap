@@ -5,30 +5,52 @@
 <head>
   <meta charset="UTF-8">
   <title>가입 유형 선택</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link th:href="@{/css/register.css}" rel="stylesheet" />
 </head>
 <body>
 <header th:replace="~{fragment/common :: header}"></header>
-  <div class="container d-flex justify-content-center align-items-center min-vh-100">
-    <div class="col-md-6">
-      <div class="card border-0 shadow-lg">
-        <div class="card-body p-5">
+<main>
+  <!-- 상단 배너 (Hero Section) -->
+  <section class="hero-section">
+    <!-- 배경 패턴 아이콘들 (Vector Background) -->
+    <i class="fas fa-utensils bg-pattern-icon icon-1"></i>
+    <i class="fas fa-wine-glass-alt bg-pattern-icon icon-2"></i>
+    <i class="fas fa-hamburger bg-pattern-icon icon-3"></i>
+    <i class="fas fa-pizza-slice bg-pattern-icon icon-4"></i>
+    <i class="fas fa-coffee bg-pattern-icon icon-5"></i>
+    <i class="fas fa-ice-cream bg-pattern-icon icon-6"></i>
 
-          <div class="text-center mb-4">
-            <h3 class="fw-bold">가입 유형 선택</h3>
-            <p class="text-secondary">원하시는 가입 유형을 선택해주세요.</p>
+    <div class="container">
+      <h1 class="display-5 fw-bold">회원가입</h1>
+      <p class="lead text-muted">TABLE GRAP과 즐거운 미식을 해보아요</p>
+    </div>
+  </section>
+  <div class="container mb-5 reg-choice-wrapper">
+    <div class="row justify-content-center mb-3">
+      <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <i class="fa-solid fa-user-plus"></i>
+              <h3 class="fw-bold">가입 유형 선택</h3>
+              <p class="text-secondary">원하시는 가입 유형을 선택해주세요.</p>
+            </div>
+            <div class="d-grid gap-3">
+              <a th:href="@{/register/owner}" class="btn btn-lg owner-reg">
+                <i class="fa-solid fa-store"></i>
+                가게 회원 가입</a>
+              <a th:href="@{/register/user}" class="btn btn-lg user-reg">
+                <i class="fa-regular fa-user"></i>
+                일반 회원 가입</a>
+            </div>
           </div>
-
-          <div class="d-grid gap-3">
-            <a th:href="@{/register/owner}" class="btn btn-primary btn-lg">가게 회원 가입</a>
-            <a th:href="@{/register/user}" class="btn btn-secondary btn-lg">일반 회원 가입</a>
-          </div>
-
         </div>
       </div>
     </div>
   </div>
+</main>
 <footer>
   <div th:insert="~{fragment/common :: footer}"></div>
 </footer>

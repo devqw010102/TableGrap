@@ -5,58 +5,68 @@
 <head>
   <meta charset="UTF-8">
   <title>회원 가입</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link th:href="@{/css/register.css}" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-light">
 <header th:replace="~{fragment/common :: header}"></header>
-<div class="container d-flex justify-content-center align-items-center min-vh-100">
-  <div class="col-md-6">
+<!-- 상단 배너 (Hero Section) -->
+<section class="owner-hero-section">
+  <i class="fas fa-bowl-rice bg-pattern-icon icon-1"></i>
+  <i class="fas fa-bowl-food bg-pattern-icon icon-2"></i>
+  <i class="fas fa-cookie-bite bg-pattern-icon icon-3"></i>
+  <i class="fas fa-burger bg-pattern-icon icon-4"></i>
+  <i class="fas fa-fish bg-pattern-icon icon-5"></i>
+  <i class="fas fa-drumstick-bite bg-pattern-icon icon-6"></i>
+
+  <div class="container">
+    <h1 class="display-5 fw-bold">식당 회원가입</h1>
+    <p class="lead text-muted">tablegrap으로 식당 예약을 편리하게 관리해보세요</p>
+  </div>
+</section>
+
+<div class="container owner-reg-wrapper">
+  <div class="d-flex justify-content-center">
+  <div class="col-md-6 col-lg-5">
     <div class="card border-0 shadow-lg">
       <div class="card-body p-5">
-
-        <div class="text-center mb-4">
-          <h3 class="fw-bold">계정 만들기</h3>
-          <p class="text-secondary">서비스 이용을 위해 정보를 입력해주세요.</p>
-        </div>
-
         <form id="ownerRegisterForm" method="post">
-
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="registerName" placeholder="이름" onkeyup="checkName(this)">
+            <input type="text" class="form-control owner-form" id="registerName" placeholder="이름" onkeyup="checkName(this)">
             <label for="registerName">이름 <span class="text-danger">*</span></label>
-            <div id="error-registerName" class="small ms-1"></div>
+            <div id="error-registerName" class="small"></div>
           </div>
-
           <div class="position-relative">
             <div class="form-floating">
-              <input type="text" class="form-control" id="businessNum" placeholder="사업자번호"
+              <input type="text" class="form-control owner-form" id="businessNum" placeholder="사업자번호"
                      style="padding-right: 90px;"
                      onkeyup="checkBusinessNum(this)">
               <label for="businessNum">사업자 등록번호 *</label>
             </div>
-            <button type="button" class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-2"
+            <button type="button" class="btn findBizBtn position-absolute top-50 end-0 translate-middle-y me-2"
                     id="businessNumBtn"
                     style="z-index: 5; height: 40px; border-radius: 5px;">
               조회하기
             </button>
             <input type="hidden" id="ownerDinerName" name="ownerDinerName">
           </div>
-          <div id="error-businessNum" class="ms-1 small mb-3"></div>
+          <div id="error-businessNum" class="small mb-3"></div>
 
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="registerId" placeholder="아이디" onkeyup="checkUsername(this, 'owner')">
+            <input type="text" class="form-control owner-form" id="registerId" placeholder="아이디" onkeyup="checkUsername(this, 'owner')">
             <label for="registerId">아이디 <span class="text-danger">*</span></label>
-            <div id="error-registerId" class="small ms-1"></div>
+            <div id="error-registerId" class="small"></div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label ms-1">이메일 <span class="text-danger">*</span></label>
+            <label class="form-label">이메일 <span class="text-danger">*</span></label>
             <input type="hidden" id="totalEmail">
             <div class="input-group">
-              <input type="text" class="form-control" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation('owner')">
+              <input type="text" class="form-control owner-form" id="registerEmail" placeholder="이메일" onkeyup="EmailValidation('owner')">
               <span class="input-group-text">@</span>
-              <input type="text" class="form-control" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation('owner')">
+              <input type="text" class="form-control owner-form" id="registerDomain" placeholder="도메인" onkeyup="EmailValidation('owner')">
               <select class="form-select" id="emailDomainSelect" onchange="selectDomain()">
                 <option value="">직접 입력</option>
                 <option value="naver.com">naver.com</option>
@@ -65,32 +75,33 @@
                 <option value="kakao.com">kakao.com</option>
               </select>
             </div>
-            <div id="error-registerEmail" class="small ms-1 mt-1"></div>
+            <div id="error-registerEmail" class="small mt-1"></div>
           </div>
 
           <div class="mb-3">
-            <label for="registerPhone" class="form-label ms-1">전화번호(선택)</label>
-            <input type="text" class="form-control" id="registerPhone" name="phone"
+            <label for="registerPhone" class="form-label">전화번호(선택)</label>
+            <input type="text" class="form-control  owner-form" id="registerPhone" name="phone"
                    placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
-            <div id="error-registerPhone" class="small ms-1 mt-1"></div>
+            <div id="error-registerPhone" class="small mt-1"></div>
           </div>
 
           <div class="form-floating mb-3">
-            <input type="password" class="form-control" id="registerPwd" onkeyup="checkPwd(this)">
+            <input type="password" class="form-control owner-form" id="registerPwd" onkeyup="checkPwd(this)">
             <label for="registerPwd">비밀번호 <span class="text-danger">*</span></label>
-            <div id="error-registerPwd" class="small ms-1"></div>
+            <div id="error-registerPwd" class="small"></div>
           </div>
 
           <div class="form-floating mb-4">
-            <input type="password" class="form-control" id="registerPwdConfirm" onkeyup="checkPwdConfirm()">
+            <input type="password" class="form-control owner-form" id="registerPwdConfirm" onkeyup="checkPwdConfirm()">
             <label for="registerPwdConfirm">비밀번호 확인 <span class="text-danger">*</span></label>
-            <div id="error-registerPwdConfirm" class="small ms-1"></div>
+            <div id="error-registerPwdConfirm" class="small"></div>
           </div>
-          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">가입 완료</button>
+          <button type="submit" class="btn w-100 py-3 fw-bold owner-reg-btn">가입 완료</button>
         </form>
       </div>
     </div>
   </div>
+</div>
 </div>
 <footer>
   <div th:insert="~{fragment/common :: footer}"></div>
