@@ -20,10 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const uploadForm = document.getElementById("excelUploadForm")
     const submitBtn = uploadForm?.querySelector('button[type="submit"]');
     if (uploadForm && submitBtn) {
-        uploadForm.addEventListener("submit", () => {
+        uploadForm.addEventListener("submit", (e) => {
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                 업로드 중...
             `;
         });
