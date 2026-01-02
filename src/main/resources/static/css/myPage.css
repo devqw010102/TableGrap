@@ -1,0 +1,189 @@
+:root {
+
+    --main-orange: #FF7E00;
+    --main-amber: #FFA000;
+    --sub-deep-orange: #E67200;
+    --sub-light-orange: #FFB366;
+    --text-dark: #2D3436;
+    --text-muted: #636E72;
+    --bg-light-grey: #F8F9FA;
+    --bg-middle-grey: #E9ECEF;
+    --border-color: #DEE2E6;
+    --white: #FFFFFF;
+}
+
+/* 1. 기본 레이아웃 및 배경 */
+body {
+    background-color: var(--white) !important;
+    color: var(--text-dark);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
+
+/* 탭 메뉴가 있는 컨테이너의 상단 여백 조절 */
+.container.mt-5 {
+    max-width: 1100px;
+    margin-top: 3rem !important; /* 헤더와의 간격 확보 */
+}
+
+/* 2. 헤더 디자인 - adminPage의 그라데이션 스타일 적용 */
+h1 {
+    color: white !important;
+    /* 관리자 페이지와 동일한 그라데이션 */
+    background: linear-gradient(135deg, var(--main-orange), var(--main-amber)) !important;
+    padding: 2.5rem !important;
+    margin: 0 !important; /* 바깥으로 뺐으므로 음수 마진은 0으로 리셋 */
+    font-weight: 800 !important;
+    text-align: center !important;
+    box-shadow: 0 4px 15px rgba(255, 126, 0, 0.25) !important;
+    border-radius: 0 !important; /* 둥근 모서리 완전 제거 */
+    border: none !important;
+    width: 100%; /* 화면 꽉 채우기 */
+}
+
+h2 {
+    color: var(--text-dark);
+    font-weight: 700;
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+    margin-bottom: 1.5rem;
+}
+
+/* 3. 탭 내비게이션 - adminPage 스타일 (중앙 정렬 및 밑줄) */
+.nav-tabs {
+    border-bottom: 2px solid var(--bg-middle-grey);
+    background-color: transparent;
+    justify-content: center; /* 중앙 정렬 */
+    gap: 15px;
+}
+
+.nav-tabs .nav-link {
+    border: none !important;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--main-orange);
+    background-color: var(--bg-light-grey);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: transparent !important;
+    color: var(--main-orange) !important;
+    font-weight: 700;
+    border-bottom: 3px solid var(--main-orange) !important;
+}
+
+/* 4. 콘텐츠 영역 */
+.tab-content {
+    background-color: var(--white);
+    padding: 40px;
+    border: none; /* 테두리 제거 후 그림자 강조 */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+/* 5. 테이블 디자인 - adminPage와 동일한 톤으로 변경 */
+.table {
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--bg-middle-grey) !important; /* 어두운 색에서 밝은 회색으로 변경 */
+    color: var(--text-dark) !important;           /* 글자색을 다크그레이로 */
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+}
+
+.table tbody td {
+    padding: 18px 15px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 예약 리스트 식당 이름 강조 */
+.table td a.text-primary {
+    color: var(--text-dark) !important;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.table td a.text-primary:hover {
+    color: var(--main-orange) !important;
+    text-decoration: underline;
+}
+
+/* 6. 버튼 디자인 - adminPage의 호버 효과 적용 */
+.btn {
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.btn-primary { /* 수정하기 / 메인 버튼 */
+    background-color: var(--main-orange) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--sub-deep-orange) !important;
+}
+
+.btn-success { /* 저장하기 */
+    background-color: var(--text-dark) !important;
+    border: none !important;
+}
+
+.btn-secondary { /* 취소 버튼 */
+    background-color: var(--bg-middle-grey) !important;
+    color: var(--text-muted) !important;
+    border: none !important;
+}
+
+/* 7. 내 정보 수정 폼 전용 스타일 */
+#myInfoEditForm .table {
+    border: 1px solid var(--border-color);
+}
+
+#myInfoEditForm th {
+    width: 200px;
+    background-color: var(--bg-light-grey) !important;
+    text-align: left;
+    padding-left: 30px;
+    color: var(--text-muted);
+}
+
+.form-control:focus {
+    border-color: var(--main-orange);
+    box-shadow: 0 0 0 4px rgba(255, 126, 0, 0.1);
+}
+
+/* 8. 모달 디자인 */
+.modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+/* 9. 비활성 링크(예약 수정 불가) 스타일 */
+a[style*="cursor: not-allowed;"] {
+    opacity: 0.5;
+    filter: grayscale(1);
+    pointer-events: none;
+    text-decoration: none !important;
+}
