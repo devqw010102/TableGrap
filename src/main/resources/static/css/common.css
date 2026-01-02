@@ -5,6 +5,14 @@
     --sub-light-orange: #FFBE7F;
     --sub-deep-orange: #FF6539;
     --sub-green: #72D1A0;
+
+    /* 고급스러운 그레이톤 변수 추가 */
+    --bg-light-grey: #F8F9FA;
+    --bg-middle-grey: #E9ECEF;
+    --text-dark: #343A40;
+    --text-muted: #6C757D;
+    --border-color: #DEE2E6;
+    --sidebar-dark: #2D3436;
 }
 
 /* ============================================================

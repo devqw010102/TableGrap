@@ -5,14 +5,6 @@
     --sub-light-orange: #FFBE7F;
     --sub-deep-orange: #FF6539;
     --sub-green: #72D1A0;
-
-    /* 고급스러운 그레이톤 변수 추가 */
-    --bg-light-grey: #F8F9FA;
-    --bg-middle-grey: #E9ECEF;
-    --text-dark: #343A40;
-    --text-muted: #6C757D;
-    --border-color: #DEE2E6;
-    --sidebar-dark: #2D3436;
 }
 
 /* 1. 기본 레이아웃 및 배경 */
@@ -135,28 +127,6 @@ h1 {
 .btn-sm {
     border-radius: 6px;
     padding: 5px 12px;
-}
-
-/* 5. 대시보드 카드 (Admin전용) */
-.card {
-    border: none;
-    border-radius: 15px;
-    transition: transform 0.3s ease;
-}
-
-.card.shadow-sm:hover {
-    transform: translateY(-5px);
-}
-
-#dashboardDinerCount, #dashboardTodayBooking, #dashboardMemberCount {
-    color: var(--main-orange);
-    font-weight: 800;
-    font-size: 2rem;
-}
-
-.list-group-item span {
-    color: var(--main-orange);
-    font-weight: bold;
 }
 
 /* 6. 폼 및 입력창 (MyPage / Info용) */
