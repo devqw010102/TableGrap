@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.dataset.originalText = button.innerHTML; // 원래 텍스트 저장
             button.innerHTML = `
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                조회 중...
+                가입 중...
             `;
         } else {
             button.disabled = false;

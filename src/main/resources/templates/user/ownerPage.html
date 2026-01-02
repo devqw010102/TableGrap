@@ -6,49 +6,68 @@
     <meta charset="UTF-8">
     <title>가게용 페이지</title>
     <link rel="stylesheet" th:href="@{/css/commonPages.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    <link rel="stylesheet" th:href="@{/css/ownerPage.css}">
 </head>
 <body>
 <header th:replace="~{fragment/common :: header}"></header>
-<h1>식당 관리 페이지</h1>
-<div class="mb-3">
-    <label for="dinerSelect" class="form-label">식당 선택:</label>
-    <select id="dinerSelect" class="form-select">
-        <option value="">전체</option>
-        <!-- JS에서 식당 목록 채움 -->
-    </select>
+
+<div class="dashboard-header">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-1">식당 관리</h2>
+            <p class="text-muted mb-0">오늘도 힘찬 하루 보내세요!</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <label for="dinerSelect" class="form-label me-2 mb-0 fw-bold">내 식당:</label>
+            <select id="dinerSelect" class="form-select form-select-sm" style="width: 200px;">
+                <option value="">전체 보기</option>
+            </select>
+        </div>
+    </div>
 </div>
 
-<!-- Tab-head -->
-<ul class = "nav nav-tabs">
-    <li class = "nav-item">
-        <a class = "nav-link active" data-bs-toggle="tab" href = "#tab1">승인대기 목록</a>
-    </li>
-    <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab2">오늘의 예약</a>
-    </li>
-    <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab3">확정된 예약 목록</a>
-    </li>
-    <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab4">리뷰 목록</a>
-    </li>
-    <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab5">내 정보</a>
-    </li>
-    <li class = "nav-item">
-        <a class = "nav-link" data-bs-toggle="tab" href = "#tab6">식당 관리</a>
-    </li>
-</ul>
+<div class="container">
+    <ul class="nav nav-tabs" id="ownerTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" data-bs-toggle="tab" href="#tab1">
+                <i class="bi bi-clock-history me-1"></i> 승인대기 목록
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab2">
+                <i class="bi bi-calendar-check me-1"></i> 오늘의 예약
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab3">
+                <i class="bi bi-check-all me-1"></i> 확정된 예약 목록
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab4">
+                <i class="bi bi-star me-1"></i> 리뷰 목록
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab5">
+                <i class="bi bi-person-gear me-1"></i> 내 정보
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" data-bs-toggle="tab" href="#tab6">
+                <i class="bi bi-shop me-1"></i> 식당 관리
+            </a>
+        </li>
+    </ul>
 
-<!-- Tab-content -->
-<div class = "tab-content mt-3">
-    <!-- tab1-content -->
-    <div id = "tab1" class = "tab-pane fade show active">
-        <div class = "container mt-4">
-            <h2>승인대기 목록</h2>
-            <table class = "table table-boarded">
+    <div class="tab-content owner-tab-content">
+        <div id="tab1" class="tab-pane fade show active">
+            <h2 class="section-title">승인대기 목록</h2>
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>식당 이름</th>
@@ -58,15 +77,13 @@
                     <th>승인 및 반려</th>
                 </tr>
                 </thead>
-                <tbody id = "bookRequestTable"></tbody>
+                <tbody id="bookRequestTable"></tbody>
             </table>
         </div>
-    </div>
-    <!-- tab2-content -->
-    <div id = "tab2" class = "tab-pane fade">
-        <div class = "container mt-4">
-            <h2>오늘의 예약</h2>
-            <table class = "table table-boarded">
+
+        <div id="tab2" class="tab-pane fade">
+            <h2 class="section-title">오늘의 예약</h2>
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>식당 이름</th>
@@ -75,15 +92,13 @@
                     <th>예약자 명</th>
                 </tr>
                 </thead>
-                <tbody id = "todayBookListTable"></tbody>
+                <tbody id="todayBookListTable"></tbody>
             </table>
         </div>
-    </div>
-    <!-- tab3-content -->
-    <div id = "tab3" class = "tab-pane fade">
-        <div class = "container mt-4">
-            <h2>예약 목록</h2>
-            <table class = "table table-boarded">
+
+        <div id="tab3" class="tab-pane fade">
+            <h2 class="section-title">예약 목록</h2>
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>식당 이름</th>
@@ -93,15 +108,13 @@
                     <th>예약 취소 요청</th>
                 </tr>
                 </thead>
-                <tbody id = "approveBookListTable"></tbody>
+                <tbody id="approveBookListTable"></tbody>
             </table>
         </div>
-    </div>
-    <!-- tab4-content -->
-    <div id = "tab4" class = "tab-pane fade">
-        <div class = "container mt-4">
-            <h2>리뷰 목록</h2>
-            <table class = "table table-boarded">
+
+        <div id="tab4" class="tab-pane fade">
+            <h2 class="section-title">리뷰 목록</h2>
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>회원 아이디</th>
@@ -111,16 +124,12 @@
                     <th>작성 일자</th>
                 </tr>
                 </thead>
-                <tbody id = "reviewListTable"></tbody>
+                <tbody id="reviewListTable"></tbody>
             </table>
         </div>
-    </div>
-    <!-- tab5-content -->
-    <div class="tab-pane fade" id="tab5" role="tabpanel" aria-labelledby="info-tab">
-        <!-- 회원 정보(owner) 출력할 table -->
-        <div class="container mt-4">
-            <h2>내 정보</h2>
 
+        <div id="tab5" class="tab-pane fade">
+            <h2 class="section-title">내 정보</h2>
             <form id="myInfoEditForm" method="post">
                 <table class="table table-bordered align-middle">
                     <tbody>
@@ -133,21 +142,14 @@
                         <td><input type="text" id="myName" class="form-control-plaintext" readonly/></td>
                     </tr>
                     <tr>
-                        <th class="bg-light text-center" style="vertical-align: middle;"><span class="text-danger">*</span>이메일</th>
+                        <th class="bg-light text-center"><span class="text-danger">*</span>이메일</th>
                         <td>
                             <input type="text" id="emailDisplay" class="form-control-plaintext" readonly>
-
                             <div id="emailEditGroup" class="input-group flex-nowrap" style="display:none">
-                                <input type="text" class="form-control" readonly autocomplete="email" id="emailId"
-                                       placeholder="이메일" onkeyup="EmailValidation()">
-
+                                <input type="text" class="form-control" readonly id="emailId" placeholder="이메일" onkeyup="EmailValidation()">
                                 <span class="input-group-text">@</span>
-
-                                <input type="text" class="form-control" readonly autocomplete="domain" id="emailDomainInput"
-                                       placeholder="도메인" onkeyup="EmailValidation()">
-
-                                <select class="form-select"  id="emailDomainSelect"
-                                        onchange="selectDomain()" style="max-width: 120px;" disabled>
+                                <input type="text" class="form-control" readonly id="emailDomainInput" placeholder="도메인" onkeyup="EmailValidation()">
+                                <select class="form-select" id="emailDomainSelect" onchange="selectDomain()" style="max-width: 120px;" disabled>
                                     <option value="">직접 입력</option>
                                     <option value="naver.com">naver.com</option>
                                     <option value="gmail.com">gmail.com</option>
@@ -155,33 +157,28 @@
                                     <option value="kakao.com">kakao.com</option>
                                 </select>
                             </div>
-
                             <div id="error-emailId" class="small ms-1 mt-1"></div>
                         </td>
                     </tr>
                     <tr>
-                        <th class="bg-light text-center" style="width: 20%;">전화번호(선택)</th>
+                        <th class="bg-light text-center">전화번호(선택)</th>
                         <td>
                             <input type="text" id="phoneDisplay" class="form-control-plaintext" readonly>
-
                             <div id="phoneEditGroup" class="input-group" style="display:none;">
-                                <input type="text" id="myPhone" name="phone" class="form-control"
-                                       placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
+                                <input type="text" id="myPhone" name="phone" class="form-control" placeholder="( - )제외, 번호만 입력해주세요." onkeyup="checkPhone(this)">
                             </div>
-
                             <div id="error-myPhone" class="small mt-1"></div>
                         </td>
                     </tr>
-
                     <tr>
                         <th class="bg-light text-center">비밀번호</th>
                         <td>
                             <div id="pwdViewRow" class="form-control-plaintext">●●●●●●●●</div>
-
                             <div id="pwdEditGroup" class="edit-mode-row">
                                 <div class="mb-2">
                                     <input type="password" id="newPassword" class="form-control" placeholder="새 비밀번호 입력(선택)" onkeyup="checkPwd(this)">
-                                    <div id="error-newPassword" class="small"></div> </div>
+                                    <div id="error-newPassword" class="small"></div>
+                                </div>
                                 <div class="mb-2">
                                     <input type="password" id="pwdConfirm" class="form-control" placeholder="비밀번호 확인" onkeyup="checkPwdConfirm()">
                                     <div id="error-pwdConfirm" class="small"></div>
@@ -191,24 +188,23 @@
                     </tr>
                     </tbody>
                 </table>
-
-                <div class="d-flex justify-content-end gap-2">
-                    <button type="button" id="btnEdit" class="btn btn-primary">수정하기</button>
-
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" id="btnEdit" class="btn btn-edit">수정하기</button>
                     <button type="button" id="btnCancel" class="btn btn-secondary" style="display:none;">취소</button>
                     <button type="button" id="btnSave" class="btn btn-success" style="display:none;">저장</button>
-
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">탈퇴</button>
                 </div>
             </form>
         </div>
-    </div>
-    <!-- tab6-content -->
-    <div id = "tab6" class = "tab-pane fade">
-        <div class = "container mt-4">
-            <h2 style="display: inline-block; position: relative">식당 관리</h2>
-            <button type="button" id="addDiner" class="btn btn-info" style="position: absolute; right: 310px;" onclick="openModal()">식당추가</button>
-            <table class = "table table-boarded">
+
+        <div id="tab6" class="tab-pane fade">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0">식당 관리</h2>
+                <button type="button" id="addDiner" class="btn btn-add fw-bold" onclick="openModal()">
+                    <i class="bi bi-plus-lg me-1"></i>식당추가
+                </button>
+            </div>
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>식당 번호</th>
@@ -218,24 +214,17 @@
                     <th>삭제 하기</th>
                 </tr>
                 </thead>
-                <tbody id = "owner-diner"></tbody>
+                <tbody id="owner-diner"></tbody>
             </table>
         </div>
     </div>
 </div>
-<!-- Page 이동 버튼 -->
+
 <div class="d-flex justify-content-center align-items-center mt-3">
-    <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm me-2">
-        이전
-    </button>
-
+    <button id="prevPageBtn" class="btn btn-outline-secondary btn-sm me-2">이전</button>
     <span id="pageInfo" class="mx-2"></span>
-
-    <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm ms-2">
-        다음
-    </button>
+    <button id="nextPageBtn" class="btn btn-outline-secondary btn-sm ms-2">다음</button>
 </div>
-<!-- 페이지 -->
 <nav class="d-flex justify-content-center mt-4">
     <ul id="pagination" class="pagination pagination-sm"></ul>
 </nav>
@@ -255,20 +244,20 @@
                     <div class="position-relative mb-3">
                         <div class="form-floating">
                             <input type="text" id="bizNum" class="form-control"
-                               placeholder="사업자번호를 (-)를 제외하고 입력해주세요.">
+                                   placeholder="사업자번호를 (-)를 제외하고 입력해주세요.">
                             <label for = "bizNum">사업자 번호</label>
-                        <button type="button" class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-2"
-                                id="bizNumBtn"
-                                style="z-index: 5; height: 40px; border-radius: 5px;">
-                            조회하기
-                        </button>
+                            <button type="button" class="btn btn-find-biznum position-absolute top-50 end-0 translate-middle-y me-2"
+                                    id="bizNumBtn"
+                                    style="z-index: 5; height: 40px; border-radius: 5px;">
+                                조회하기
+                            </button>
                         </div>
                     </div>
                     <input type="hidden" id="ownerDinerName" name="ownerDinerName">
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="addBtn">추가하기</button>
+                <button type="button" class="btn btn-add-diner" id="addBtn">추가하기</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
@@ -299,7 +288,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-success" id="editDiner" onclick="updateDiner(dinerId)">수정하기</button>
+                <button type="button" class="btn btn-edit-diner" id="editDiner" onclick="updateDiner(dinerId)">수정하기</button>
             </div>
         </div>
     </div>
@@ -331,7 +320,7 @@
     <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-<script src = "/js/ownerPage.js" type="text/javascript"></script>
+<script src="/js/ownerPage.js" type="text/javascript"></script>
 <script src="/js/validation.js" type="text/javascript"></script>
 </body>
 </html>

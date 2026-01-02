@@ -1,0 +1,206 @@
+@charset "UTF-8";
+
+/* =========================================
+   1. 대시보드 헤더
+   ========================================= */
+.dashboard-header {
+    background-color: #fff;
+    padding: 20px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dashboard-header h2 {
+    color: var(--main-orange);
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* 셀렉트 박스 스타일 */
+#dinerSelect {
+    border: 2px solid #dee2e6;
+    color: var(--main-amber);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* =========================================
+   2. 탭 네비게이션 (핵심 수정)
+   ========================================= */
+/* commonPages.css의 스타일을 덮어쓰고 강제로 가로 정렬 */
+.nav-tabs {
+    display: flex !important;       /* 계단 현상 방지: Flexbox 강제 */
+    flex-wrap: nowrap !important;   /* 줄바꿈 방지 */
+    border-bottom: 1px solid #dee2e6 !important; /* 바닥 선 통일 */
+    gap: 2px !important;            /* 탭 간격 좁힘 */
+    margin-bottom: 0 !important;    /* 컨텐츠 박스와 딱 붙임 */
+    padding-left: 0;
+}
+
+.nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-bottom: none;
+    color: #6c757d; /* 비활성 탭 색상 */
+    background-color: transparent;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px 10px 0 0; /* 위쪽 둥글게 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    margin-bottom: -1px; /* 활성 탭이 바닥 선을 덮도록 */
+    transition: all 0.2s ease;
+}
+
+/* 탭 호버 */
+.nav-tabs .nav-link:hover {
+    background-color: #f8f9fa; /* 연한 회색 */
+    color: var(--main-orange);
+}
+
+/* 활성화된 탭 (Active) - 아래 선을 흰색으로 덮어서 뚫린 효과 */
+.nav-tabs .nav-link.active {
+    background-color: #fff !important;
+    color: var(--main-orange) !important;
+    border-color: var( --border-color) var( --border-color) #fff var( --border-color) !important; /* 아래쪽만 흰색 */
+    font-weight: 700;
+    z-index: 5;
+}
+
+/* =========================================
+   3. 탭 컨텐츠 박스 (카드 디자인)
+   ========================================= */
+/* 탭 바로 아래 붙는 흰색 박스 */
+.owner-tab-content {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none; /* 위쪽은 탭이 덮으므로 테두리 없음 */
+    border-radius: 0 0 12px 12px; /* 아래쪽 둥글게 */
+    padding: 40px;
+    min-height: 500px; /* 최소 높이 확보 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* 은은한 그림자 */
+}
+
+/* 각 섹션 제목 */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+}
+
+/* =========================================
+   4. 테이블 스타일 재정의 (ownerPage 전용)
+   ========================================= */
+.owner-tab-content .table {
+    margin-bottom: 0;
+}
+
+.owner-tab-content .table thead th {
+    background-color: #f8f9fa; /* 헤더 배경 밝은 회색 */
+    color: #495057;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+    font-weight: 600;
+}
+
+.owner-tab-content .table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+/* 내 정보 테이블 스타일 */
+#myInfoEditForm .table th {
+    background-color: #f8f9fa !important;
+    text-align: center;
+}
+#myInfoEditForm .table td {
+    text-align: left; /* 입력창은 왼쪽 정렬 */
+    padding-left: 20px;
+}
+
+/* =========================================
+   5. 모달, 버튼 등 기타 수정
+   ========================================= */
+/* 모달 헤더 */
+.modal-header {
+    background-color: #f8f9fa;
+}
+
+/* 페이지네이션 */
+#pagination .page-link {
+    border: none;
+    border-radius: 50%;
+    margin: 0 3px;
+    width: 35px; height: 35px;
+    display: flex; align-items: center; justify-content: center;
+    color: #6c757d;
+}
+
+#pagination .page-item.active .page-link {
+    background-color: var(--main-orange);
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(255, 126, 0, 0.3);
+}
+
+/* 개인 정보 수정*/
+.btn-edit {
+    background-color: var(--main-orange) !important;;
+    border-color: var(--main-orange) !important;
+    color: #fff;
+}
+.btn-edit:hover {
+    background-color: #fff !important;
+    border-color: var(--main-orange) !important;
+    color: var(--main-orange) !important;
+}
+
+.btn-find-biznum{
+    background-color: var(--sub-deep-orange);
+    border-color: var(--sub-light-orange);
+    color: #fff;
+}
+
+.btn-find-biznum:hover{
+    background-color: #fff;
+    border-color: var(--sub-light-orange);
+    color: var(--sub-deep-orange);
+}
+
+ .btn-info{
+      background-color: var(--main-amber) !important;
+      border-color: var(--main-amber) !important;
+      color: #fff !important;
+
+ }
+
+ .btn-info:hover{
+      background-color: #fff !important;
+      border-color: var(--main-amber) !important;
+      color: var(--main-amber) !important;
+ }
+
+.btn-add-diner {
+  background-color: var(--main-orange);
+  border-color: var(--main-amber);
+  color: #fff
+}
+.btn-add-diner:hover {
+  background-color: #fff;
+  border-color: var(--main-amber);
+  color: var(--main-orange);
+}
+
+.btn-edit-diner{
+  background-color: var(--main-orange);
+    border-color: var(--main-amber);
+    color: #fff
+}
+
+.btn-edit-diner:hover{
+  background-color: #fff;
+  border-color: var(--main-amber);
+  color: var(--main-orange);
+}

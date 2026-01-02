@@ -258,7 +258,7 @@ async function allowUserCancel(bookId) {
         alert("사용자에게 취소 요청 알람을 보냈습니다.");
         loadBookings({ pending: false, page: currentPage});
     } catch(e) {
-        alter("처리에 실패했습니다.")
+        alert("처리에 실패했습니다.")
     }
 }
 
