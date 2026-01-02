@@ -3,74 +3,96 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>메인 페이지</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link th:href="@{/css/dinerList.css}" rel="stylesheet" />
 </head>
 <body>
 <header th:insert="~{fragment/common :: header}"></header>
-  <div class="container mt-5 mb-5">
-    <h2 class="page-title mb-4" th:text="${categoryName} + ' 맛집을 찾아볼까요?'">식당 찾기</h2>
-    <div class="button">
-      <button type="button" class="btn btn-secondary" id="toggleBtn">혹시 사장님이신가요?</button>
-      <button type="button" class="btn btn-info" id="getOwnerBtn" style="display: none;">선택한 식당 신청하기</button>
+<!-- 상단 타이틀 영역 -->
+<section class="list-header">
+    <i class="fas fa-bowl-rice bg-pattern-icon icon-1"></i>
+    <i class="fas fa-bowl-food bg-pattern-icon icon-2"></i>
+    <i class="fas fa-cookie-bite bg-pattern-icon icon-3"></i>
+    <i class="fas fa-burger bg-pattern-icon icon-4"></i>
+    <i class="fas fa-fish bg-pattern-icon icon-5"></i>
+    <i class="fas fa-drumstick-bite bg-pattern-icon icon-6"></i>
+    <div class="container">
+        <h2 class="mb-2 fw-bold" th:text="${categoryName} + ' 맛집을 찾아볼까요?'">식당 찾기</h2>
+        <p class="text-muted mb-0">검색된 맛집 리스트를 확인해보세요.</p>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th class="owner-check" style="display: none;">선택</th>
-          <th>식당 이름 </th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- 해당 카테고리의 맛집이 존재하는 경우 출력하기, th:unless: 반복문안에서 특정 조건에 따라 렌더링 제어,(조건이 거짓일 경우 렌더링) -->
-        <tr th:each="diner :${dinerList.content}" th:unless="${dinerList.isEmpty()}">
-          <td class="owner-check" style="display: none;"><input type="checkbox" name="selectDiner" th:value="${diner.id}"></td>
-          <td><a th:text="${diner.dinerName}" th:href="@{/reservation(id=${diner.id})}">식당이름</a></td>
-        </tr>
-        <!-- 해당 카테고리의 식당이 존재하지 않는 경우 -->
-        <tr th:if="${dinerList.isEmpty()}">
-          <td colspan="2" class="text-center py-5">
-            현재 준비중입니다.
-          </td>
-        </tr>
-      </tbody>
-    </table>
+</section>
+
+<div class="container mt-5 mb-5">
+    <!-- 해당 카테고리의 식당이 존재하지 않는 경우 -->
+    <div th:if="${dinerList.isEmpty()}" class="text-center py-5">
+        <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+        <p class="text-muted">현재 준비중입니다.</p>
+        <a href="/" class="btn btn-outline-secondary mt-2">홈으로 가기</a>
+    </div>
+
+    <!-- 해당 카테고리의 맛집이 존재하는 경우 출력하기, th:unless: 반복문안에서 특정 조건에 따라 렌더링 제어,(조건이 거짓일 경우 렌더링) -->
+        <div class="diner-list-wrapper" th:unless="${dinerList.isEmpty()}">
+            <a th:each="diner :${dinerList.content}"
+               th:href="@{/diner/reservation(id=${diner.id})}"
+               class="diner-card">
+
+                <!--아이콘-->
+                <div class="diner-icon-box">
+                    <i class="fas fa-utensils"></i>
+                </div>
+
+                <!-- 식당 정보 -->
+                <div class="diner-info">
+                    <div class="diner-title" th:text="${diner.dinerName}">식당이름</div>
+                    <div class="diner-addr">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${diner.location}">주소</span>
+                    </div>
+                </div>
+
+                <div class="diner-status">
+                    <span class="status-badge" th:text="${diner.status}">영업 상태</span>
+                    <i class="fas fa-chevron-right arrow-icon"></i>
+                </div>
+            </a>
+        </div>
+
     <!-- 페이지 네비게이션 -->
-      <nav th:if="${!dinerList.isEmpty()}">
-          <ul class="pagination"
-              th:with="start=${T(java.lang.Math).floor(dinerList.number / 10) * 10},
+    <nav th:if="${!dinerList.isEmpty()}">
+        <ul class="pagination"
+            th:with="start=${T(java.lang.Math).floor(dinerList.number / 10) * 10},
                  end=(${start + 9 < dinerList.totalPages ? start + 9 : dinerList.totalPages - 1})">
 
-              <li class="page-item" th:classappend="${dinerList.first} ? 'disabled'">
-                  <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=0)}">처음으로</a>
-              </li>
+            <li class="page-item" th:classappend="${dinerList.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=0)}">처음으로</a>
+            </li>
 
-              <li class="page-item" th:classappend="${dinerList.first} ? 'disabled'">
-                  <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.number - 1})}">이전</a>
-              </li>
+            <li class="page-item" th:classappend="${dinerList.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.number - 1})}">이전</a>
+            </li>
 
-              <li class="page-item" th:each="pageNum : ${#numbers.sequence(start, end)}"
-                  th:classappend="${pageNum == dinerList.number} ? 'active'">
-                  <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${pageNum})}" th:text="${pageNum + 1}">1</a>
-              </li>
+            <li class="page-item" th:each="pageNum : ${#numbers.sequence(start, end)}"
+                th:classappend="${pageNum == dinerList.number} ? 'active'">
+                <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+            </li>
 
-              <li class="page-item" th:classappend="${dinerList.last} ? 'disabled'">
-                  <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.number + 1})}">다음</a>
-              </li>
+            <li class="page-item" th:classappend="${dinerList.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.number + 1})}">다음</a>
+            </li>
 
-              <li class="page-item" th:classappend="${dinerList.last} ? 'disabled'">
-                  <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.totalPages - 1})}">끝으로</a>
-              </li>
-          </ul>
-      </nav>
-  </div>
+            <li class="page-item" th:classappend="${dinerList.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/diner/list(category=${categoryName}, page=${dinerList.totalPages - 1})}">끝으로</a>
+            </li>
+        </ul>
+    </nav>
+</div>
 <footer>
-  <div th:insert="~{fragment/common :: footer}"></div>
+    <div th:insert="~{fragment/common :: footer}"></div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script th:src="@{/js/dinerList.js}"></script>
 </body>
 </html>

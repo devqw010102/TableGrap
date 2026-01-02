@@ -86,7 +86,37 @@ public class MemberController {
             @AuthenticationPrincipal MemberUserDetails userDetails,
             @RequestBody MemberUpdateDto memberUpdateDto) {
         memberService.updateMember(userDetails.getMember().getId(), memberUpdateDto);
+    }
 
+    // 아이디 찾기
+    @GetMapping("/find-id")
+    public ResponseEntity<String> findId(@RequestParam String name, @RequestParam String email) {
+        return memberService.findIdByNameAndEmail(name, email)
+                .map(id -> ResponseEntity.ok(maskId(id)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // 비밀번호 재설정 전 본인 확인
+    @PostMapping("/verify-identity")
+    public ResponseEntity<?> verifyIdentity(@RequestParam String username, @RequestParam String email) {
+        boolean isValid = memberService.existsByUsernameAndEmail(username, email);
+        return isValid ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    }
+
+    // 실제 비밀번호 업데이트
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody MemberDto dto) {
+        if (!dto.getPassword().equals(dto.getPasswordConfirm())) {
+            return ResponseEntity.badRequest().body("비밀번호가 일치하지 않습니다.");
+        }
+        memberService.updatePassword(dto.getUsername(), dto.getPassword());
+        return ResponseEntity.ok("비밀번호 변경 성공");
+    }
+
+    // ( ex) test1234 -> test****)
+    private String maskId(String id) {
+        if (id.length() <= 4) return id;
+        return id.substring(0, 4) + "*".repeat(id.length() -4);
     }
 
     // Member delete
@@ -109,8 +139,10 @@ public class MemberController {
             }
             return ResponseEntity.ok().body("회원 탈퇴가 완료되었습니다.");
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류가 발생했습니다.");
         }
     }
 }

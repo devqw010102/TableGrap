@@ -6,11 +6,18 @@ import com.example.demo.data.dto.owner.OwnerUpdateDto;
 import java.util.Optional;
 
 public interface OwnerService {
+
   OwnerDto createOwner(OwnerDto ownerDto);
+
   Optional<OwnerDto> findByEmail(String email);
+
   boolean existsByUsername(String username);
+
   Optional<OwnerDto> findByOwnerId(Long id);
+
   void updateOwner(Long id, OwnerUpdateDto ownerUpdateDto);
-  //void deleteOwnerById(Long id);
+
   boolean deleteOwner(Long ownerId, String checkPassword);
+
+  void notificationUser(Long bookId);
 }

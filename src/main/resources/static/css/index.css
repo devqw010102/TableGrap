@@ -1,0 +1,64 @@
+/* 메인 배너 스타일 */
+.hero-section {
+  background: linear-gradient(190deg, #FF7E00, #FFB300);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+/* --- 벡터 배경 패턴 아이콘 스타일 --- */
+.bg-pattern-icon {
+  position: absolute;
+  color: white;
+  opacity: 0.1; /* 아주 연하게 처리 */
+  z-index: 0; /* 텍스트 뒤로 배치 */
+  pointer-events: none; /* 클릭 방지 */
+}
+
+/* 아이콘 배치 */
+.icon-1 { top: -10%; left: 5%; font-size: 8rem; transform: rotate(15deg); }
+.icon-2 { top: 20%; right: 10%; font-size: 6rem; transform: rotate(-20deg); opacity: 0.08; }
+.icon-3 { bottom: -10%; left: 15%; font-size: 10rem; transform: rotate(10deg); }
+.icon-4 { top: 40%; left: 45%; font-size: 5rem; transform: rotate(45deg); opacity: 0.05; }
+.icon-5 { bottom: 10%; right: 5%; font-size: 9rem; transform: rotate(-15deg); }
+.icon-6 { top: 10%; left: 30%; font-size: 4rem; transform: rotate(30deg); opacity: 0.07; }
+
+/* 카테고리 카드 스타일 */
+.category-card {
+  border: 1px solid #dee2e6;
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background-color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none; /* 링크 밑줄 제거 */
+  color: #212529;
+}
+
+/* 마우스 호버 효과 */
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  border-color: #ffc107; /* 강조 색상 */
+  color: #212529;
+}
+
+/* 아이콘 스타일 */
+.category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ff9800; /* 아이콘 색상 */
+}
+
+.category-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}

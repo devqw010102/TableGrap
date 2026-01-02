@@ -1,162 +1,205 @@
-﻿﻿# TableGrap
+﻿# 🍽️ TableGrap
 
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=Gradle&logoColor=white)
+![H2 Database](https://img.shields.io/badge/H2%20Database-004B8D?style=for-the-badge&logo=databricks&logoColor=white)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-%23005C00.svg?style=for-the-badge&logo=Thymeleaf&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=Spring%20Security&logoColor=white)
+> **대량의 식당 데이터를 효율적으로 관리하고 예약하는 플랫폼**
 
-## 사전 토의 결과
-<pre>
-	def : <b>식당 예약 프로젝트</b>
+## 📖 Project Overview
 
-	1. 프론트 UI 중요도 높음
-	2. 로직, 예외(동시 예약, 잔여 좌석, 테이블별 인원 매칭) 설계 많음
-	3. 테스트케이스 많음(오픈, 마감시간 예약, 휴무일, 영업시간 변경...etc
-	4. 백엔드 위주
-</pre>
+**TableGrap**은 엑셀 파일로 된 대량의 식당 데이터를 손쉽게 업로드하고, 이를 분석하여 사용자에게 예약 및 조회 서비스를 제공하는 웹 애플리케이션입니다.
+단순한 CRUD를 넘어, **비정형 데이터(식당 이름/카테고리) 정제 알고리즘**과 **Geocoding API를 활용한 위치 기반 서비스**를 중점적으로 구현했습니다.
 
-## Definition
-<pre>
-  프로젝트 이름 : TableGrap
-  
-  Spring 의존성 : h2 database, spring web, spring data jpa, lombok, Thymeleaf, spring security, Validation + ...ETC
-  
-  Entity : 식당, 예약 현황(식당 이름), 회원(Many to one, 리뷰), 완료된 예약(구현)
-</pre>
+## 🛠️ Tech Stack
+- **Language**: Java 21
+- **Framework**: Spring Boot 4.0.0
+- **Build Tool**: Gradle
+- **Database**: H2 Database (File Mode for Persistence)
+- **Frontend**: Thymeleaf, HTML/CSS, Vanilla JS
+- **Security**: Spring Security (Role-based Auth)
+- **API**: Naver Maps API (Geocoding), Naver Search API (Category), Bizno API (Business registration number)
 
-##### VIEW
-| 이름(예명) | 기능 |
-| --------- | ----- |
-| Main | Index(음식 카테고리, 로그인) |
-| login | 로그인 | 
-| register | 회원가입 |
-| myPage | 마이페이지(예약 목록, 회원 수정) |
-| adminPage | 관리자 페이지(통계, 예약 현황...etc) |
-| reservation | 예약 페이지 |
+## 🌟 Key Features
+> 수정 필요
 
-##### Entity
-<img width="749" height="550" alt="erd_diagram" src="https://github.com/user-attachments/assets/509a5fd8-ba50-4eb2-83a1-a84612a86b0b" />
+### 1. 엑셀 데이터 파싱 및 자동 카테고리 분류
+- **문제**: 원본 데이터의 카테고리가 불분명하거나 '기타'로 되어있는 경우가 많음.
+- **해결**: 기타 카테고리의 데이터를 검색 API 를 사용하여 **분류 알고리즘** 구현
+    - 정규표현식(Regex)과 Enum을 활용하여 분류 정확도 향상.
+    - `Enum` 기반 설계를 통해 키워드 관리의 유지보수성 증대.
 
+### 2. Geocoding & 데이터 영속성 관리
+- 주소 데이터를 기반으로 위도/경도 좌표를 자동 추출하여 시각화 기반 마련.
+- 중복 데이터 업로드 방지 로직을 통해 불필요한 API 호출 비용 절감.
 
-// lucid.app
+### 3. 사용자 권한 분리 (RBAC)
+- **Admin**: 식당 엑셀 업로드, 전체 회원 관리.
+- **Owner**: 본인 식당 정보 수정 및 예약 관리.
+- **Member**: 식당 검색, 예약 신청, 마이페이지 조회, 리뷰 작성.
 
-
------
-
-## Implement Function Constraint(Exception)
-<pre>
-	1. 식당 목록(지도, 키워드 검색)
-	2. 예약(동시간대 여러 예약 처리)
-	3. 예약 순서 미루기
-	4. 대기열(시간)
-	5. 회원의 예약 순서가 가까워지면 알람(Message or Alert)
-	6. 예약 성공 시 알람(캘린더)에 추가
-</pre>
-
----
-
-## 📂 TableGrap Project Structure
-
-```bash
-📁 TableGrap
-├─ 📁 .gradle
-├─ 📁 .idea
-├─ 📁 build
-├─ 📁 gradle
-│   └─ 📁 wrapper
-├─ 📁 src
-│   ├─ 📁 main
-│   │   ├─ 📁 java
-│   │   │   └─ 📁 com
-│   │   │       └─ 📁 example
-│   │   │           └─ 📁 demo
-│   │   │               ├─ 📁 config
-│   │   │               │   ├─ ☕ AdminDataInitializer.java		// admin 권한 부여
-│   │   │               │   └─ ☕ SecurityConfiguration.java	// Security 설정
-│   │   │               ├─ 📁 controller
-│   │   │               │   ├─ ☕ AdminController.java			// 파일(식당) 업로드 
-│   │   │               │   ├─ ☕ HomeController.java			// 페이지 이동
-│   │   │               │   ├─ ☕ ManageController.java			// 관리자 페이지
-│   │   │               │   └─ ☕ MemberController.java			// 회원
-│   │   │               ├─ 📁 data
-│   │   │               │   ├─ 📁 dto
-│   │   │               │   │   ├─ ☕ CoordinateDto.java		// 식당 좌표
-│   │   │               │   │   └─ ☕ MemberDto.java			// 회원가입
-│   │   │               │   ├─ 📁 model
-│   │   │               │   │   ├─ ☕ Authority.java			// 권한 테이블
-│   │   │               │   │   ├─ ☕ Book.java					// 예약 테이블
-│   │   │               │   │   ├─ ☕ Diner.java				// 식당 테이블
-│   │   │               │   │   ├─ ☕ Member.java				// 회원 테이블
-│   │   │               │   │   └─ ☕ MemberUserDetails.java	// 회원 권한 세팅
-│   │   │               │   └─ 📁 repository
-│   │   │               │       ├─ 🟢 AuthorityRepository.java		// 권한
-│   │   │               │       ├─ 🟢 BookRepository.java			// 예약
-│   │   │               │       ├─ 🟢 DinerRepository.java			// 식당
-│   │   │               │       └─ 🟢 MemberRepository.java			// 회원
-│   │   │               ├─ 📁 service
-│   │   │               │   ├─ 🟢 DinerExcelService.java			// 파일(식당) 관련 서비스 Interface
-│   │   │               │   ├─ 🟢 DinerService.java					// 식당 관련 서비스 Interface
-│   │   │               │   ├─ 🟢 GeocodingService.java				// 식당 좌표 api 서비스 Class
-│   │   │               │   ├─ 🟢 MemberService.java				// 회원 관련 서비스 Interface
-│   │   │               │   └─ 📁 impl								// 실제 구현 파일 폴더
-│   │   │               │       ├─ ☕ CustomUserDetailsService.java
-│   │   │               │       ├─ ☕ DinerExcelServiceImpl.java
-│   │   │               │       ├─ ☕ DinerServiceImpl.java
-│   │   │               │       ├─ ☕ GeocodingServiceImpl.java
-│   │   │               │       └─ ☕ MemberServiceImpl.java
-│   │   │
-│   │   └─ 📁 resources
-│   │       ├─ 📁 static
-│   │       │   └─ 📄 register.js				// 회원가입 스크립트
-│   │       ├─ 📁 templates
-│   │       │   ├─ 📁 admin
-│   │       │   │   └─ 🌐 adminPage.html		// 관리자 페이지
-│   │       │   ├─ 📁 fragment
-│   │       │   │   └─ 🌐 common.html			// header, footer 파일
-│   │       │   ├─ 📁 reservation
-│   │       │   │   └─ 🌐 reservation.html		// 예약 페이지
-│   │       │   └─ 📁 user
-│   │       │       ├─ 🌐 login.html			// 로그인 페이지
-│   │       │       ├─ 🌐 logout.html			// 로그아웃 페이지
-│   │       │       ├─ 🌐 myPage.html			// 마이페이지
-│   │       │       ├─ 🌐 ownerPage.html		// 식당주인 페이지
-│   │       │       └─ 🌐 register.html			// 회원가입 페이지
-│   │       │
-│   │       ├─ 🌐 index.html					// 메인 페이지
-│   │       ├─ ⚙️ application.properties		// 설정
-│   │       ├─ 🗄️ schema.sql					// h2 DB 스키마
-│   │       └─ 📊 test_diner.xlsx				// 테스트용 식당 정보 파일
-├─ 📝 README.md
-├─ 📝 HELP.md
-├─ ⚙️ build.gradle
-├─ ⚙️ gradlew
-├─ ⚙️ gradlew.bat
-├─ ⚙️ settings.gradle
-├─ ⚙️ .gitignore
-└─ ⚙️ .gitattributes
+## 📂 Project Structure
+```
+src/
+├─ main/
+│  ├─ java/
+│  │  └─ com.example.demo/
+│  │     ├─ config/        # 보안, 초기 데이터 설정
+│  │     ├─ controller/    # MVC / REST 컨트롤러
+│  │     ├─ data/
+│  │     │  ├─ dto/        # 요청/응답 DTO
+│  │     │  ├─ enums/      # 공통 Enum
+│  │     │  ├─ model/      # JPA Entity
+│  │     │  ├─ repository/# Spring Data JPA
+│  │     │  └─ userDetails/# Security UserDetails
+│  │     ├─ service/       # 비즈니스 로직
+│  │     │  └─ impl/       # 서비스 구현체
+│  │     └─ DemoApplication.java
+│  │
+│  └─ resources/
+│     ├─ static/           # CSS / JavaScript
+│     └─ templates/        # Thymeleaf View
+│
+└─ test/
+└─ java/                # 테스트 코드
 ```
 
+## 🔥 Technical Issues & Solutions
+> 직접 겪은 문제 중 하나 이상 종합 필요  
+> 
+#### ⚡ 복합 데이터 조회 시 성능 병목 해결 (Performance Optimization)
+
+* **Issue (문제)**
+    * 마이페이지 및 관리자 대시보드 진입 시, 예약 내역·리뷰·식당 정보 등 **다량의 DB 조회가 단일 시점에 집중**되어 초기 페이지 렌더링 속도가 현저히 저하되는 현상 발생.
+* **Solution (해결)**
+    * **UI/UX 모듈화**: 화면 구조를 기능별 탭(Tab) 단위로 분리하여 시각적 복잡도 해소 및 데이터 호출 시점 분산.
+    * **비동기 지연 로딩 (Lazy Loading)**: 전체 데이터를 한 번에 가져오는 기존 방식 대신, 사용자가 특정 탭을 클릭하는 시점에만 **JavaScript Fetch API**를 호출하여 해당 데이터를 비동기적으로 로드.
+    * **RESTful API 설계**: 각 탭에 필요한 데이터만 반환하는 경량 API 엔드포인트를 구축하여 데이터 전송 효율 극대화.
+* **Result (결과)**
+    * **초기 로딩 시간 단축**: 불필요한 초기 쿼리 실행을 방지하여 첫 화면 진입 속도 및 사용자 체감 응답 속도 대폭 개선.
+    * **서버 리소스 최적화**: 사용자가 실제로 확인하는 탭의 데이터에 대해서만 서버 자원을 소모하도록 설계하여 불필요한 DB 부하 절감.
+
 ---
+## 🚀 Getting Started
+1. **Clone the repository**
+   ```bash
+   git clone [https://github.com/devqw010102/TableGrap.git](https://github.com/devqw010102/TableGrap.git)
+2. **Set Application Properties**
+    ```bash
+    src/main/resources/application.properties 파일에 API 키 설정이 필요합니다.
+3. **Run the Project**
+    ```bash
+   ./gradlew bootRun
+4. **Access**
+   - Main : <code>http://localhost:8080</code>
+   - DB Console : <code>http://localhost:8080/h2-console</code>
 
-#### FLOW
-<pre>
-  1. 식당 테이블에 api 값을 불러와서 초기값(울산광역시 만)
-  
-  2. 메인 페이지
-	  2-1) 로그인, 회원가입 : 회원 테이블
-	  2-2) 카테고리 : 식당 리스트 출력 -> 예약 버튼 클릭시 로그인 페이지로 이동
+### 🗄️ Database ERD
 
-  3. 로그인 상태
-	  3-1) 마이페이지
-	  3-2) 회원 수정
-</pre>
+```mermaid
+erDiagram
+    MEMBER ||--o{ AUTHORITY : "assigned"
+    OWNER ||--o{ AUTHORITY : "assigned"
+    
+    OWNER ||--o{ DINER : "manages"
+    OWNER ||--o{ OWNER_REQUEST : "submits"
+    DINER ||--o{ OWNER_REQUEST : "requested"
+    
+    MEMBER ||--o{ BOOK : "reserves"
+    DINER ||--o{ BOOK : "receives"
+    
+    MEMBER ||--o{ REVIEW : "writes"
+    DINER ||--o{ REVIEW : "reviewed_at"
+    BOOK ||--|| REVIEW : "references"
 
-#### Commit Message
+    MEMBER {
+        Long id PK
+        String username UK
+        String password
+        String email UK
+        String name
+        String phone
+    }
 
-| commit | func |
-| ------ | ---- |
-| add | 기능 추가|
-| modify | 수정 |
-| fix | 버그 수정|
-| delete | 삭제 |
-| style | 스타일/포맷팅 |
-| test | 테스트 코드 |
+    OWNER {
+        Long id PK
+        String username UK
+        String password
+        String name
+        String email
+        String phone
+    }
 
-<img width="1920" height="1040" alt="Spring Initializr - Chrome 25-12-11 오후 12_13_34" src="https://github.com/user-attachments/assets/2906b98f-c8a2-407b-a2f9-91fe73a381e7" />
+    DINER {
+        Long id PK
+        Long owner_id FK
+        String dinerName
+        String category
+        String location
+        String tel
+        Double dx "x좌표"
+        Double dy "y좌표"
+        DinerStatus status
+        String businessNum
+    }
 
+    BOOK {
+        Long bookId PK
+        Long member_id FK
+        Long diner_id FK
+        LocalDateTime addDate
+        LocalDateTime bookingDate
+        Integer personnel
+        Boolean success
+    }
+
+    AUTHORITY {
+        Long id PK
+        Long member_id FK
+        Long owner_id FK
+        String authority "Role Name"
+    }
+
+    REVIEW {
+        Long reviewId PK
+        Long memberId FK
+        Long bookId FK
+        Long dinerId FK
+        int rating
+        String comment
+        LocalDateTime createTime
+    }
+
+    OWNER_REQUEST {
+        Long id PK
+        Long owner_id FK
+        Long diner_id FK
+        RequestStatus status
+        LocalDateTime createAt
+    }
+
+    NOTIFICATION {
+        Long id PK
+        Long memberId
+        String message
+        String role
+        boolean isRead
+        LocalDateTime createdAt
+        NotificationType type
+    }
+```
+
+### 🔄 Data Processing Flow
+> (예시) 데이터 흐름도 Mermaid or Diagram 으로 작성 예정
+```mermaid
+graph TD
+    A[Excel File Upload] --> B{Category Refinement}
+    B -->|Regex/Enum Matching| C[Standard Category Assigned]
+    C --> D[Geocoding API Call]
+    D --> E[Coordinate Data Obtained]
+    E --> F{Duplicate Check}
+    F -->|New Data| G[Save to H2 File Database]
+    F -->|Exists| H[Skip/Update]
+    G --> I[Persistence Guaranteed]

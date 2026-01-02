@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>비밀번호 재설정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/reserPwd.css}">
+</head>
+<body>
+
+<header th:replace="~{fragment/common :: header}"></header>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-5">
+                <h3 class="fw-bold text-center mb-4">비밀번호 재설정</h3>
+
+                <form id="verifyPwdForm">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="registerId" placeholder="아이디" onkeyup="checkUsernameFormat(this)">
+                        <label for="registerId">아이디</label>
+                        <div id="error-registerId" class="small ms-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="hidden" id="totalEmail">
+                        <div class="input-group">
+                        <input type="text" class="form-control" id="registerEmail" placeholder="이메일" oninput="this.value = this.value.replace(/\s/g, ''); checkEmailFormat()" aria-label="이메일 아이디">
+                        <span class="input-group-text">@</span>
+                        <input type="text" class="form-control" id="registerDomain" placeholder="도메인" oninput="this.value = this.value.replace(/\s/g, ''); checkEmailFormat()" aria-label="이메일 도메인">
+                            <select class="form-select" id="emailDomainSelect" onchange="selectDomainSimple()" aria-label="이메일 도메인 선택">
+                                <option value="">직접 입력</option>
+                                <option value="naver.com">naver.com</option>
+                                <option value="gmail.com">gmail.com</option>
+                                <option value="daum.net">daum.net</option>
+                                <option value="kakao.com">kakao.com</option>
+                            </select>
+                        </div>
+                        <div id="error-registerEmail" class="small ms-1 mt-1"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">본인 확인</button>
+                </form>
+
+                <form id="newPwdForm" class="d-none">
+                    <input type="hidden" id="verifiedUsername">
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="registerPwd" placeholder="새 비밀번호" onkeyup="checkPwd(this)">
+                        <label for="registerPwd">새 비밀번호</label>
+                        <div id="error-registerPwd" class="small ms-1"></div>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="registerPwdConfirm" placeholder="비밀번호 확인" onkeyup="checkPwdConfirm()">
+                        <label for="registerPwdConfirm">비밀번호 확인</label>
+                        <div id="error-registerPwdConfirm" class="small ms-1"></div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold">비밀번호 변경 완료</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="/js/validation.js" type="text/javascript"></script>
+<script src="/js/findAccount.js" type="text/javascript"></script>
+</body>
+</html>

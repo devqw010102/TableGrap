@@ -205,6 +205,57 @@ function checkPwdConfirm() {
         if (bizNumReg.test(bizNumVal)) {
             clearError(businessNumber.id);
         } else {
-            showError(businessNumber.id, "사업자 번호는 숫자 10자리여야 합니다.");
+            showError(businessNumber.id, "사업자 번호는 (-)를 제외한 숫자 10자리여야 합니다.");
+        }
     }
+
+        // 아이디 찾기, 비밀번호 재설정
+        // 아이디 형식만 검사 - resetPwd
+        function checkUsernameFormat(idInput) {
+            const username = idInput.value.trim();
+            const idReg = /^[a-zA-Z0-9]{3,12}$/;
+
+            if (username.length >= 3 && username.length <= 12 && idReg.test(username)) {
+                clearError(idInput.id);
+                return true;
+            } else {
+                showError(idInput.id, "아이디는 영문/숫자 3~12자여야 합니다.");
+                return false;
+            }
+        }
+
+        // 이메일 형식만 검사 - findId, resetPwd
+        function checkEmailFormat() {
+            const emailInput = document.getElementById("registerEmail");
+            const domainInput = document.getElementById("registerDomain");
+            const totalEmailInput = document.getElementById("totalEmail");
+
+            const emailPrefix = emailInput.value.trim();
+            const domain = domainInput.value.trim();
+            const fullEmail = `${emailPrefix}@${domain}`;
+            const emailReg = /^[a-zA-Z0-9]{2,}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (emailReg.test(fullEmail)) {
+                clearError(emailInput.id);
+                domainInput.classList.remove('is-invalid');
+                domainInput.classList.add('is-valid');
+                if (totalEmailInput) totalEmailInput.value = fullEmail;
+                return true;
+            } else {
+                // 형식이 안 맞을 때만 에러 표시
+                showError(emailInput.id, "유효한 이메일 형식이 아닙니다.");
+                domainInput.classList.add('is-invalid');
+                return false;
+            }
+        }
+        // 이메일 선택 시
+    function selectDomainSimple() {
+        const domainInput = document.getElementById("registerDomain");
+        const domainSelect = document.getElementById("emailDomainSelect");
+
+        if (domainInput && domainSelect) {
+            domainInput.value = domainSelect.value;
+            domainInput.readOnly = (domainSelect.value !== "");
+            checkEmailFormat();
+        }
 }

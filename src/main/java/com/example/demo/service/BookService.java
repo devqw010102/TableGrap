@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
+import com.example.demo.data.dto.SlotResponseDto;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import org.springframework.data.domain.Page;
 
@@ -9,8 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BookService {
+
     List<BookResponseDto> findMyBooks(Long memberId);
+
     BookResponseDto getBooking(Long bookId);
+
     void updateBooking(BookDto dto);
 
     void deleteBooking(Long bookId);
@@ -23,4 +27,6 @@ public interface BookService {
     void approveBooking(Long bookId);
 
     void rejectBooking(Long bookId);
+
+    List<SlotResponseDto> getDailyAvailability(LocalDate date, int requestedPersonnel, Long dinerId);
 }

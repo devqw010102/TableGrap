@@ -3,7 +3,6 @@ package com.example.demo.data.dto;
 import com.example.demo.data.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

@@ -9,8 +9,12 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findByMemberIdOrderByCreatedAtDesc(Long id);
 
-    long countByMemberIdAndIsReadFalse(Long memberId);
-
     @Transactional
     void deleteByMemberIdAndRole(Long memberId, String role);
+
+    //사장님이 받는 알림
+    List<Notification> findByOwnerIdOrderByCreatedAtDesc(Long id);
+
+    @Transactional
+    void deleteByOwnerIdAndRole(Long ownerId, String role);
 }

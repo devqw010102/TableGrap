@@ -165,16 +165,26 @@ function loadBooks() {
                 let modifyDate = book.bookingDate.replace("T", " ").substring(0, 16);
                 const myBookingLink = `/reservation?id=${book.dinerId}&bookId=${book.bookId}`;
                 // 예약 취소 | 후기 작성 버튼 변환
-                //const date = new Date();
+                const date = new Date();
+
                 //테스트용 시간 설정 (미래) -> 예약 대기 상태에서는 버튼 출력x
-                const date = new Date("2026-01-01");
+                //const date = new Date("2026-01-01");
                 //테스트용 시간 설정 (과거)
                 //const date = new Date("2025-01-01");
                 //const now = new Date();
+
                 const bookDate = new Date(book.bookingDate);
                 const isPast = date > bookDate;
-
                 const timeDiff = date - bookDate; //현재 시간과 예약
+
+                const oneDayInMs = 24 * 60 * 60 * 1000;
+                // 예약까지 남은시간
+                const timeLeft = bookDate - date;
+                // 클릭 차단 조건
+                const isLinkBlocked = timeDiff >= 0 || timeLeft <= oneDayInMs;
+
+                const canCancel = (timeDiff <= 0) || (book.cancelAllowed === true);
+
                 //버튼 변경 로직
                 const changeBtn =
                     (book.reviewId) ? `<button class="btn btn-info btn-sm btn-update-review" 
@@ -188,14 +198,22 @@ function loadBooks() {
                     data-diner-id="${book.dinerId}"
                     >후기 작성</button>`
                             // 예약 일자 경과 전
-                            : (timeDiff <= 0 && (book.success || !book.success))
+                            //: (timeDiff <= 0 && (book.success || !book.success))
+                            : (canCancel && (book.success || !book.success))
                                 ? `<button class="btn btn-danger btn-sm btn-cancel-booking" data-id="${book.bookId}">예약 취소</button>`
                                 : "";
 
-                //예약 시간이 경과한 후 예약 수정 페이지 진입 차단
-                const changeUrl =
-                    (timeDiff >= 0 && book.success) ? `${book.dinerName}`
-                        : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`
+                //예약 시간이 경과한 후 예약 수정 페이지 진입 차단 + 예약 하루 전 수정 불가능
+                const changeUrl = (isLinkBlocked && book.success)
+                    ? `<a href="javascript:void(0);"
+                          onclick="alert('예약 24시간 전부터는 수정이 불가능합니다. 식당으로 직접 문의해주세요.');"
+                          class="text-secondary text-decoration-none"
+                          style="cursor: not-allowed;">${book.dinerName}</a>`
+                    : `<a href="${myBookingLink}" class="text-primary text-decoration-underline">${book.dinerName}</a>`;
+
+                    const statusBadge = book.success
+                        ? `<span class="badge bg-success-subtle text-success border border-success-subtle">확정</span>`
+                        : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle">대기</span>`;
 
                 const rowHtml = `
                     <tr>
@@ -203,8 +221,7 @@ function loadBooks() {
                         <td>${modifyDate}</td>
                         <td>${book.personnel}</td>
                         <td>${book.memberName}</td>
-                        <td>${book.success ? "확정" : "대기"}</td>
-                        <td>${changeBtn}</td>
+                        <td>${statusBadge}</td> <td>${changeBtn}</td>
                     </tr>
                 `;
 
@@ -315,16 +332,20 @@ function deleteMember() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: password })
     })
-        .then(res => {
+        .then(async res => {
             if (res.ok) {
                 alert("정상적으로 탈퇴되었습니다. 메인으로 이동합니다.");
                 // location.reload();
                 location.href="/";
             } else {
-                alert("비밀번호가 일치하지 않거나 오류가 발생했습니다.");
+                const errorMsg = await res.text();
+                alert(errorMsg || "오류가 발생했습니다.");
             }
         })
-        .catch(err => console.error("Delete Error:", err));
+        .catch(err => {
+            console.error("Delete Error:", err);
+            alert("서버 통신 오류가 발생했습니다.");
+        });
 }
 
 // 예약 취소
@@ -332,12 +353,13 @@ function cancelBooking(bookId) {
     if (!confirm("정말로 예약을 취소하시겠습니까?")) return;
 
     fetch(`/api/myPage/book/delete/${bookId}`, { method: 'DELETE' })
-        .then(res => {
+        .then(async res => {
             if (res.ok) {
                 alert("예약이 취소되었습니다.");
                 loadBooks(); // 목록 갱신
             } else {
-                alert("취소 실패: 이미 취소되었거나 오류가 있습니다.");
+                const errorMsg = await res.text();
+                alert("예약 24시간 전 취소 불가합니다, 가게로 연락 부탁드립니다.");
             }
         })
         .catch(() => alert("서버 통신 오류"));
@@ -539,4 +561,17 @@ function renderEmptyRow(tbody, colSpan, message) {
                 ${message}
             </td>
         </tr>
-    `}
+    `
+}
+
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'closed') {
+        alert("해당 식당은 현재 예약 서비스를 일시 중단하였습니다. 관련 문의는 식당으로 직접 연락 부탁드립니다.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    if (urlParams.get('error') === 'dinerIdNull') {
+        alert("식당 정보를 불러올 수 없습니다.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}

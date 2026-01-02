@@ -1,49 +1,111 @@
-.notif-list {
-    width: 400px !important;    /* 너비를 300px에서 400px로 확장 */
-    max-height: 500px !important; /* 높이도 조금 더 여유 있게 조정 */
-    padding: 0;                 /* 내부 여백 최적화 */
-    border-radius: 12px;        /* 테두리를 더 부드럽게 */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* 그림자를 주어 입체감 부여 */
-    overflow-x: hidden;         /* 가로 스크롤 방지 */
+/* TableGrap 브랜드 컬러 변수 */
+:root {
+    --main-orange: #FF7E00;
+    --main-amber: #FFB300;
+    --sub-light-orange: #FFBE7F;
+    --sub-deep-orange: #FF6539;
+    --sub-green: #72D1A0;
+
+    /* 고급스러운 그레이톤 변수 추가 */
+    --bg-light-grey: #F8F9FA;
+    --bg-middle-grey: #E9ECEF;
+    --text-dark: #343A40;
+    --text-muted: #6C757D;
+    --border-color: #DEE2E6;
+    --sidebar-dark: #2D3436;
 }
 
+/* ============================================================
+   알림 사이드바 (Offcanvas) 스타일
+   ============================================================ */
+
+/* 1. 사이드바 전체 설정 */
+.offcanvas {
+    width: 400px !important;
+    background-color: #ffffff !important; /* 배경 투명 방지 */
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    border-left: none;
+}
+
+/* 2. 알림 아이템 기본 구조 */
 .notif-item {
-    transition: all 0.2s ease-in-out;
-    border-left: 5px solid transparent;
-    cursor: pointer;
     padding: 1.25rem !important;
+    cursor: pointer;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease-in-out;
+    border-left: 5px solid transparent; /* 왼쪽 강조 선 기본값 */
+    display: block; /* 영역 전체 클릭 보장 */
+    text-decoration: none;
 }
 
+/* 3. 알림 메시지 텍스트 (줄바꿈 핵심) */
 .notif-item p {
-    font-size: 1rem !important; /* 글자 크기 살짝 키움 */
-    line-height: 1.5;           /* 줄 간격 확보 */
+    font-size: 1rem !important;
+    line-height: 1.5;
     margin-bottom: 5px;
+    color: #333;
+    white-space: normal;       /* 줄바꿈 허용 */
+    word-break: keep-all;      /* 한글 단어 단위 줄바꿈 */
+    overflow-wrap: break-word; /* 긴 단어 강제 줄바꿈 */
 }
 
+/* 4. 알림 시간 텍스트 */
+.notif-item small {
+    display: block;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* 5. 상태별 강조 (읽음/안읽음) */
 .notif-item.unread {
-    background-color: #e7f3ff !important;
-    border-left: 5px solid #007bff !important;
-    font-weight: 600;
+    background-color: #f0f7ff !important; /* 매우 연한 파란색 */
+    border-left: 5px solid #007bff !important; /* 파란색 강조 라인 */
+}
+
+.notif-item.unread p {
+    font-weight: 600; /* 안 읽은 메세지 강조 */
     color: #000;
 }
 
-.notif-item.read {
+.notif-item.read .btn-move{
     background-color: #ffffff !important;
-    color: #6c757d;
 }
 
+.notif-item.read p {
+    color: #6c757d; /* 읽은 메세지는 흐리게 */
+}
+
+/* 6. 호버 효과 */
 .notif-item:hover {
-    background-color: #f1f1f1 !important;
-    transform: translateX(4px);
+    background-color: #f8f9fa !important;
 }
 
+/* 7. 삭제 애니메이션 (JS 연동) */
 .fade-out {
-    opacity: 0;
-    transform: translateX(30px);
-    transition: 0.4s ease;
+    opacity: 0 !important;
+    transform: translateX(50px); /* 오른쪽으로 밀려남 */
+    transition: all 0.4s ease-out !important;
+    pointer-events: none; /* 애니메이션 도중 클릭 방지 */
 }
 
-.notif-content {
-    padding-left: 5px;
-    white-space: normal;
+nav {
+    font-size: 1.2rem !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.ms-1 {
+    margin-left : 3rem !important;
+}
+
+/* 이동 버튼 스타일 */
+.notif-action .btn-move {
+    white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
 }

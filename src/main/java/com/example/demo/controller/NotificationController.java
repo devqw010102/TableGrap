@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.data.enums.AuthorityStatus;
 import com.example.demo.data.model.Notification;
 import com.example.demo.data.repository.NotificationRepository;
 import com.example.demo.service.impl.notification.NotificationManager;
@@ -24,18 +25,32 @@ public class NotificationController {
     public SseEmitter subscribe(@PathVariable Long id, @RequestParam String role) {
         return notificationManager.subscribe(role, id);
     }
+    //권한에 따른 분기 구분
+    @GetMapping("/{id}")
+    public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long id, @RequestParam String role) {
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<List<Notification>> getNotifications(@PathVariable Long memberId) {
-        List<Notification> lists = notificationRepository.findByMemberIdOrderByCreatedAtDesc(memberId);
+        List <Notification> lists;
+        if("ROLE_OWNER".equals(role)) {
+            lists = notificationRepository.findByOwnerIdOrderByCreatedAtDesc(id);
+        } else {
+            lists = notificationRepository.findByMemberIdOrderByCreatedAtDesc(id);
+        }
         return ResponseEntity.ok(lists);
     }
-
+    //검증 로직 분기
     @PatchMapping("/{id}/read")
-    public ResponseEntity<Void> readNotification(@PathVariable Long id, @RequestParam Long memberId, @RequestParam String role) {
+    public ResponseEntity<Void> readNotification(@PathVariable Long id, @RequestParam(required = false) Long memberId,
+                                                 @RequestParam(required = false) Long ownerId, @RequestParam String role) {
         Notification notification = notificationRepository.findById(id).orElseThrow();
-
-        if (!notification.getMemberId().equals(memberId) || !notification.getRole().equals(role)) {
+        boolean isAuthorized=false;
+        if(AuthorityStatus.ROLE_OWNER.getCode().equals(role)) {
+            //owner면 owner db와 구분
+            isAuthorized = notification.getOwnerId() != null && notification.getOwnerId().equals(ownerId);
+        } else {
+            //user면 member db와 구분
+            isAuthorized = notification.getMemberId() != null && notification.getMemberId().equals(memberId);
+        }
+        if (!isAuthorized || !notification.getRole().equals(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -44,9 +59,13 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/all/{memberId}")
-    public ResponseEntity<Void> deleteAllNotifications(@PathVariable Long memberId, @RequestParam String role) {
-        notificationRepository.deleteByMemberIdAndRole(memberId, role);
+    @DeleteMapping("/all/{id}")
+    public ResponseEntity<Void> deleteAllNotifications(@PathVariable Long id, @RequestParam String role) {
+        if("ROLE_OWNER".equals(role)) {
+            notificationRepository.deleteByOwnerIdAndRole(id, role);
+        } else {
+            notificationRepository.deleteByMemberIdAndRole(id, role);
+        }
         return ResponseEntity.ok().build();
     }
 }

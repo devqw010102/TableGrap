@@ -1,6 +1,7 @@
 package com.example.demo.data.repository;
 
 import com.example.demo.data.dto.owner.OwnerDinerDto;
+import com.example.demo.data.enums.DinerStatus;
 import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
 import org.springframework.data.domain.Page;
@@ -13,48 +14,62 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
-    Page<Diner> findByCategory(Pageable pageable, String category);
-    Optional<Diner> findById(Long id);
-    // Owner's diners 조회
-    Optional<Diner> findByDinerName(String dinerName);
-    //공백을 제거하고 식당이름 가져오기
-    @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName")
-    Optional<Diner> findByDinerNameIgnoreSpace(@Param("dinerName") String dinerName);
+    //사장이 등록되지 않은 식당은 제외
+    Page<Diner> findByCategoryAndStatusNotAndOwnerNotNull(Pageable pageable, String category, DinerStatus status);
 
+    Optional<Diner> findById(Long id);
+
+    //식당 수정 모달에 사용
+    Optional<Diner> findByIdAndStatusNot(Long id, DinerStatus status);
+
+    //공백을 제거하고 식당이름 가져오기
+    @Query("SELECT d FROM Diner d WHERE REPLACE(d.dinerName, ' ', '') = :dinerName AND d.status <> :status")
+    Optional<Diner> findByDinerNameIgnoreSpaceStatusNot(@Param("dinerName") String dinerName, @Param("status") DinerStatus status);
 
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerDinerDto(
             d.id,
-            d.dinerName
+            d.dinerName,
+            d.status
         )
         from Diner d
         where d.owner.id = :ownerId
+        And d.status <> :status
     """)
-    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId);
+    List<OwnerDinerDto> findByOwnerId(@Param("ownerId") Long ownerId, @Param("status") DinerStatus status);
 
     @Query("""
         select d
         from Diner d
         join fetch d.owner m
         join fetch m.authorities a
-        where a.authority = 'ROLE_OWNER'
+        where a.authority = :userRole
+        And d.status <> :status
     """)
-    Page<Diner> findOwnerDiners(Pageable pageable);
+    Page<Diner> findOwnerDiners(Pageable pageable, @Param("status") DinerStatus status, @Param("userRole") String userRole);
 
-    @Query("select count(d) from Diner d")
+    @Query("select count(d) from Diner d where d.status <> 'DELETED'")
     Long countAllDiners();
 
     List<Diner> findAllByOwner(Owner owner);
 
     @Query("""
-        SELECT new com.example.demo.data.dto.owner.OwnerDinerDto(d.id, d.dinerName)
+        SELECT new com.example.demo.data.dto.owner.OwnerDinerDto(d.id, d.dinerName, d.status)
         FROM Diner d
-        WHERE d.id = :dinerId AND d.owner.id = :ownerId
+        WHERE d.id = :dinerId AND d.owner.id = :ownerId And d.status <> :status
     """)
     Optional<OwnerDinerDto> findDinerByOwner(
             @Param("dinerId") Long dinerId,
-            @Param("ownerId") Long ownerId
+            @Param("ownerId") Long ownerId,
+            @Param("status") DinerStatus status
     );
 
+    //식당 삭제할 때 사용
     Optional<Diner> findByIdAndOwnerId(Long dinerId, Long ownerId);
+
+    //식당 수정 할 때 사용
+    Optional<Diner> findByIdAndOwnerIdAndStatus(Long dinerId, Long ownerId, DinerStatus status);
+
+    //식당 중복 업로드 방지
+    boolean existsByDinerNameAndLocation(String dinerName, String location);
 }

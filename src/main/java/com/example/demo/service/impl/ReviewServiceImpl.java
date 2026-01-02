@@ -27,7 +27,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final DinerRepository dinerRepository;
-
     private final ApplicationEventPublisher eventPublisher;
 
     //식당페이지 리뷰 가져오기
@@ -130,22 +129,6 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.deleteById(reviewId);
     }
 
-    public ReviewDto mapToReviewDto(Review review, String dinerName) {
-        return ReviewDto.builder()
-                .reviewId(review.getReviewId())
-                .memberId(review.getMemberId())
-                .bookId(review.getBookId())
-                .dinerId(review.getDinerId())
-                .dinerName(dinerName)
-                .rating(review.getRating())
-                .comment(review.getComment())
-                .createTime(review.getCreateTime())
-                .updateTime(review.getUpdateTime())
-                .build();
-    }
-
-
-
     @Override
     public Page<OwnerReviewDto> getOwnerReviews(Owner owner, Long dinerId, int page, int size) {
 
@@ -163,5 +146,20 @@ public class ReviewServiceImpl implements ReviewService {
             return Page.empty();
         }
         return reviewRepository.findReviewByDinerIds(dinerIds, pageable);
+    }
+
+    //  Review -> ReviewDto 변환 메서드
+    public ReviewDto mapToReviewDto(Review review, String dinerName) {
+        return ReviewDto.builder()
+                .reviewId(review.getReviewId())
+                .memberId(review.getMemberId())
+                .bookId(review.getBookId())
+                .dinerId(review.getDinerId())
+                .dinerName(dinerName)
+                .rating(review.getRating())
+                .comment(review.getComment())
+                .createTime(review.getCreateTime())
+                .updateTime(review.getUpdateTime())
+                .build();
     }
 }

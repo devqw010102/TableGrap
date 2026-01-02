@@ -1,0 +1,176 @@
+/* ==========================================================================
+   1. 헤더 및 페이지 제목 (Header & Title)
+   ========================================================================== */
+/*h1 {
+    color: white;
+    background: linear-gradient(135deg, var(--main-orange), var(--main-amber));
+    padding: 2.5rem;
+    margin: 0;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(255, 126, 0, 0.25);
+    border-left: none;
+}
+*/
+
+h2 {
+    color: var(--text-dark);
+    font-weight: 700;
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+    margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   2. 탭 내비게이션 (Tab Navigation)
+   ========================================================================== */
+.nav-tabs {
+    border-bottom: 2px solid var(--bg-middle-grey);
+    background-color: transparent !important; /* 배경을 투명하게 해서 떠 있는 느낌 부여 */
+    padding: 0 1rem;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 3rem !important;    /* ★ 헤더(h1)와 탭 사이의 간격 추가 */
+    margin-bottom: 1.5rem !important;
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-muted);
+    border: none !important;
+    padding: 1rem 1.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--main-orange);
+    background-color: var(--bg-light-grey);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--main-orange) !important;
+    background-color: transparent !important;
+    font-weight: 700;
+    border-bottom: 3px solid var(--main-orange) !important; /* 오렌지색 밑줄 */
+}
+
+/* ==========================================================================
+   3. 데이터 추가 탭 (Tab 1: Excel Upload)
+   ========================================================================== */
+.upload-card {
+    background-color: white;
+    width: 50%;
+    min-width: 450px;
+    margin: 0 auto;
+    padding: 3.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.upload-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.upload-header h2 {
+    border-left: none;
+    padding-left: 0;
+    color: var(--main-orange);
+    font-size: 2rem;
+}
+
+/* 파일 입력 및 버튼 */
+.custom-file-input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light-grey);
+}
+
+.custom-file-input:focus {
+    border-color: var(--main-orange);
+    box-shadow: 0 0 0 0.25rem rgba(255, 126, 0, 0.1);
+}
+
+.btn-lg {
+    padding: 14px;
+    font-weight: 700;
+    border-radius: 12px;
+    background-color: var(--main-orange);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-lg:hover {
+    background-color: var(--sub-deep-orange);
+    transform: translateY(-2px);
+}
+
+/* 로딩 상태 (disabled) */
+#submitBtn:disabled {
+    background-color: var(--sub-light-orange) !important;
+    border-color: var(--sub-light-orange) !important;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   4. 테이블 및 리스트 (Tables)
+   ========================================================================== */
+.tab-pane .container {
+    max-width: 1200px;
+    overflow-x: auto;
+}
+
+.table {
+    min-width: 900px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.table thead th {
+    background-color: var(--bg-middle-grey) !important;
+    color: var(--text-dark) !important;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+}
+
+/* ==========================================================================
+   5. 대시보드 (Dashboard)
+   ========================================================================== */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+#dashboardDinerCount,
+#dashboardTodayBooking,
+#dashboardMemberCount {
+    color: var(--main-orange);
+    font-weight: 800;
+    font-size: 2.2rem;
+}
+
+.list-group-item span {
+    font-weight: bold;
+    color: var(--main-orange);
+}
+
+/* ==========================================================================
+   6. 기타 (Footer & Utility)
+   ========================================================================== */
+footer {
+    margin-top: 5rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--border-color);
+    background-color: white;
+    text-align: center;
+}

@@ -1,0 +1,211 @@
+@charset "UTF-8";
+
+/* =========================================
+   1. 대시보드 헤더
+   ========================================= */
+/* ownerPage.css */
+.dashboard-header {
+    background-color: #fff;
+    padding: 15px 0; /* padding을 조금 줄임 */
+    margin-bottom: 30px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+
+
+/*.dashboard-header h2 {
+    color: var(--main-orange);
+    font-size: 1.8rem;
+    margin: 0;
+}
+*/
+
+/* 셀렉트 박스 스타일 */
+#dinerSelect {
+    border: 2px solid #dee2e6;
+    color: var(--main-amber);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* =========================================
+   2. 탭 네비게이션 (admin/myPage 스타일로 통일)
+   ========================================= */
+.nav-tabs {
+    display: flex !important;
+    justify-content: center; /* 중앙 정렬 */
+    gap: 15px;               /* 탭 사이 간격 */
+    border-bottom: 2px solid var(--bg-middle-grey) !important; /* 연한 회색 바닥선 */
+    background-color: transparent !important;
+    margin-bottom: 20px !important;
+    padding-left: 0;
+}
+
+.nav-tabs .nav-link {
+    border: none !important;      /* 모든 테두리 제거 */
+    color: var(--text-muted);     /* 비활성 탭 글자색 */
+    font-weight: 600;
+    padding: 1rem 1.5rem;         /* adminPage와 유사한 패딩 */
+    background-color: transparent !important;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border-radius: 0 !important;  /* 둥근 모서리 제거 */
+}
+
+/* 아이콘 색상 조절 (선택 사항) */
+.nav-tabs .nav-link i {
+    color: inherit; /* 글자색과 동일하게 유지 */
+}
+
+/* 탭 호버 효과 */
+.nav-tabs .nav-link:hover {
+    color: var(--main-orange) !important;
+    background-color: var(--bg-light-grey) !important;
+}
+
+/* 활성화된 탭 (Active) - 하단 오렌지색 밑줄 강조 */
+.nav-tabs .nav-link.active {
+    color: var(--main-orange) !important;
+    background-color: transparent !important;
+    font-weight: 700;
+    border-bottom: 3px solid var(--main-orange) !important; /* 오렌지색 밑줄 */
+}
+
+/* =========================================
+   3. 탭 컨텐츠 박스 (카드 디자인)
+   ========================================= */
+/* 탭 바로 아래 붙는 흰색 박스 */
+.owner-tab-content {
+    background-color: #fff;
+    border: 1px solid var(--border-color) !important; /* 모든 면에 테두리 추가 */
+    border-radius: 15px !important;                   /* 모서리 둥글게 */
+    padding: 40px;
+    min-height: 500px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; /* adminPage 스타일 그림자 */
+    margin-top: 10px;
+}
+/* 각 섹션 제목 */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 25px;
+    border-left: 5px solid var(--main-orange);
+    padding-left: 15px;
+}
+
+/* =========================================
+   4. 테이블 스타일 재정의 (ownerPage 전용)
+   ========================================= */
+.owner-tab-content .table {
+    margin-bottom: 0;
+}
+
+.owner-tab-content .table thead th {
+    background-color: #f8f9fa; /* 헤더 배경 밝은 회색 */
+    color: #495057;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+    font-weight: 600;
+}
+
+.owner-tab-content .table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+/* 내 정보 테이블 스타일 */
+#myInfoEditForm .table th {
+    background-color: #f8f9fa !important;
+    text-align: center;
+}
+#myInfoEditForm .table td {
+    text-align: left; /* 입력창은 왼쪽 정렬 */
+    padding-left: 20px;
+}
+
+/* =========================================
+   5. 모달, 버튼 등 기타 수정
+   ========================================= */
+/* 모달 헤더 */
+.modal-header {
+    background-color: #f8f9fa;
+}
+
+/* 페이지네이션 */
+#pagination .page-link {
+    border: none;
+    border-radius: 50%;
+    margin: 0 3px;
+    width: 35px; height: 35px;
+    display: flex; align-items: center; justify-content: center;
+    color: #6c757d;
+}
+
+#pagination .page-item.active .page-link {
+    background-color: var(--main-orange);
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(255, 126, 0, 0.3);
+}
+
+/* 개인 정보 수정*/
+.btn-edit {
+    background-color: var(--main-orange) !important;;
+    border-color: var(--main-orange) !important;
+    color: #fff;
+}
+.btn-edit:hover {
+    background-color: #fff !important;
+    border-color: var(--main-orange) !important;
+    color: var(--main-orange) !important;
+}
+
+.btn-find-biznum{
+    background-color: var(--sub-deep-orange);
+    border-color: var(--sub-light-orange);
+    color: #fff;
+}
+
+.btn-find-biznum:hover{
+    background-color: #fff;
+    border-color: var(--sub-light-orange);
+    color: var(--sub-deep-orange);
+}
+
+ .btn-info{
+      background-color: var(--main-amber) !important;
+      border-color: var(--main-amber) !important;
+      color: #fff !important;
+
+ }
+
+ .btn-info:hover{
+      background-color: #fff !important;
+      border-color: var(--main-amber) !important;
+      color: var(--main-amber) !important;
+ }
+
+.btn-add-diner {
+  background-color: var(--main-orange);
+  border-color: var(--main-amber);
+  color: #fff
+}
+.btn-add-diner:hover {
+  background-color: #fff;
+  border-color: var(--main-amber);
+  color: var(--main-orange);
+}
+
+.btn-edit-diner{
+  background-color: var(--main-orange);
+    border-color: var(--main-amber);
+    color: #fff
+}
+
+.btn-edit-diner:hover{
+  background-color: #fff;
+  border-color: var(--main-amber);
+  color: var(--main-orange);
+}

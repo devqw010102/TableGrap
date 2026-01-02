@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.data.dto.BookDto;
 import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.DinerDetailDto;
+import com.example.demo.data.enums.DinerStatus;
+import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Member;
 import com.example.demo.data.userDeatils.MemberUserDetails;
 import com.example.demo.service.BookService;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,8 +44,16 @@ public class BookingController {
 
         // ID가 없으면 기본값 1번 식당 보여주기...? 404?
         if (dinerId == null) {
-            dinerId = 1L;
+            return "redirect:/mypage?error=dinerIdNull";
         }
+        Optional<Diner> dinerCheck = dinerService.findById(dinerId);
+        if (dinerCheck.isPresent()) {
+            Diner check = dinerCheck.get();
+            if(check.getStatus() != DinerStatus.PUBLIC) {
+                return "redirect:/mypage?error=closed";
+            }
+        }
+
         // DB에서 식당 정보 가져오기
         DinerDetailDto diner = dinerService.getDinerById(dinerId);
 

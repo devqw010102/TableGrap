@@ -13,7 +13,6 @@ import com.example.demo.data.repository.OwnerRepository;
 import com.example.demo.service.DinerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,11 +34,13 @@ public class DinerServiceImpl implements DinerService {
         return DinerListDto.builder()
                 .id(diner.getId())
                 .dinerName(diner.getDinerName())
+                .location(diner.getLocation())
+                .status(diner.getStatus())
                 .category(diner.getCategory())
                 .build();
     }
 
-    //Diner -> DinerDetailDto 변환 메서드
+    // Diner -> DinerDetailDto 변환 메서드
     private DinerDetailDto mapToDinerDetailDto(Diner diner){
         return DinerDetailDto.builder()
                 .id(diner.getId())
@@ -64,13 +65,20 @@ public class DinerServiceImpl implements DinerService {
     @Override
     //Pagination활용하기 위해 Page타입으로 변경
     public Page<DinerListDto> getListByCat(Pageable pageable, String category){
-        return dinerRepository.findByCategory(pageable, category).map(this::mapToDinerListDto);
+        return dinerRepository.findByCategoryAndStatusNotAndOwnerNotNull(pageable, category, DinerStatus.DELETED).map(this::mapToDinerListDto);
     }
 
     @Override
     public List<OwnerDinerDto> getOwnerDiners(Long ownerId) {
-        return dinerRepository.findByOwnerId(ownerId);
+        return dinerRepository.findByOwnerId(ownerId, DinerStatus.DELETED);
     }
+
+    //사업자 조회시 식당 추가
+    @Override
+    public Optional<Diner> findByDinerNameBiz(String dinerName){
+        return dinerRepository.findByDinerNameIgnoreSpaceStatusNot(dinerName, DinerStatus.DELETED);
+    }
+
 
     //식당 추가
     @Override
@@ -83,7 +91,7 @@ public class DinerServiceImpl implements DinerService {
         Owner owner = ownerRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         //식당이름으로 기존 owner가 존재하는지 확인
-        dinerRepository.findByDinerNameIgnoreSpace(strippedDinerName)
+        dinerRepository.findByDinerNameIgnoreSpaceStatusNot(strippedDinerName, DinerStatus.DELETED)
                 .ifPresentOrElse(diner -> {
                     //이미 식당 주인이 있는 경우 예외 처리
                     if(diner.getOwner() != null) {
@@ -101,7 +109,7 @@ public class DinerServiceImpl implements DinerService {
     //식당 삭제 탭에서 선택한 식당 출력
     @Override
     public Optional<OwnerDinerDto> getOwnerDinerById(Long dinerId, Long ownerId) {
-        return dinerRepository.findDinerByOwner(dinerId, ownerId);
+        return dinerRepository.findDinerByOwner(dinerId, ownerId, DinerStatus.DELETED);
     }
 
     //식당 삭제
@@ -110,10 +118,55 @@ public class DinerServiceImpl implements DinerService {
     public void deleteDiner(Long dinerId, Long ownerId) {
         Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId).orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
         //삭제신청일 이후의 예약이 존재하는 지 확인
-        boolean hasFutureBookings = bookRepository.existsByDiner_IdAndBookingDateAfter(dinerId, LocalDateTime.now());
+        //예약일자가 지나고 실제로 삭제되는 확인: LocalDateTime.now() -> LocalDateTime.of()로 변경하고 테스트
+        boolean hasFutureBookings = bookRepository.existsByDiner_IdAndBookingDateAfter(dinerId, LocalDateTime.of(2026, 1, 10, 0, 0));
         if (hasFutureBookings) {
             throw new IllegalStateException("예약일자가 지나지 않은 예약이 존재하여 삭제할 수 없습니다.");
         }
-        dinerRepository.delete(diner);
+
+        //enum활용하여 status를 delete로 변경(soft delete)
+        diner.setStatus(DinerStatus.DELETED);
+        //식당목록을 불러오는 메소드 변경 필요
+
+
+    }
+
+    //식당 상태 변경
+    @Override
+    @Transactional
+    public void changeStatus(Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerId(dinerId, ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        if(diner.getStatus().equals(DinerStatus.PUBLIC)) {
+            // 식당 수용인원 0명으로 만들어서 예약 불가능하게
+            diner.setDefaultMaxCapacity(0);
+            diner.setStatus(DinerStatus.CLOSED);
+        } else if(diner.getStatus().equals(DinerStatus.CLOSED)) {
+            diner.setDefaultMaxCapacity(10);
+            diner.setStatus(DinerStatus.PUBLIC);
+        }
+    }
+
+    //식당 정보 변경
+    @Override
+    @Transactional
+    public void updateDinerInfo(DinerDto dto, Long dinerId, Long ownerId) {
+        Diner diner = dinerRepository.findByIdAndOwnerIdAndStatus(dinerId, ownerId, DinerStatus.PUBLIC)
+                .orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+        diner.setTel(dto.getTel());
+        diner.setDefaultMaxCapacity(dto.getDefaultMaxCapacity());
+    }
+    // 식당 수정 모달에 정보 가져오기
+    public DinerDto getDinerInfo(Long dinerId) {
+       Diner diner = dinerRepository.findByIdAndStatusNot(dinerId, DinerStatus.DELETED).orElseThrow(() -> new IllegalArgumentException("식당이 존재하지 않습니다."));
+       return DinerDto.builder()
+               .tel(diner.getTel())
+               .defaultMaxCapacity(diner.getDefaultMaxCapacity())
+               .build();
+    }
+
+    @Override
+    public Optional<Diner> findById(Long id) {
+        return dinerRepository.findById(id);
     }
 }
