@@ -3,18 +3,22 @@
 /* =========================================
    1. 대시보드 헤더
    ========================================= */
+/* ownerPage.css */
 .dashboard-header {
     background-color: #fff;
-    padding: 20px 0;
+    padding: 15px 0; /* padding을 조금 줄임 */
     margin-bottom: 30px;
     border-bottom: 1px solid #dee2e6;
 }
 
-.dashboard-header h2 {
+
+
+/*.dashboard-header h2 {
     color: var(--main-orange);
     font-size: 1.8rem;
     margin: 0;
 }
+*/
 
 /* 셀렉트 박스 스타일 */
 #dinerSelect {
@@ -25,44 +29,46 @@
 }
 
 /* =========================================
-   2. 탭 네비게이션 (핵심 수정)
+   2. 탭 네비게이션 (admin/myPage 스타일로 통일)
    ========================================= */
-/* commonPages.css의 스타일을 덮어쓰고 강제로 가로 정렬 */
 .nav-tabs {
-    display: flex !important;       /* 계단 현상 방지: Flexbox 강제 */
-    flex-wrap: nowrap !important;   /* 줄바꿈 방지 */
-    border-bottom: 1px solid #dee2e6 !important; /* 바닥 선 통일 */
-    gap: 2px !important;            /* 탭 간격 좁힘 */
-    margin-bottom: 0 !important;    /* 컨텐츠 박스와 딱 붙임 */
+    display: flex !important;
+    justify-content: center; /* 중앙 정렬 */
+    gap: 15px;               /* 탭 사이 간격 */
+    border-bottom: 2px solid var(--bg-middle-grey) !important; /* 연한 회색 바닥선 */
+    background-color: transparent !important;
+    margin-bottom: 20px !important;
     padding-left: 0;
 }
 
 .nav-tabs .nav-link {
-    border: 1px solid transparent;
-    border-bottom: none;
-    color: #6c757d; /* 비활성 탭 색상 */
-    background-color: transparent;
+    border: none !important;      /* 모든 테두리 제거 */
+    color: var(--text-muted);     /* 비활성 탭 글자색 */
     font-weight: 600;
-    padding: 12px 20px;
-    border-radius: 10px 10px 0 0; /* 위쪽 둥글게 */
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-    margin-bottom: -1px; /* 활성 탭이 바닥 선을 덮도록 */
-    transition: all 0.2s ease;
+    padding: 1rem 1.5rem;         /* adminPage와 유사한 패딩 */
+    background-color: transparent !important;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border-radius: 0 !important;  /* 둥근 모서리 제거 */
 }
 
-/* 탭 호버 */
+/* 아이콘 색상 조절 (선택 사항) */
+.nav-tabs .nav-link i {
+    color: inherit; /* 글자색과 동일하게 유지 */
+}
+
+/* 탭 호버 효과 */
 .nav-tabs .nav-link:hover {
-    background-color: #f8f9fa; /* 연한 회색 */
-    color: var(--main-orange);
+    color: var(--main-orange) !important;
+    background-color: var(--bg-light-grey) !important;
 }
 
-/* 활성화된 탭 (Active) - 아래 선을 흰색으로 덮어서 뚫린 효과 */
+/* 활성화된 탭 (Active) - 하단 오렌지색 밑줄 강조 */
 .nav-tabs .nav-link.active {
-    background-color: #fff !important;
     color: var(--main-orange) !important;
-    border-color: var( --border-color) var( --border-color) #fff var( --border-color) !important; /* 아래쪽만 흰색 */
+    background-color: transparent !important;
     font-weight: 700;
-    z-index: 5;
+    border-bottom: 3px solid var(--main-orange) !important; /* 오렌지색 밑줄 */
 }
 
 /* =========================================
@@ -71,14 +77,13 @@
 /* 탭 바로 아래 붙는 흰색 박스 */
 .owner-tab-content {
     background-color: #fff;
-    border: 1px solid #dee2e6;
-    border-top: none; /* 위쪽은 탭이 덮으므로 테두리 없음 */
-    border-radius: 0 0 12px 12px; /* 아래쪽 둥글게 */
+    border: 1px solid var(--border-color) !important; /* 모든 면에 테두리 추가 */
+    border-radius: 15px !important;                   /* 모서리 둥글게 */
     padding: 40px;
-    min-height: 500px; /* 최소 높이 확보 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* 은은한 그림자 */
+    min-height: 500px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; /* adminPage 스타일 그림자 */
+    margin-top: 10px;
 }
-
 /* 각 섹션 제목 */
 .section-title {
     font-size: 1.5rem;

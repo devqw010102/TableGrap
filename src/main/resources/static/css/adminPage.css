@@ -1,7 +1,7 @@
 /* ==========================================================================
    1. 헤더 및 페이지 제목 (Header & Title)
    ========================================================================== */
-h1 {
+/*h1 {
     color: white;
     background: linear-gradient(135deg, var(--main-orange), var(--main-amber));
     padding: 2.5rem;
@@ -11,6 +11,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(255, 126, 0, 0.25);
     border-left: none;
 }
+*/
 
 h2 {
     color: var(--text-dark);
@@ -25,17 +26,19 @@ h2 {
    ========================================================================== */
 .nav-tabs {
     border-bottom: 2px solid var(--bg-middle-grey);
-    background-color: white;
+    background-color: transparent !important; /* 배경을 투명하게 해서 떠 있는 느낌 부여 */
     padding: 0 1rem;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
+    margin-top: 3rem !important;    /* ★ 헤더(h1)와 탭 사이의 간격 추가 */
+    margin-bottom: 1.5rem !important;
 }
 
 .nav-tabs .nav-link {
     color: var(--text-muted);
-    border: none;
+    border: none !important;
     padding: 1rem 1.8rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
 }
 
@@ -46,9 +49,9 @@ h2 {
 
 .nav-tabs .nav-link.active {
     color: var(--main-orange) !important;
-    background-color: transparent;
+    background-color: transparent !important;
     font-weight: 700;
-    border-bottom: 3px solid var(--main-orange) !important;
+    border-bottom: 3px solid var(--main-orange) !important; /* 오렌지색 밑줄 */
 }
 
 /* ==========================================================================
