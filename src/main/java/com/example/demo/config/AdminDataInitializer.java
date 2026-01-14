@@ -69,5 +69,26 @@ public class AdminDataInitializer implements CommandLineRunner {
         } else {
             log.info("[AdminInitializer] 관리자 계정이 이미 존재합니다.");
         }
+
+//        if(memberRepository.count() == 1) {
+//            log.info("테스트 유저 계정 생성 시작");
+//
+//            for (int i = 1; i <= 10; i++) {
+//                Member testMember = Member.builder()
+//                        .username("testuser" + i)
+//                        .password(passwordEncoder.encode("test1234@"))
+//                        .name("테스트유저"  + i)
+//                        .email("test" + i + "@naver.com")
+//                        .build();
+//                memberRepository.save(testMember);
+//
+//                Authority userAuthority = Authority.builder()
+//                        .member(testMember)
+//                        .authority(AuthorityStatus.ROLE_USER.getCode())
+//                        .build();
+//                authorityRepository.save(userAuthority);
+//            }
+//            log.info("테스트용 일반 계정 생성완료");
+//        }
     }
 }
