@@ -237,18 +237,65 @@ async function loadReviews(page = 0) {
     }
 }
 
+// 카테고리 차트
+async function loadCategoryChart() {
+    const chartDiv = document.getElementById('categoryDonutChart');
+
+    try {
+        const res = await fetch('/api/adminPage/charts/diner-categories');
+        const resJson = await res.json();
+
+        //console.log("받은 데이터:", resJson); // 여기서 데이터 구조 확인
+
+        chartDiv.innerHTML = '';        // 스피너 제거
+
+        const chartData = Array.isArray(resJson.data) ? resJson.data : [resJson.data[0]];
+
+        Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout);
+    }
+    catch(e) {
+        console.error("차트 로드 실패:", error);
+        // 에러 발생 시 사용자에게 알림 텍스트 표시 가능
+        chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
+    }
+
+}
+
 /* 대시보드 */
 async function loadDashboard() {
+    console.log("1. loadDashboard 진입"); // 체크포인트 1
     try {
         const url = `/api/adminPage/dashboard`;
         const data = await fetchJson(url);
+        console.log("2. 데이터 페칭 성공:", data); // 체크포인트 2
 
-        document.getElementById("dashboardDinerCount").innerText = data.dinerCount;
-        document.getElementById("dashboardTodayBooking").innerText = data.todayBookingCount;
-        document.getElementById("dashboardMemberCount").innerText = data.memberCount;
-        document.getElementById("dashboardUserCount").innerText = data.userCount;
-        document.getElementById("dashboardOwnerCount").innerText = data.ownerCount;
+        // DEBUG
+        const safeSetText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerText = text;
+            } else {
+                console.warn(`주의: ID가 '${id}'인 요소를 찾을 수 없습니다.`);
+            }
+        };
 
+        safeSetText("dashboardDinerCount", data.dinerCount);
+        safeSetText("dashboardTodayBooking", data.todayBookingCount);
+        safeSetText("dashboardMemberCount", data.memberCount);
+        safeSetText("dashboardUserCount", data.userCount);
+        safeSetText("dashboardOwnerCount", data.ownerCount);
+
+        console.log("3. 텍스트 매핑 완료. 차트 호출 시도...");
+
+        // 차트 함수 호출
+        try {
+            await loadCategoryChart();
+            console.log("4. 차트 로딩 함수 실행 완료");
+        } catch (chartErr) {
+            console.error("차트 함수 내부에서 에러 발생:", chartErr);
+        }
+
+        // 리뷰 테이블 렌더링
         renderTable({
             tbodyId: "dashboardReviewTable",
             colSpan: 6,
@@ -259,16 +306,20 @@ async function loadDashboard() {
                     <td>${r.reviewId}</td>
                     <td>${r.memberUsername}</td>
                     <td>${r.dinerName}</td>
-                    <td class = "text-warning">${"⭐".repeat(r.rating)}</td>
+                    <td class="text-warning">${"⭐".repeat(r.rating)}</td>
                     <td>${r.comment}</td>
                     <td>${formatDate(r.createTime)}</td>
                 </tr>
             `
         });
+        console.log("5. 전체 프로세스 종료");
 
-
-    } catch {
-        console.error("대시보드 로딩 실패");
+    } catch (error) {
+        // [중요] 에러의 전체 스택 추적 정보를 출력합니다.
+        console.error("❌ 대시보드 로딩 중 치명적 에러 발생!");
+        console.error("에러 메시지:", error.message);
+        console.error("에러 위치(Stack):", error.stack);
+        console.log("에러 객체 전체:", error);
     }
 }
 
@@ -322,3 +373,4 @@ function switchToReviewTab() {
         console.error("리뷰 목록 탭을 찾을 수 없습니다.");
     }
 }
+
