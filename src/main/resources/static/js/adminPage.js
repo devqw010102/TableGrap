@@ -245,7 +245,7 @@ async function loadCategoryChart() {
         const res = await fetch('/api/adminPage/charts/diner-categories');
         const resJson = await res.json();
 
-        //console.log("받은 데이터:", resJson); // 여기서 데이터 구조 확인
+        console.log("받은 데이터:", resJson); // 여기서 데이터 구조 확인
 
         chartDiv.innerHTML = '';        // 스피너 제거
 
@@ -253,12 +253,32 @@ async function loadCategoryChart() {
 
         Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout);
     }
-    catch(e) {
+    catch(error) {
         console.error("차트 로드 실패:", error);
         // 에러 발생 시 사용자에게 알림 텍스트 표시 가능
         chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
     }
 
+}
+
+// 최근 1주일 예약 차트
+async function loadReservationChart() {
+    const chartDiv = document.getElementById('reservationStatsChart');
+
+    try {
+        const res = await fetch('/api/adminPage/charts/weekly-reservation');
+        const resJson = await res.json();
+
+        console.log('주간 예약 데이터 : ' , resJson);
+
+        chartDiv.innerHTML = '';
+
+        Plotly.newPlot('reservationStatsChart', resJson.data, resJson.layout, {responsive: true});
+    }
+    catch(e) {
+        console.error('주간 예약 차트 로드 실패 : ', e);
+        chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
+    }
 }
 
 /* 대시보드 */
@@ -290,6 +310,7 @@ async function loadDashboard() {
         // 차트 함수 호출
         try {
             await loadCategoryChart();
+            await loadReservationChart();
             console.log("4. 차트 로딩 함수 실행 완료");
         } catch (chartErr) {
             console.error("차트 함수 내부에서 에러 발생:", chartErr);

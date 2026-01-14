@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface BookRepository extends JpaRepository<Book,Long> {
 
@@ -100,4 +101,13 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     );
 
+    // 최근 1주일
+    @Query("SELECT " +
+            "  FUNCTION('FORMATDATETIME', b.bookingDate, 'yyyy-MM-dd') as date, " +
+            "  COUNT(b.bookId) as count " +
+            "FROM Book b " +
+            "WHERE b.bookingDate >= :startDate " +
+            "GROUP BY date " +
+            "ORDER BY date ASC")
+    List<Map<String, Object>> getWeeklyBookingStats(@Param("startDate") LocalDateTime startDate);
 }
