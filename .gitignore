@@ -36,3 +36,9 @@ application-secret.properties
 ### Others ###
 *.zip
 *.tmp
+
+# Python Evm
+.venv/
+venv/
+__pycache__/
+*.pyc
