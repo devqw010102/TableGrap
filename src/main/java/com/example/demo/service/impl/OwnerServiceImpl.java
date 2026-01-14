@@ -33,6 +33,7 @@ public class OwnerServiceImpl implements OwnerService {
   private final AuthorityRepository authorityRepository;
   private final DinerRepository dinerRepository;
   private final BookRepository bookRepository;
+  private final ReviewRepository reviewRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   @Override
@@ -198,5 +199,16 @@ public class OwnerServiceImpl implements OwnerService {
 
     public static class CancelManager {
         public static final Set<Long> allowedBookingIds = Collections.synchronizedSet(new HashSet<>());
+  }
+
+  // 차트 그리기
+  // 식당별 리뷰 개수
+  public List<Map<String, Object>> getReviewCount(Long dinerId){
+    return reviewRepository.findReviewCount(dinerId);
+  }
+
+  // 식당별 평점 평균
+  public List<Map<String,Object>> getAvgRate(Long dinerId) {
+    return reviewRepository.findAvgRate(dinerId);
   }
 }

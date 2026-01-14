@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
@@ -75,6 +76,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         where r.dinerId = :dinerId
     """)
     Page<OwnerReviewDto> findReviewByDinerId(@Param("dinerId") Long dinerId, Pageable pageable);
+
+    @Query(value = """
+        SELECT FORMATDATETIME(r.create_time, 'yyyy-MM-dd') AS reviewDate, 
+               COUNT(*) AS reviewCount 
+        FROM review r 
+        WHERE r.diner_id = :dinerId 
+        GROUP BY FORMATDATETIME(r.create_time, 'yyyy-MM-dd') 
+        ORDER BY reviewDate ASC
+        """, nativeQuery = true)
+    List<Map<String, Object>> findReviewCount(@Param("dinerId") Long dinerId);
+
+    @Query("SELECT r.diner_id as dinerId, AVG(r.rating) as avg " +
+            "From review r " +
+            "group by r.diner_id")
+    List<Map<String, Object>> findAvgRate(@Param("dinerId") Long dinerId);
 
     // Owner 의 식당들 리뷰 전체
     @Query("""
