@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,5 +94,12 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<Map<String, Object>> getCategoryStats() {
         return dinerRepository.findCategoryStats();
+    }
+
+    // 최근 1주일 예약 차트
+    @Override
+    public List<Map<String, Object>> getWeeklyReservationChart() {
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7).with(LocalTime.MIN);
+        return bookRepository.getWeeklyBookingStats(startDate);
     }
 }

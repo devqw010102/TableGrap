@@ -23,4 +23,6 @@ public interface AdminService {
     AdminDashboardDto getDashboard(Pageable pageable);
 
     List<Map<String, Object>> getCategoryStats();
+
+    List<Map<String, Object>> getWeeklyReservationChart();
 }

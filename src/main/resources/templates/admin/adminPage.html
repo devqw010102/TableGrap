@@ -173,16 +173,14 @@
     </div>
     <!-- tab7-content -->
     <div id="dashboard" class="tab-pane fade">
-        <!-- 대시보드 -->
         <div class="container mt-4">
             <h2 class="mb-4">대시보드</h2>
 
-            <!-- 요약 카드 -->
-            <div class="row mb-4">
-                <div class="col-md-7">
+            <div class="row mb-4 g-3">
+                <div class="col-xl-4 col-lg-5">
                     <div class="card shadow-sm h-100">
                         <div class="card-header bg-white fw-bold">
-                            <i class="bi bi-pie-chart-fill me-2"></i>식당 카테고리별 분포
+                            <i class="bi bi-pie-chart-fill me-2 text-primary"></i>식당 카테고리별 분포
                         </div>
                         <div class="card-body">
                             <div id="categoryDonutChart" style="height: 300px;">
@@ -194,72 +192,83 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="card text-center shadow-sm">
-                        <div class="card-body">
-                            <h5>오늘 예약</h5>
-                            <h3 id="dashboardTodayBooking">-</h3>
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white fw-bold">
+                            <i class="bi bi-graph-up me-2 text-success"></i>날짜별 예약 통계
                         </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card text-center shadow-sm">
                         <div class="card-body">
-                            <h5>총 회원 수</h5>
-                            <h3 id="dashboardMemberCount">-</h3>
+                            <div id="reservationStatsChart" style="height: 300px;">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <div class="spinner-border text-success" role="status"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 권한별 회원 -->
-            <div class="row mb-4">
+            <div class="row mb-4 g-3">
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-start border-primary border-4">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-1">오늘 예약</h6>
+                            <h3 id="dashboardTodayBooking" class="fw-bold mb-0">-</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-start border-info border-4">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-1">총 회원 수</h6>
+                            <h3 id="dashboardMemberCount" class="fw-bold mb-0">-</h3>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-6">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5>권한별 회원 수</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between">
-                                    USER
-                                    <span id="dashboardUserCount">-</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    OWNER
-                                    <span id="dashboardOwnerCount">-</span>
-                                </li>
-                            </ul>
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex align-items-center justify-content-around py-2">
+                            <div class="text-center">
+                                <span class="text-muted small">USER</span>
+                                <h4 id="dashboardUserCount" class="mb-0 fw-bold">-</h4>
+                            </div>
+                            <div class="vr"></div>
+                            <div class="text-center">
+                                <span class="text-muted small">OWNER</span>
+                                <h4 id="dashboardOwnerCount" class="mb-0 fw-bold">-</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 오늘의 리뷰 -->
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white fw-bold py-3">
+                    <i class="bi bi-chat-left-text-fill me-2 text-warning"></i>오늘의 리뷰
+                </div>
                 <div class="card-body">
-                    <h5>오늘의 리뷰</h5>
-
-                    <table class="table table-hover mt-3">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>작성자</th>
-                            <th>식당</th>
-                            <th>평점</th>
-                            <th>내용</th>
-                            <th>작성일</th>
-                        </tr>
-                        </thead>
-                        <tbody id="dashboardReviewTable"></tbody>
-                    </table>
-                    <div class="card-footer text-center">
-                        <button type="button" class="btn btn-sm btn-link text-decoration-none" onclick="switchToReviewTab()">
-                            리뷰 전체보기 <i class="bi bi-chevron-right"></i>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>작성자</th>
+                                <th>식당</th>
+                                <th>평점</th>
+                                <th>내용</th>
+                                <th>작성일</th>
+                            </tr>
+                            </thead>
+                            <tbody id="dashboardReviewTable"></tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-4" onclick="switchToReviewTab()">
+                            리뷰 전체보기 <i class="bi bi-chevron-right ms-1"></i>
                         </button>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
