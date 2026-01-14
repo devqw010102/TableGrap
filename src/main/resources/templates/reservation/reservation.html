@@ -10,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/css/reservation.css}">
 
     <script th:src="'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + ${naverClientId}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -23,6 +24,7 @@
         <input type="hidden" name="dinerId" th:value="${diner.id}">
         <input type="hidden" name="memberId" th:value="${member.id}">
         <input type="hidden" name="bookId" th:value="${myBooking != null ? myBooking.bookId : ''}">
+        <input type="hidden" id="ownerId" th:value="${ownerId}">
 
         <div th:if="${mode == 'modify'}" style="display:none;">
             <input type="hidden" id="oldDate" th:value="${myBooking.bookingDate}">
@@ -78,6 +80,16 @@
                                   <span th:if="${diner.status.name() == 'PUBLIC'}" class="badge bg-success fs-6">예약 가능</span>
                             <span th:if="${diner.status.name() == 'CLOSED'}" class="badge bg-danger fs-6">영업 종료</span>
                             <span th:if="${diner.status.name() == 'CLAIMED'}" class="badge bg-warning fs-6">준비 중</span>
+                        </div>
+
+                        <hr> <h5>사장님 평균 응답 속도</h5>
+                        <div class="response-chart-container" style="position: relative; height:150px; width:100%">
+                            <canvas id="responseChart"></canvas>
+                            <div style="display: flex; justify-content: space-between; padding: 0 10px; margin-top: -20px; font-size: 0.8rem; font-weight: bold;">
+                                <span style="color: #4ade80;">빠름</span>
+                                <span style="color: #facc15;">보통</span>
+                                <span style="color: #f87171;">느림</span>
+                            </div>
                         </div>
                         <hr>
 

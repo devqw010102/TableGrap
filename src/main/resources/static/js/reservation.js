@@ -371,6 +371,131 @@ document.addEventListener("DOMContentLoaded", () => {
     UI.renderCalendar();
     UI.updateSummary();
     API.loadReviews();
+    loadOwnerResponse();
 
     window.loadReviewDetail = UI.loadReviewDetail;
 });
+
+async function loadOwnerResponse() {
+    const ownerId = document.getElementById("ownerId")?.value;
+    const canvas = document.getElementById('responseChart');
+
+    if (!ownerId || !canvas) {
+        console.log("ownerId나 canvas가 없어서 종료합니다.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`http://localhost:8000/api/owner-response/${ownerId}`);
+        const data = await res.json();
+
+        console.log(JSON.stringify(data));
+        const responseTime = data.avg_response_min || 0;
+
+        let visualValue;
+        if (responseTime <= 60) {
+            visualValue = responseTime - 60;
+        } else if (responseTime <= 900) {
+            visualValue = 1 + (responseTime - 60) / 840;
+        } else {
+            visualValue = 2 + Math.min(responseTime - 900, 540) / 540;
+        }
+
+        // 기준
+        let responseText = "";
+        let responseColor = "";
+
+        if (responseTime <= 60 ) {
+            responseText = "빠름";
+            responseColor = "#4ade80";
+        } else if (responseTime <= 900) { // 15시간 이내
+            responseText = "보통";
+            responseColor = "#facc15";
+        } else {
+            responseText = "느림";
+            responseColor = "#f87171";
+        }
+
+        const responseEl = document.getElementById("responseTimeStatus");
+
+        if(responseEl) {
+            const displayTime = responseTime >= 60
+                ? (responseTime / 60).toFixed(1) + "시간"
+                : responseTime + "분";
+            responseEl.innerText = `${responseText} (평균 ${displayTime})`;
+            responseEl.style.color = responseColor
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (window.myResponseChart) window.myResponseChart.destroy();
+
+        // 게이지 바늘(Needle) 플러그인 정의
+        const gaugeNeedle = {
+            id: 'gaugeNeedle',
+            afterDatasetsDraw(chart) {
+                const { ctx, chartArea: { width, height } } = chart;
+                ctx.save();
+
+                const needleValue = chart.config.data.datasets[0].needleValue;
+
+
+                const dataTotal = chart.config.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                // 각도 계산 (반원 180도 기준)
+                const angle = Math.PI + (Math.PI * (Math.min(vVal, 3) /3 ));
+                const cx = width / 2;
+                const cy = chart._metasets[0].data[0].y;
+
+                // 바늘 그리기
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.lineTo(height - 40, 0); // 바늘 길이
+                ctx.lineTo(0, 4);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.font = "bold 16px sans-sarif"
+                ctx.fillStyle = "#333";
+                ctx.textAlign = "center";
+
+                const labelTime = responseTime >= 60
+                ? (responseTime / 60).toFixed(1) + "h"
+                                : responseTime + "m";
+
+                ctx.fillText(labelTime, cx, cy -10);
+                ctx.restore();
+            }
+        };
+
+        window.myResponseChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [1,1,1],
+                    backgroundColor: ['#4ade80', '#facc15', '#f87171'], // 초록, 노랑, 빨강
+                    needleValue: visualValue,
+                    borderColor: 'white',
+                    borderWidth: 2,
+                    cutout: '75%', // 도넛 두께
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                rotation: 270, // 시작 위치 (바닥 왼쪽)
+                circumference: 180, // 반원 형태
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            },
+            plugins: [gaugeNeedle]
+        });
+
+    } catch (e) {
+        console.error("통계 로드 실패:", e);
+    }
+}

@@ -73,6 +73,8 @@ public class DinerListController {
             model.addAttribute("diner", diner);
             model.addAttribute("member", member);
             model.addAttribute("dinerId", id);
+            model.addAttribute("ownerId", diner.getOwnerId());
+            log.info("조회된 점주 ID: {}", diner.getOwnerId());
 
             return "reservation/reservation";
         } catch (Exception e) {

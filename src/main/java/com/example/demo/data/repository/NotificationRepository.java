@@ -1,5 +1,6 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.enums.NotificationType;
 import com.example.demo.data.model.Notification;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Transactional
     void deleteByOwnerIdAndRole(Long ownerId, String role);
+
+    List<Notification> findByTypeIn(List<NotificationType> types);
 }

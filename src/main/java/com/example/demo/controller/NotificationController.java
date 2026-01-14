@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.data.enums.AuthorityStatus;
+import com.example.demo.data.enums.NotificationType;
 import com.example.demo.data.model.Notification;
 import com.example.demo.data.repository.NotificationRepository;
 import com.example.demo.service.impl.notification.NotificationManager;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -67,5 +69,15 @@ public class NotificationController {
             notificationRepository.deleteByMemberIdAndRole(id, role);
         }
         return ResponseEntity.ok().build();
+    }
+
+    // OWNER 응답 속도
+    @GetMapping("/response-data")
+    public ResponseEntity<List<Notification>> getAnalysisResponseData() {
+        List<NotificationType> targets = Arrays.asList(
+                NotificationType.RESERVATION_CREATE,
+                NotificationType.RESERVATION_APPROVE,
+                NotificationType.RESERVATION_REJECT);
+        return ResponseEntity.ok(notificationRepository.findByTypeIn(targets));
     }
 }
