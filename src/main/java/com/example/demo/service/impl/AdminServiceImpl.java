@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -86,5 +87,11 @@ public class AdminServiceImpl implements AdminService {
                 roleMap.getOrDefault(AuthorityStatus.ROLE_USER.name(), 0L),
                 reviewRepository.findTodayReviews(start, end, PageRequest.of(0, 5))
         );
+    }
+
+    // 카테고리 차트
+    @Override
+    public List<Map<String, Object>> getCategoryStats() {
+        return dinerRepository.findCategoryStats();
     }
 }

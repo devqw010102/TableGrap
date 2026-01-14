@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.common.python.PythonProcessExecutor;
 import com.example.demo.data.dto.MemberInfoResponseDto;
 import com.example.demo.data.dto.admin.*;
 import com.example.demo.service.AdminService;
@@ -8,6 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import tools.jackson.databind.ObjectMapper;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final AdminService adminService;
+    private final PythonProcessExecutor pythonProcessExecutor;
 
     // 식당 목록 fetch
     @GetMapping("/diners")
@@ -46,5 +52,25 @@ public class AdminController {
     @GetMapping("/dashboard")
     public AdminDashboardDto dashboard(@PageableDefault(size = 5) Pageable pageable) {
         return adminService.getDashboard(pageable);
+    }
+
+    // 카테고리 차트
+    @GetMapping("/charts/diner-categories")
+    public String getDinerCategoryChart() {
+        try {
+            // 1. DB 값 불러오기
+            List<Map<String, Object>> stats = adminService.getCategoryStats();
+
+            // 2. Mapper 사용하여 Json 으로 변환
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonData = mapper.writeValueAsString(stats);
+
+            System.out.println("jsonData: " + jsonData);
+            // 3. 파이썬 실행
+            return pythonProcessExecutor.execute("admin", "category_donut_chart", jsonData);
+        }
+        catch(Exception e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+        }
     }
 }

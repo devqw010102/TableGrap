@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
@@ -72,4 +73,8 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
 
     //식당 중복 업로드 방지
     boolean existsByDinerNameAndLocation(String dinerName, String location);
+
+    // 카테고리 차트
+    @Query("SELECT d.category as category, COUNT(d) as count FROM Diner d GROUP BY d.category")
+    List<Map<String, Object>> findCategoryStats();
 }
