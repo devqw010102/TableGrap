@@ -58,4 +58,22 @@ public class AdminChartController {
         }
     }
 
+    // 회원 분포 차트 (가로형 막대)
+    @GetMapping("/member-count")
+    public String getMemberDistributionChart() {
+        try {
+            List<Map<String, Object>> stats = adminService.getMemberStatsForChart();
+
+            ObjectMapper  mapper = new ObjectMapper();
+            String jsonData = mapper.writeValueAsString(stats);
+
+            System.out.println("jsonData : " + jsonData);
+
+            return pythonProcessExecutor.execute("admin", "member_stats_chart", jsonData);
+        }
+        catch(Exception e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+        }
+    }
+
 }

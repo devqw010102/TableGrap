@@ -33,7 +33,8 @@ def main():
             font=dict(family="Malgun Gothic, Dotum, sans-serif", size=12),
             title={'text': f"카테고리별 식당 분포 (총 {int(sum(counts))}개)", 'x': 0.5},
             margin=dict(l=20, r=20, t=60, b=20),
-            template="plotly_white"
+            template="plotly_white",
+            dragmode=False
         )
 
         # [최후의 수정] dict 변환 후 values와 labels를 강제로 순수 리스트로 덮어씁니다.

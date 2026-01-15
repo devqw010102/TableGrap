@@ -237,6 +237,13 @@ async function loadReviews(page = 0) {
     }
 }
 
+// Plotly 차트 옵션
+const config = {
+    responsive: true,
+    displayModeBar: false, // 확대, 줌 등 도구창 숨김
+    scrollZoom: false,     // 마우스 휠 확대 끄기
+}
+
 // 카테고리 차트
 async function loadCategoryChart() {
     const chartDiv = document.getElementById('categoryDonutChart');
@@ -251,7 +258,7 @@ async function loadCategoryChart() {
 
         const chartData = Array.isArray(resJson.data) ? resJson.data : [resJson.data[0]];
 
-        Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout);
+        Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout, config);
     }
     catch(error) {
         console.error("차트 로드 실패:", error);
@@ -273,12 +280,45 @@ async function loadReservationChart() {
 
         chartDiv.innerHTML = '';
 
-        Plotly.newPlot('reservationStatsChart', resJson.data, resJson.layout, {responsive: true});
+        Plotly.newPlot('reservationStatsChart', resJson.data, resJson.layout, config);
     }
     catch(e) {
         console.error('주간 예약 차트 로드 실패 : ', e);
         chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
     }
+}
+
+// 회원수 차트
+async function loadMemberCountChart() {
+    const chartDiv = document.getElementById('memberPlotlyChart');
+
+    try {
+        const res = await fetch('/api/adminPage/charts/member-count');
+        const resJson = await res.json();
+
+        console.log('회원 수 데이터 : ', resJson);
+
+        chartDiv.innerHTML = '';
+        Plotly.newPlot('memberPlotlyChart', resJson.data, resJson.layout, config);
+
+        const userCount = resJson.data[0].x[0];
+        const ownerCount = resJson.data[1].x[0];
+
+        if(document.getElementById('dashboardTotalCount')) {
+            document.getElementById('dashboardTotalCount').innerText = (userCount + ownerCount).toLocaleString();
+        }
+        if(document.getElementById('dashboardUserCount')) {
+            document.getElementById('dashboardUserCount').innerText = userCount.toLocaleString();
+        }
+        if(document.getElementById('dashboardOwnerCount')) {
+            document.getElementById('dashboardOwnerCount').innerText = ownerCount.toLocaleString();
+        }
+    }
+    catch(e) {
+        console.error('회원 수 차트 로드 실패 : ', e);
+        chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
+    }
+
 }
 
 /* 대시보드 */
@@ -289,7 +329,7 @@ async function loadDashboard() {
         const data = await fetchJson(url);
         console.log("2. 데이터 페칭 성공:", data); // 체크포인트 2
 
-        // DEBUG
+//      DEBUG
         const safeSetText = (id, text) => {
             const el = document.getElementById(id);
             if (el) {
@@ -309,9 +349,13 @@ async function loadDashboard() {
 
         // 차트 함수 호출
         try {
-            await loadCategoryChart();
-            await loadReservationChart();
-            console.log("4. 차트 로딩 함수 실행 완료");
+            await Promise.all([
+                loadCategoryChart(),
+                loadReservationChart(),
+                loadMemberCountChart()
+            ]).then(() => {
+                console.log("4. 차트 로딩 함수 실행 완료");
+            });
         } catch (chartErr) {
             console.error("차트 함수 내부에서 에러 발생:", chartErr);
         }
@@ -336,7 +380,6 @@ async function loadDashboard() {
         console.log("5. 전체 프로세스 종료");
 
     } catch (error) {
-        // [중요] 에러의 전체 스택 추적 정보를 출력합니다.
         console.error("❌ 대시보드 로딩 중 치명적 에러 발생!");
         console.error("에러 메시지:", error.message);
         console.error("에러 위치(Stack):", error.stack);
