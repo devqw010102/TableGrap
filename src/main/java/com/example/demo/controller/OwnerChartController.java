@@ -1,36 +1,30 @@
 package com.example.demo.controller;
 
-import com.example.demo.common.python.PythonProcessExecutor;
+import com.example.demo.data.dto.ReviewChartDto;
+import com.example.demo.data.userDeatils.OwnerUserDetails;
 import com.example.demo.service.OwnerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tools.jackson.databind.ObjectMapper;
-
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ownerPage/charts")
 public class OwnerChartController {
     private final OwnerService ownerService;
-    private final PythonProcessExecutor pythonProcessExecutor;
 
-    @GetMapping("/reviewCharts")
-    public String reviewCharts(Long dinerId) {
-        try{
-            List<Map<String, Object>> avgRate = ownerService.getAvgRate(dinerId);
+    @GetMapping("/review_chart")
+    public List<ReviewChartDto> getAvgReviewCharts(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+       return ownerService.getAvgRate(userDetails.getOwner().getId());
+    }
 
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonData = mapper.writeValueAsString(avgRate);
-
-            System.out.println("jsonData: " + jsonData);
-
-            return pythonProcessExecutor.execute("owner", "avgRate_chart", jsonData);
-        } catch(Exception e){
-            return "{\"error\":\"" + e.getMessage() + "\"}";
-        }
+    @GetMapping("/generate")
+    public String generateChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+        return ownerService.generateReviewChart(userDetails.getOwner().getId());
     }
 }

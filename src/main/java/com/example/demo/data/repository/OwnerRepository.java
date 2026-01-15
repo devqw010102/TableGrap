@@ -34,10 +34,4 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
             @Param("adminRole") String adminRole,
             @Param("deletedRole") String deletedRole
     );
-
-    // 차트 생성을 위한 리뷰 개수 가져오기
-    List<Map<String, Object>> getReviewCount(Long dinerId);
-
-    // 식당 별 평점 평균 가져오기
-    List<Map<String, Object>> getAvgRate(Long dinerId);
 }

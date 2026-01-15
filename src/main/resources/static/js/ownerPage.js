@@ -514,6 +514,7 @@ async function loadDinerInfoTab() {
                     <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
                 </tr>`
             })
+            await loadReviewChart();
         } catch(e) {
             console.log(e.status, e.message);
             alert("식당 목록을 불러오는데 실패 했습니다.")
@@ -545,6 +546,7 @@ async function loadDinerInfoTab() {
                 <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${dinerData.id})">상태 변경</button></td>
                 <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
             </tr>`
+            await loadReviewChart();
         } catch (e) {
             console.error(e);
             alert("오류발생!" + e);
@@ -885,4 +887,33 @@ function autoHyphen(target) {
         .replace(/[^0-9]/g, '') // 숫자만 남기기
         .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`) // 10~11자리 대응
         .replace(/^(\d{2,3})(\d{3,4})(\d{1,3})$/, `$1-$2-$3`); // 입력 중인 상태 대응
+}
+
+async function loadReviewChart(ownerId) {
+  //로딩 표시
+  document.getElementById("chartLoading").style.display="block";
+  document.getElementById("reviewChart").style.display="none";
+
+  try{
+    // 데이터 요청(JSON 문자열이 옴)
+    const res = await fetch(`/api/ownerPage/charts/generate`);
+    if(res.ok){
+      // JSON 파싱
+      const chartJson= await res.json();
+
+      // 차트 그리기(Plotly)
+      Plotly.newPlot('reviewChart', chartJson.data, chartJson.layout);
+      // 차트 출력
+      document.getElementById("chartLoading").style.display="none";
+      document.getElementById("reviewChart").style.display="block";
+    }  else {
+      // --- [추가] 실패 로직 (여기가 핵심!) ---
+      // 서버가 400이나 500을 주면 에러를 던져서 catch로 보냅니다.
+      const errorText = await res.text(); // 서버가 보낸 에러 메시지 읽기
+      throw new Error(`Server Error (${res.status}): ${errorText}`);
+    }
+  } catch (e){
+    console.error(e)
+    document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
+  }
 }

@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.data.dto.ReviewChartDto;
+import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 
@@ -23,7 +25,9 @@ public interface OwnerService {
 
   void notificationUser(Long bookId);
 
-  List<Map<String, Object>> getReviewCount(Long dinerId);
+  List<ReviewChartDto> getAvgRate(Long ownerId);
 
-  List<Map<String,Object>> getAvgRate(Long dinerId);
+  String generateReviewChart(Long ownerId);
+
+  List<RevisitDto> getRevisits(Long ownerId);
 }

@@ -1,5 +1,6 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.dto.ReviewChartDto;
 import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Review;
@@ -18,8 +19,10 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 마이페이지에서 리뷰 가져오기
     List<Review> findByMemberId(Long MemberId);
+
     // 식당 리뷰 5개 가져오기
     List<Review> findTop5ByDinerIdOrderByCreateTimeDesc(Long dinerId);
+
     //리뷰 수정 위해 추가
     Optional<Review> findByBookId(Long bookId);
 
@@ -77,21 +80,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     """)
     Page<OwnerReviewDto> findReviewByDinerId(@Param("dinerId") Long dinerId, Pageable pageable);
 
-    @Query(value = """
-        SELECT FORMATDATETIME(r.create_time, 'yyyy-MM-dd') AS reviewDate, 
-               COUNT(*) AS reviewCount 
-        FROM review r 
-        WHERE r.diner_id = :dinerId 
-        GROUP BY FORMATDATETIME(r.create_time, 'yyyy-MM-dd') 
-        ORDER BY reviewDate ASC
-        """, nativeQuery = true)
-    List<Map<String, Object>> findReviewCount(@Param("dinerId") Long dinerId);
-
-    @Query("SELECT r.diner_id as dinerId, AVG(r.rating) as avg " +
-            "From review r " +
-            "group by r.diner_id")
-    List<Map<String, Object>> findAvgRate(@Param("dinerId") Long dinerId);
-
     // Owner 의 식당들 리뷰 전체
     @Query("""
         select new com.example.demo.data.dto.owner.OwnerReviewDto(
@@ -113,4 +101,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Modifying
     @Query("UPDATE Review r SET r.memberId= :dummyId WHERE r.memberId = :memberId")
     void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
+
+
+    // 리뷰 갯수, 평균
+    @Query("SELECT new com.example.demo.data.dto.ReviewChartDto(" +
+            "r.dinerId, AVG(r.rating), COUNT(r)) " +
+            "FROM Review r, Diner d " +         // <-- 뒤에 공백 추가!
+            "WHERE r.dinerId = d.id " +         // <-- d,id를 d.id로 수정!
+            "AND d.owner.id = :ownerId " +      // <-- 조건 추가
+            "GROUP BY r.dinerId")
+    List<ReviewChartDto> findAvgRatingByOwnerId(@Param("ownerId") Long ownerId);
 }
