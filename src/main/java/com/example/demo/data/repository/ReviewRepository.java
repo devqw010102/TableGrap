@@ -1,5 +1,6 @@
 package com.example.demo.data.repository;
 
+import com.example.demo.data.dto.ReviewChartDto;
 import com.example.demo.data.dto.admin.AdminReviewDto;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
 import com.example.demo.data.model.Review;
@@ -17,8 +18,10 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 마이페이지에서 리뷰 가져오기
     List<Review> findByMemberId(Long MemberId);
+
     // 식당 리뷰 5개 가져오기
     List<Review> findTop5ByDinerIdOrderByCreateTimeDesc(Long dinerId);
+
     //리뷰 수정 위해 추가
     Optional<Review> findByBookId(Long bookId);
 
@@ -101,4 +104,14 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 특정 식당의 모든 리뷰 코멘트만 가져오기
     @Query("SELECT r.comment FROM Review r WHERE r.dinerId = :dinerId")
     List<String> findCommentsByDinerId(@Param("dinerId") Long dinerId);
+
+
+    // 리뷰 갯수, 평균
+    @Query("SELECT new com.example.demo.data.dto.ReviewChartDto(" +
+            "r.dinerId, AVG(r.rating), COUNT(r)) " +
+            "FROM Review r, Diner d " +         // <-- 뒤에 공백 추가!
+            "WHERE r.dinerId = d.id " +         // <-- d,id를 d.id로 수정!
+            "AND d.owner.id = :ownerId " +      // <-- 조건 추가
+            "GROUP BY r.dinerId")
+    List<ReviewChartDto> findAvgRatingByOwnerId(@Param("ownerId") Long ownerId);
 }

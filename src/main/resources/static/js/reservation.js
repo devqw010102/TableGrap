@@ -383,15 +383,25 @@ async function loadOwnerResponse() {
     if (!ownerId || !canvas) return;
 
     try {
-        const res = await fetch(`http://localhost:8000/api/owner-response/${ownerId}`);
-        const data = await res.json();
+        const res = await fetch(`/api/reservation/charts/owner-response/${ownerId}`);
+        if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
 
-        // 1. 데이터 부재 여부 판별 (API 응답의 msg 활용)
-        const isNoData = (data.avg_response_min === 0 && data.msg && data.msg.includes("존재하지 않음")) || data.avg_response_min === undefined;
+            const text = await res.text(); // 바로 json() 하지 말고 텍스트로 먼저 받기
+            let data;
+            try {
+                data = JSON.parse(text); // 여기서 JSON으로 변환 시도
+            } catch (parseError) {
+                console.error("JSON 파싱 실패. 서버 응답:", text); // 에러 발생 시 서버가 보낸 실제 내용 확인
+                return;
+            }
 
-        // 데이터 없으면 9999로 처리해서 '느림'
-        const responseTime = isNoData ? 9999 : data.avg_response_min;
+        const isNoData = (data.avg_response_min === 0 && data.msg && data.msg.includes("데이터 없음")) ||
+                         data.avg_response_min === undefined ||
+                         data.error === true;
 
+        let responseTime = data.avg_response_min;
         let visualValue;
         let responseText = "";
         let responseColor = "";
@@ -399,7 +409,7 @@ async function loadOwnerResponse() {
         if (isNoData) {
             visualValue = 0.5;
             responseText = "데이터 없음";
-            responseColor = "#9ca3af";
+            responseColor = "#9ca3af"; // 회색
         } else if (responseTime > 900) {
             visualValue = 0.5;
             responseText = "느림";
@@ -416,13 +426,17 @@ async function loadOwnerResponse() {
 
         const responseEl = document.getElementById("responseTimeStatus");
         if(responseEl) {
+            // 데이터가 없을 때는 "기록 없음"으로 표시
             const displayTime = isNoData ? "기록 없음" : (responseTime >= 60 ? (responseTime / 60).toFixed(1) + "시간" : responseTime + "분");
             responseEl.innerText = `${responseText} (${displayTime})`;
             responseEl.style.color = responseColor;
         }
 
         const ctx = canvas.getContext('2d');
-        if (window.myResponseChart) window.myResponseChart.destroy();
+
+        if (window.myResponseChart instanceof Chart) {
+            window.myResponseChart.destroy();
+        }
 
         const gaugeNeedle = {
             id: 'gaugeNeedle',
@@ -469,6 +483,7 @@ async function loadOwnerResponse() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {padding: {bottom: 30}},
                 rotation: 270,
                 circumference: 180,
                 plugins: {
