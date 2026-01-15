@@ -19,5 +19,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Transactional
     void deleteByOwnerIdAndRole(Long ownerId, String role);
 
-    List<Notification> findByTypeIn(List<NotificationType> types);
+    // List<Notification> findByTypeIn(List<NotificationType> types);
+    List<Notification> findByOwnerIdAndTypeIn(Long ownerId, List<NotificationType> types);
 }

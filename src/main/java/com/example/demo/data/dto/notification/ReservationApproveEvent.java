@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
     수신받을 memberId, 식당 이름, 예약 시간
 
  */
-public record ReservationApproveEvent(Long memberId, String dinerName, String reservationTime) {
+public record ReservationApproveEvent(Long memberId,Long ownerId, String dinerName, String reservationTime) {
 }
