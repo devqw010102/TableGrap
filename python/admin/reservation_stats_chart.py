@@ -44,7 +44,8 @@ def main():
             xaxis={'type': 'category', 'title': "날짜"},
             yaxis={'title': "예약 건수", 'dtick': 1},
             template='plotly_white',
-            margin=dict(l=50, r=50, t=80, b=50)
+            margin=dict(l=50, r=50, t=80, b=50),
+            dragmode=False
         )
 
         # 5. [핵심] JSON 직렬화 시 에러 방지 옵션 추가

@@ -210,32 +210,37 @@
 
             <div class="row mb-4 g-3">
                 <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-start border-primary border-4">
-                        <div class="card-body">
+                    <div class="card text-center shadow-sm border-start border-primary border-4 h-100">
+                        <div class="card-body d-flex flex-column justify-content-center">
                             <h6 class="text-muted mb-1">오늘 예약</h6>
                             <h3 id="dashboardTodayBooking" class="fw-bold mb-0">-</h3>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-start border-info border-4">
-                        <div class="card-body">
-                            <h6 class="text-muted mb-1">총 회원 수</h6>
-                            <h3 id="dashboardMemberCount" class="fw-bold mb-0">-</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
+
+                <div class="col-md-9">
                     <div class="card shadow-sm h-100">
-                        <div class="card-body d-flex align-items-center justify-content-around py-2">
-                            <div class="text-center">
-                                <span class="text-muted small">USER</span>
-                                <h4 id="dashboardUserCount" class="mb-0 fw-bold">-</h4>
+                        <div class="card-header bg-white py-2 fw-bold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-people-fill me-2 text-info"></i>회원 권한별 분포</span>
+                            <small class="text-muted">총 <span id="dashboardMemberCount" class="fw-bold text-dark">-</span>명</small>
+                        </div>
+                        <div class="card-body py-2">
+                            <div id="memberPlotlyChart" style="height: 60px;">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                                </div>
                             </div>
-                            <div class="vr"></div>
-                            <div class="text-center">
-                                <span class="text-muted small">OWNER</span>
-                                <h4 id="dashboardOwnerCount" class="mb-0 fw-bold">-</h4>
+
+                            <div class="d-flex justify-content-around mt-1">
+                                <div class="text-center">
+                                    <span class="badge bg-primary-subtle text-primary mb-0">USER</span>
+                                    <span id="dashboardUserCount" class="fw-bold ms-2">-</span>
+                                </div>
+                                <div class="vr"></div>
+                                <div class="text-center">
+                                    <span class="badge bg-success-subtle text-success mb-0">OWNER</span>
+                                    <span id="dashboardOwnerCount" class="fw-bold ms-2">-</span>
+                                </div>
                             </div>
                         </div>
                     </div>

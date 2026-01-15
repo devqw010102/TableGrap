@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,5 +103,43 @@ public class AdminServiceImpl implements AdminService {
     public List<Map<String, Object>> getWeeklyReservationChart() {
         LocalDateTime startDate = LocalDateTime.now().minusDays(7).with(LocalTime.MIN);
         return bookRepository.getWeeklyBookingStats(startDate);
+    }
+
+    // 회원 수 차트
+    @Override
+    public List<Map<String, Object>> getMemberStatsForChart() {
+        long memberCount = memberRepository.countMembersExceptAdmin(AuthorityStatus.ROLE_ADMIN.name())
+                + ownerRepository.countOwnersExceptAdminAndDeleted(AuthorityStatus.ROLE_ADMIN.name(), AuthorityStatus.ROLE_DELETED.name());
+
+        if(memberRepository.existsByUsername("unknown_user")) {
+            memberCount -= 1;
+        }
+
+        Map<String, Long> roleMap = authorityRepository.countByRoleForDashboard(AuthorityStatus.ROLE_ADMIN.name(), AccountStatus.DELETED.name())
+                .stream()
+                .collect(Collectors.toMap(
+                        o -> (String) o[0],
+                        o -> ((Number) o[1]).longValue()
+                ));
+
+        List<Map<String, Object>> statsList = new ArrayList<>();
+
+        Map<String, Object> userRow = new HashMap<>();
+        userRow.put("role", "USER");
+        userRow.put("count", roleMap.getOrDefault(AuthorityStatus.ROLE_USER.name(), 0L));
+        statsList.add(userRow);
+
+        Map<String, Object> ownerRow = new HashMap<>();
+        ownerRow.put("role", "OWNER");
+        ownerRow.put("count", roleMap.getOrDefault(AuthorityStatus.ROLE_OWNER.name(), 0L));
+        statsList.add(ownerRow);
+
+        // 가로형 막대에서 전체 수치를 계산하기 쉽도록 합계 데이터도 포함 가능
+        Map<String, Object> totalRow = new HashMap<>();
+        totalRow.put("role", "TOTAL");
+        totalRow.put("count", memberCount);
+        statsList.add(totalRow);
+
+        return statsList;
     }
 }

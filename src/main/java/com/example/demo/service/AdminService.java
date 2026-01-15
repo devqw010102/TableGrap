@@ -25,4 +25,6 @@ public interface AdminService {
     List<Map<String, Object>> getCategoryStats();
 
     List<Map<String, Object>> getWeeklyReservationChart();
+
+    List<Map<String, Object>> getMemberStatsForChart();
 }
