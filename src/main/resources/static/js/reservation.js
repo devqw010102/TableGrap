@@ -371,6 +371,115 @@ document.addEventListener("DOMContentLoaded", () => {
     UI.renderCalendar();
     UI.updateSummary();
     API.loadReviews();
+    loadOwnerResponse();
 
     window.loadReviewDetail = UI.loadReviewDetail;
 });
+
+async function loadOwnerResponse() {
+    const ownerId = document.getElementById("ownerId")?.value;
+    const canvas = document.getElementById('responseChart');
+
+    if (!ownerId || !canvas) return;
+
+    try {
+        const res = await fetch(`http://localhost:8000/api/owner-response/${ownerId}`);
+        const data = await res.json();
+
+        // 1. 데이터 부재 여부 판별 (API 응답의 msg 활용)
+        const isNoData = (data.avg_response_min === 0 && data.msg && data.msg.includes("존재하지 않음")) || data.avg_response_min === undefined;
+
+        // 데이터 없으면 9999로 처리해서 '느림'
+        const responseTime = isNoData ? 9999 : data.avg_response_min;
+
+        let visualValue;
+        let responseText = "";
+        let responseColor = "";
+
+        if (isNoData) {
+            visualValue = 0.5;
+            responseText = "데이터 없음";
+            responseColor = "#9ca3af";
+        } else if (responseTime > 900) {
+            visualValue = 0.5;
+            responseText = "느림";
+            responseColor = "#f87171";
+        } else if (responseTime > 60) {
+            visualValue = 1.5;
+            responseText = "보통";
+            responseColor = "#facc15";
+        } else {
+            visualValue = 2.5;
+            responseText = "빠름";
+            responseColor = "#4ade80";
+        }
+
+        const responseEl = document.getElementById("responseTimeStatus");
+        if(responseEl) {
+            const displayTime = isNoData ? "기록 없음" : (responseTime >= 60 ? (responseTime / 60).toFixed(1) + "시간" : responseTime + "분");
+            responseEl.innerText = `${responseText} (${displayTime})`;
+            responseEl.style.color = responseColor;
+        }
+
+        const ctx = canvas.getContext('2d');
+        if (window.myResponseChart) window.myResponseChart.destroy();
+
+        const gaugeNeedle = {
+            id: 'gaugeNeedle',
+            afterDatasetsDraw(chart) {
+                const { ctx, chartArea: { width, height } } = chart;
+                ctx.save();
+
+                const needleValue = chart.config.data.datasets[0].needleValue;
+                const angle = Math.PI + (Math.PI * (Math.min(needleValue, 3) / 3));
+                const cx = width / 2;
+                const cy = chart._metasets[0].data[0].y;
+
+                // 바늘 그리기
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.lineTo(height - 40, 0);
+                ctx.lineTo(0, 4);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+                ctx.restore();
+
+                ctx.save();
+                ctx.font = "bold 16px sans-serif";
+                ctx.fillStyle = "#333";
+                ctx.textAlign = "center";
+                ctx.restore();
+            }
+        };
+
+        window.myResponseChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [1,1,1],
+                    backgroundColor: ['#f87171', '#facc15', '#4ade80'],
+                    needleValue: visualValue,
+                    borderColor: 'white',
+                    borderWidth: 2,
+                    cutout: '75%',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                rotation: 270,
+                circumference: 180,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            },
+            plugins: [gaugeNeedle]
+        });
+
+    } catch (e) {
+        console.error("통계 로드 실패:", e);
+    }
+}

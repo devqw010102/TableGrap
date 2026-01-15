@@ -17,6 +17,7 @@ public class DinerDetailDto {
   private Double dy;
   private DinerStatus status;
   private String ownerPhone;
+  private Long ownerId;
 
   //운영시간은 어떻게?
   //후기는 schema를 어떻게 할 것인지? One to Many?

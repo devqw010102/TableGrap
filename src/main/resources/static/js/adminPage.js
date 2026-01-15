@@ -260,8 +260,13 @@ async function loadCategoryChart() {
 
         Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout, config);
     }
+<<<<<<< Updated upstream
     catch(error) {
         console.error("차트 로드 실패:", error);
+=======
+    catch(e) {
+        console.error("차트 로드 실패:", e);
+>>>>>>> Stashed changes
         // 에러 발생 시 사용자에게 알림 텍스트 표시 가능
         chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
     }
