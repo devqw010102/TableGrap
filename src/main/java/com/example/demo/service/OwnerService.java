@@ -29,5 +29,5 @@ public interface OwnerService {
 
   String generateReviewChart(Long ownerId);
 
-  List<RevisitDto> getRevisits(Long ownerId);
+//  List<RevisitDto> getRevisits(Long ownerId);
 }

@@ -1,5 +1,8 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.common.python.PythonProcessExecutor;
+import com.example.demo.data.dto.ReviewChartDto;
+import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.notification.ReservationCancelRequestEvent;
@@ -13,6 +16,7 @@ import com.example.demo.data.model.Book;
 import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.OwnerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +39,8 @@ public class OwnerServiceImpl implements OwnerService {
   private final BookRepository bookRepository;
   private final ReviewRepository reviewRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final PythonProcessExecutor pythonProcessExecutor;
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   @Transactional
@@ -201,14 +207,34 @@ public class OwnerServiceImpl implements OwnerService {
         public static final Set<Long> allowedBookingIds = Collections.synchronizedSet(new HashSet<>());
   }
 
-  // 차트 그리기
-  // 식당별 리뷰 개수
-  public List<Map<String, Object>> getReviewCount(Long dinerId){
-    return reviewRepository.findReviewCount(dinerId);
+  // 식당별 평점 평균
+  @Override
+  public List<ReviewChartDto> getAvgRate(Long ownerId) {
+    return reviewRepository.findAvgRatingByOwnerId(ownerId);
   }
 
-  // 식당별 평점 평균
-  public List<Map<String,Object>> getAvgRate(Long dinerId) {
-    return reviewRepository.findAvgRate(dinerId);
+  @Override
+  // 파이썬 실행
+  public String generateReviewChart(Long ownerId) {
+
+    try {
+      // 파이썬으로 전송할 데이터 생성
+      List<ReviewChartDto> chartData = reviewRepository.findAvgRatingByOwnerId(ownerId);
+      Map<String, Object> inputData = new HashMap<>();
+      inputData.put("ownerId", ownerId);
+      inputData.put("chartData", chartData);
+      String jsonInput = objectMapper.writeValueAsString(inputData);
+      String result = pythonProcessExecutor.execute("owner", "review_chart", jsonInput);
+
+      // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
+      System.out.println("================ 파이썬 실행 결과 ================");
+      System.out.println(result);
+      System.out.println("================================================");
+
+      return result;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return "{\"error\": \"Java Error\"}";
+    }
   }
 }
