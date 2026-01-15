@@ -3,6 +3,7 @@ package com.example.demo.controller.admin;
 import com.example.demo.common.python.PythonProcessExecutor;
 import com.example.demo.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,22 +22,17 @@ public class AdminChartController {
     private final AdminService adminService;
 
     // 카테고리 차트
-    @GetMapping("/diner-categories")
-    public String getDinerCategoryChart() {
+    @GetMapping(value = "/diner-categories", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDinerCategoryChart() {
         try {
-            // 1. DB 값 불러오기
             List<Map<String, Object>> stats = adminService.getCategoryStats();
+            String jsonData = new ObjectMapper().writeValueAsString(stats);
 
-            // 2. Mapper 사용하여 Json 으로 변환
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonData = mapper.writeValueAsString(stats);
-
-            System.out.println("jsonData: " + jsonData);
-            // 3. 파이썬 실행
-            return pythonProcessExecutor.execute("admin", "category_donut_chart", jsonData);
-        }
-        catch(Exception e) {
-            return "{\"error\":\"" + e.getMessage() + "\"}";
+            // Python 호출 시 한글 깨짐 방지를 위해 true(Base64) 추천
+            String result = pythonProcessExecutor.execute("admin", "category_donut_chart", jsonData, true);
+            return ResponseEntity.ok(result);
+        } catch(Exception e) {
+            return ResponseEntity.status(500).body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
 

@@ -13,18 +13,64 @@
 <body>
 <header th:insert="~{fragment/common :: header}"></header>
 <main>
-    <!-- 상단 배너 (Hero Section) -->
     <section class="hero-section">
-        <!-- 배경 패턴 아이콘들 (Vector Background) -->
         <i class="fas fa-utensils bg-pattern-icon icon-1"></i>
         <i class="fas fa-wine-glass-alt bg-pattern-icon icon-2"></i>
         <i class="fas fa-hamburger bg-pattern-icon icon-3"></i>
         <i class="fas fa-pizza-slice bg-pattern-icon icon-4"></i>
         <i class="fas fa-coffee bg-pattern-icon icon-5"></i>
         <i class="fas fa-ice-cream bg-pattern-icon icon-6"></i>
+
         <div class="container">
-            <h1 class="display-5 fw-bold">오늘은 무엇을 먹을까요?</h1>
-            <p class="lead text-muted">원하는 메뉴 카테고리를 선택해보세요.</p>
+            <div class="row align-items-center">
+                <div class="col-lg-5 text-lg-start text-center mb-5 mb-lg-0">
+                    <h1 class="display-6 fw-bold">오늘은 무엇을 먹을까요?</h1>
+                    <p class="lead mb-4">TableGrap이 분석한 맛집 데이터입니다.</p>
+                    <div>
+                        <span class="badge badge-trend rounded-pill">#실시간_평점</span>
+                        <span class="badge badge-trend rounded-pill">#리뷰_키워드</span>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="card hero-chart-card">
+                        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item p-4">
+                                    <div class="chart-header">
+                                        <h5 class="fw-bold m-0"><i class="fas fa-chart-pie text-primary me-2"></i>인기 카테고리 TOP 5</h5>
+                                        <div class="carousel-controls-custom">
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="categoryDistributionChart" style="height: 280px;"></div>
+                                </div>
+                                <div class="carousel-item active p-4">
+                                    <div class="chart-header">
+                                        <h5 class="fw-bold m-0"><i class="fas fa-medal text-warning me-2"></i>베스트 평점 맛집</h5>
+                                        <div class="carousel-controls-custom">
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="topRatingChart" style="height: 280px;"></div>
+                                </div>
+                                <div class="carousel-item p-4">
+                                    <div class="chart-header">
+                                        <h5 class="fw-bold m-0"><i class="fas fa-tags text-success me-2"></i>최근 리뷰 키워드</h5>
+                                        <div class="carousel-controls-custom">
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="prev"><i class="fas fa-chevron-left"></i></button>
+                                            <button class="btn-chart-nav" data-bs-target="#heroCarousel" data-bs-slide="next"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="keywordAnalysisChart" style="height: 280px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -114,5 +160,7 @@
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src = "js/index.js" type="text/javascript"></script>
 </body>
 </html>

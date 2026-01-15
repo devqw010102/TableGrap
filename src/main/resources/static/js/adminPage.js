@@ -247,30 +247,26 @@ const config = {
 // 카테고리 차트
 async function loadCategoryChart() {
     const chartDiv = document.getElementById('categoryDonutChart');
+    if (!chartDiv) return;
 
     try {
         const res = await fetch('/api/adminPage/charts/diner-categories');
         const resJson = await res.json();
 
-        console.log("받은 데이터:", resJson); // 여기서 데이터 구조 확인
+        console.log("받은 데이터:", resJson);
 
-        chartDiv.innerHTML = '';        // 스피너 제거
+        chartDiv.innerHTML = '';
 
-        const chartData = Array.isArray(resJson.data) ? resJson.data : [resJson.data[0]];
-
-        Plotly.newPlot('categoryDonutChart', resJson.data, resJson.layout, config);
+        if (resJson && resJson.data) {
+            Plotly.newPlot(chartDiv, resJson.data, resJson.layout, config);
+        } else {
+            throw new Error("No chart data");
+        }
     }
-<<<<<<< Updated upstream
-    catch(error) {
-        console.error("차트 로드 실패:", error);
-=======
     catch(e) {
         console.error("차트 로드 실패:", e);
->>>>>>> Stashed changes
-        // 에러 발생 시 사용자에게 알림 텍스트 표시 가능
-        chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
+        chartDiv.innerHTML = '<p class="text-center text-muted">카테고리 데이터를 불러올 수 없습니다.</p>';
     }
-
 }
 
 // 최근 1주일 예약 차트
@@ -285,7 +281,7 @@ async function loadReservationChart() {
 
         chartDiv.innerHTML = '';
 
-        Plotly.newPlot('reservationStatsChart', resJson.data, resJson.layout, config);
+        Plotly.newPlot(chartDiv, resJson.data, resJson.layout, config);
     }
     catch(e) {
         console.error('주간 예약 차트 로드 실패 : ', e);
@@ -296,34 +292,32 @@ async function loadReservationChart() {
 // 회원수 차트
 async function loadMemberCountChart() {
     const chartDiv = document.getElementById('memberPlotlyChart');
+    if (!chartDiv) return;
 
     try {
         const res = await fetch('/api/adminPage/charts/member-count');
         const resJson = await res.json();
 
         console.log('회원 수 데이터 : ', resJson);
-
         chartDiv.innerHTML = '';
-        Plotly.newPlot('memberPlotlyChart', resJson.data, resJson.layout, config);
 
-        const userCount = resJson.data[0].x[0];
-        const ownerCount = resJson.data[1].x[0];
+        await Plotly.newPlot(chartDiv, resJson.data, resJson.layout, config);
 
-        if(document.getElementById('dashboardTotalCount')) {
-            document.getElementById('dashboardTotalCount').innerText = (userCount + ownerCount).toLocaleString();
-        }
-        if(document.getElementById('dashboardUserCount')) {
-            document.getElementById('dashboardUserCount').innerText = userCount.toLocaleString();
-        }
-        if(document.getElementById('dashboardOwnerCount')) {
-            document.getElementById('dashboardOwnerCount').innerText = ownerCount.toLocaleString();
-        }
+        const userCount = resJson.data?.[0]?.x?.[0] || 0;
+        const ownerCount = resJson.data?.[1]?.x?.[0] || 0;
+
+        const totalEl = document.getElementById('dashboardTotalCount');
+        const userEl = document.getElementById('dashboardUserCount');
+        const ownerEl = document.getElementById('dashboardOwnerCount');
+
+        if(totalEl) totalEl.innerText = (userCount + ownerCount).toLocaleString();
+        if(userEl) userEl.innerText = userCount.toLocaleString();
+        if(ownerEl) ownerEl.innerText = ownerCount.toLocaleString();
     }
     catch(e) {
         console.error('회원 수 차트 로드 실패 : ', e);
-        chartDiv.innerHTML = '<p class="text-center">데이터를 불러올 수 없습니다.</p>';
+        chartDiv.innerHTML = '<p class="text-center text-muted">데이터를 불러올 수 없습니다.</p>';
     }
-
 }
 
 /* 대시보드 */

@@ -97,4 +97,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Modifying
     @Query("UPDATE Review r SET r.memberId= :dummyId WHERE r.memberId = :memberId")
     void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
+
+    // 특정 식당의 모든 리뷰 코멘트만 가져오기
+    @Query("SELECT r.comment FROM Review r WHERE r.dinerId = :dinerId")
+    List<String> findCommentsByDinerId(@Param("dinerId") Long dinerId);
 }
