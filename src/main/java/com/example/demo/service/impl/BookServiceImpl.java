@@ -244,6 +244,7 @@ public class BookServiceImpl implements BookService {
 
         eventPublisher.publishEvent(new ReservationApproveEvent(
                 book.getMember().getId(),     // 알림 받을 유저 ID
+                book.getDiner().getOwner().getId(),
                 book.getDiner().getDinerName(),     // 식당 이름
                 formatterDate      // 예약 시간
         ));
