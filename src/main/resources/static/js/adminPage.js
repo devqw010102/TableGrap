@@ -263,10 +263,6 @@ async function loadCategoryChart() {
             throw new Error("No chart data");
         }
     }
-<<<<<<< Updated upstream
-    catch(error) {
-        console.error("차트 로드 실패:", error);
-=======
     catch(e) {
         console.error("차트 로드 실패:", e);
         chartDiv.innerHTML = '<p class="text-center text-muted">카테고리 데이터를 불러올 수 없습니다.</p>';

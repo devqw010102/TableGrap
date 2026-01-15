@@ -889,6 +889,13 @@ function autoHyphen(target) {
         .replace(/^(\d{2,3})(\d{3,4})(\d{1,3})$/, `$1-$2-$3`); // 입력 중인 상태 대응
 }
 
+// Plotly 차트 옵션
+const config = {
+    responsive: true,
+    displayModeBar: false, // 확대, 줌 등 도구창 숨김
+    scrollZoom: false,     // 마우스 휠 확대 끄기
+}
+
 async function loadReviewChart(ownerId) {
   //로딩 표시
   document.getElementById("chartLoading").style.display="block";
@@ -902,7 +909,7 @@ async function loadReviewChart(ownerId) {
       const chartJson= await res.json();
 
       // 차트 그리기(Plotly)
-      Plotly.newPlot('reviewChart', chartJson.data, chartJson.layout);
+      Plotly.newPlot('reviewChart', chartJson.data, chartJson.layout, config);
       // 차트 출력
       document.getElementById("chartLoading").style.display="none";
       document.getElementById("reviewChart").style.display="block";

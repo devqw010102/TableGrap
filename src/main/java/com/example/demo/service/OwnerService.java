@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.data.dto.ReviewChartDto;
-import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 
