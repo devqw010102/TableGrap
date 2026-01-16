@@ -84,7 +84,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
         checkDuplicateBooking(book.getMember().getId(), dto.getBookingDate(), dto.getBookId());
-        
+
         // 슬롯
         // 1. 기존 슬롯 복구
         availabilityRepository.findByDinerIdAndDateAndTime(book.getDiner().getId(), book.getBookingDate().toLocalDate(), book.getBookingDate().toLocalTime())
@@ -330,5 +330,39 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findVisitorTrendDataForChart(dinerId, LocalDateTime.now());
     }
 
+    @Override
+    public List<Map<String, Object>> getFoodPreference(Long memberId) {
+        return bookRepository.findFoodPreferencesForChart(memberId, LocalDateTime.now());
+    }
 
+    @Override
+    public Map<String, Object> getMonthlyVisitData(Long memberId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sixMonthsAgo = now.minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0);
+
+        List<Map<String, Object>> myData = bookRepository.findMyMonthlyVisitCount(memberId, sixMonthsAgo, now);
+        Double avgAllTotal = bookRepository.getAverageVisitCountAllUsers(sixMonthsAgo, now);
+        List<Long> allVisits = bookRepository.getAllUsersTotalVisits(sixMonthsAgo, now);
+        long totalMembers = memberRepository.count(); // 전체 회원수
+
+        // BookServiceImpl.java 내 관련 로직
+        long myTotal = myData.stream()
+                .mapToLong(m -> ((Number) m.get("count")).longValue())
+                .sum();
+
+    // 나보다 많이 방문한 사람 수
+        long rank = allVisits.stream().filter(v -> v > myTotal).count();
+
+    // 상위 백분위 계산 (1등인 경우 0%가 아닌 1%로 보이게 하려면 보정 필요)
+        double percentile = (totalMembers == 0) ? 0 : (double) (rank + 1) / totalMembers * 100;
+        if (percentile > 100) percentile = 100;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("myHistory", myData);
+        result.put("avgAll", avgAllTotal != null ? avgAllTotal / 6.0 : 0);
+        result.put("percentile", Math.round(percentile)); // 반올림
+        result.put("totalCount", myTotal);
+
+        return result;
+    }
 }

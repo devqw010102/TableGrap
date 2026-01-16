@@ -3,10 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const pastBookLink = document.querySelector('a[href="#pastBooks"]')
     const infoLink = document.querySelector('a[href="#info"]');
     const reviewLink = document.querySelector('a[href="#review"]');
+    const reportLink = document.querySelector('a[href="#report"]');
     if (bookLink) bookLink.addEventListener('click', loadBooks);
     if (pastBookLink) pastBookLink.addEventListener('click', loadBooks);
     if (infoLink) infoLink.addEventListener('click', loadMyInfo);
     if (reviewLink) reviewLink.addEventListener('click', loadMyReview);
+    if (reportLink) {
+        reportLink.addEventListener('click', () => {
+            loadFoodPreferenceChart();
+            loadMonthlyVisitChart();
+        });
+    }
 
     // 회원정보 수정/저장/취소 버튼 이벤트 연결
     const btnEdit = document.getElementById("btnEdit");
@@ -574,4 +581,66 @@ window.onload = function() {
         alert("식당 정보를 불러올 수 없습니다.");
         window.history.replaceState({}, document.title, window.location.pathname);
     }
+}
+
+function loadFoodPreferenceChart() {
+    fetch("/api/member/info")
+    .then(res => res.json())
+    .then(member => {
+        const memberId = member.id;
+        return fetch(`/api/reservation/charts/food-preference/${memberId}`);
+    })
+    .then(res => res.json())
+    .then(response => {
+
+        if (response.error) {
+            console.error("Python 에러:", response.error);
+            return;
+        }
+
+        Plotly.newPlot('foodPreferenceChart', response.data, response.layout);
+
+        const analysisTexts = document.getElementById("foodAnalysisText");
+        if (analysisTexts && response.data && response.data[0] && response.data[0].labels) {
+            const topCategory = response.data[0].labels[0]; // 가장 비율 높은 카테고리
+            if (topCategory) {
+                analysisTexts.innerText = `사용자님은 '${topCategory}' 음식을 가장 선호하시는군요!`;
+            }
+        }
+    })
+    .catch(err => {
+        console.error("차트 로드 중 예외 발생:", err);
+    });
+}
+
+function loadMonthlyVisitChart() {
+    fetch("/api/member/info")
+    .then(res => res.json())
+    .then(member => fetch(`/api/reservation/charts/monthly-visit/${member.id}`))
+    .then(res => res.json())
+    .then(response => {
+        if (response.error) {
+            console.error("차트 에러:", response.error);
+            return;
+        }
+
+        Plotly.newPlot('monthlyVisitChart', response.data, response.layout);
+
+        const analysisText = document.getElementById("visitAnalysisText");
+        const myRank = response.percentile;
+        const total = response.totalCount;
+        const avgAll = response.avgAll;
+
+        let rankMsg = `회원님은 상위 ${myRank}%의 미식가입니다!`; // 이 문구들을 수정
+        if(myRank <= 10) rankMsg = `👑 대단해요! 상위 ${myRank}%의 진정한 미식가시네요!`;
+        if(total === 0) rankMsg = `아직 방문 확정된 내역이 없네요. 맛집 예약을 시작해보세요!`;
+
+        analysisText.innerHTML = `
+            <div>
+                <strong>${rankMsg}</strong><br>
+                <small>(최근 6개월 총 ${total}회 방문 | 전체 사용자 월평균: ${avgAll}회)</small>
+            </div>
+        `;
+    })
+    .catch(err => console.error("방문 차트 로드 실패:", err));
 }
