@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,31 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public List<Map<String, Object>> getCategoryRankingStats() {
         return dinerRepository.findCategoryStats();
+    }
+
+    @Override
+    public List<Map<String, Object>> getTop5RatedDiners() {
+        List<Map<String, Object>> results = dinerRepository.findTop5RatedDinersJPQL(PageRequest.of(0, 5));
+
+        return results.stream().map(m -> {
+            Map<String, Object> newMap = new HashMap<>();
+
+            newMap.putAll(m);
+            // 데이터 전처리
+            if (m.get("dinerName") != null) {
+                String originalName = m.get("dinerName").toString();
+                String cleanedName = originalName.replaceAll("[^\\x00-\\x7F가-힣ㄱ-ㅎㅏ-ㅣ]", "");
+                newMap.put("dinerName", cleanedName);
+            }
+
+            Object avgObj = m.get("averageRating");
+            if (avgObj != null) {
+                double avg = ((Number) avgObj).doubleValue();
+                newMap.put("averageRating", Math.round(avg * 10.0) / 10.0);
+            }
+
+            return newMap;
+        }).collect(Collectors.toList());
     }
 
     @Override

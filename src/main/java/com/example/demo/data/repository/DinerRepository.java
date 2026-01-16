@@ -85,4 +85,11 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
             "HAVING COUNT(r) >= 2 " +
             "ORDER BY COUNT(r) DESC, MAX(r.createTime) DESC")
     List<Diner> findFeaturedDiners(Pageable pageable);
+
+    // Index 베스트 평점 맛집 차트
+    @Query("SELECT d.id as dinerId, d.dinerName as dinerName, AVG(CAST(r.rating AS double)) as averageRating " +
+            "FROM Diner d JOIN Review r ON d.id = r.dinerId " +
+            "GROUP BY d.id, d.dinerName " +
+            "ORDER BY AVG(r.rating) DESC")
+    List<Map<String, Object>> findTop5RatedDinersJPQL(Pageable pageable);
 }

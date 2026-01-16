@@ -31,7 +31,7 @@ def generate(data, kiwi):
             x=values,
             y=labels,
             orientation='h',
-            marker_color='#FF7E00',
+            marker=dict(color=['#FF7E00', '#FF9E33', '#FFBD66', '#FFDC99', '#FFEBCC']),
             text=values,
             textposition='auto'
         )])
