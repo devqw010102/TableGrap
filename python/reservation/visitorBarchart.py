@@ -20,7 +20,7 @@ def generate(data, kiwi=None):
             'THU': '목요일', 'FRI': '금요일', 'SAT': '토요일', 'SUN': '일요일'
         }
 
-        # 1. 통계 계산
+        # 통계 계산
         if df.empty:
             most_frequent_hour = "-"
             most_frequent_day_kr = "-"
@@ -30,28 +30,28 @@ def generate(data, kiwi=None):
             most_frequent_day_kr = day_map.get(most_frequent_day_en, most_frequent_day_en)
             most_frequent_hour = df['hour'].value_counts().idxmax()
 
-        # 2. 요일별 데이터 정리
+        # 요일별 데이터 정리
         day_order = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
         day_total = df.groupby('day_of_week_en').size().reindex(day_order, fill_value=0)
 
         x_values = [day_map[d] for d in day_order]
         y_values = day_total.values.tolist()
 
-        # 3. 차트 생성
+        # 차트 생성
         fig = go.Figure()
 
-        # [막대 차트]
+        # 막대 
         fig.add_trace(
             go.Bar(
                 x=x_values,
                 y=y_values,
                 name="예약 건수",
-                marker_color='rgba(52, 152, 219, 0.5)', # 약간 투명하게 변경
+                marker_color='rgba(52, 152, 219, 0.5)', 
                 hovertemplate='%{x}: <b>%{y}건</b><extra></extra>'
             )
         )
 
-        # [꺾은선 차트]
+        # 꺾은선
         fig.add_trace(
             go.Scatter(
                 x=x_values,
@@ -64,7 +64,7 @@ def generate(data, kiwi=None):
             )
         )
 
-        # 4. 레이아웃 설정
+        # 레이아웃
         stats_text = f"인기 시간대: {most_frequent_hour}시 | 인기 요일: {most_frequent_day_kr}"
 
         fig.update_layout(
@@ -76,7 +76,7 @@ def generate(data, kiwi=None):
             },
             xaxis=dict(
                 title="요일",
-                showgrid=False # X축 그리드 제거로 깔끔하게
+                showgrid=False 
             ),
             yaxis=dict(
                 title="예약 건수(건)",
@@ -96,7 +96,7 @@ def generate(data, kiwi=None):
                 xanchor="right",
                 x=1
             ),
-            hovermode="x unified" # 같은 X축 상의 데이터를 한꺼번에 보여줌
+            hovermode="x unified" 
         )
 
         return fig.to_dict()
