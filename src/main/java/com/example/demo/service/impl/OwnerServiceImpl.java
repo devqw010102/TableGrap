@@ -2,7 +2,6 @@ package com.example.demo.service.impl;
 
 import com.example.demo.common.python.PythonProcessExecutor;
 import com.example.demo.data.dto.ReviewChartDto;
-import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.notification.ReservationCancelRequestEvent;
@@ -224,7 +223,7 @@ public class OwnerServiceImpl implements OwnerService {
       inputData.put("ownerId", ownerId);
       inputData.put("chartData", chartData);
       String jsonInput = objectMapper.writeValueAsString(inputData);
-      String result = pythonProcessExecutor.execute("owner", "review_chart", jsonInput);
+      String result = pythonProcessExecutor.execute("owner", "review_chart", jsonInput, true);
 
       // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
       System.out.println("================ 파이썬 실행 결과 ================");

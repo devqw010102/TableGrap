@@ -2,10 +2,68 @@
 .hero-section {
   background: linear-gradient(190deg, #FF7E00, #FFB300);
   color: white;
-  padding: 3rem 0;
+  padding: 4rem 0; /* 슬라이드 공간을 위해 패딩 살짝 증가 */
   margin-bottom: 2rem;
-  text-align: center;
+  text-align: left; /* 텍스트 정렬을 왼쪽으로 변경 */
   position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* 배너 내 텍스트 강조 */
+.hero-section h1 {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero-section .lead {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* --- 슬라이드 차트 카드 스타일 (추가) --- */
+.hero-chart-card {
+  background: rgba(255, 255, 255, 0.95); /* 배경 살짝 투명하게 하여 세련미 추가 */
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  color: #333; /* 차트 내부 텍스트는 어둡게 */
+  overflow: hidden;
+}
+
+/* 슬라이드 내부 타이틀 바 */
+.chart-header {
+  padding: 1.25rem 1.5rem 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 슬라이드 컨트롤 버튼 커스텀 */
+.carousel-controls-custom .btn-chart-nav {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.carousel-controls-custom .btn-chart-nav:hover {
+  background: #FF7E00;
+  color: white;
+  color: white;
+  border-color: #FF7E00;
+}
+
+/* 배지(Badge) 스타일 */
+.badge-trend {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-weight: 500;
+  margin-right: 0.5rem;
 }
 
 /* --- 벡터 배경 패턴 아이콘 스타일 --- */

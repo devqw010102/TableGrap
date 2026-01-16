@@ -1,59 +1,57 @@
 package com.example.demo.common.python;
 
 import org.springframework.stereotype.Component;
-
-import java.io.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class PythonProcessExecutor {
 
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String FASTAPI_URL = "http://127.0.0.1:8000";
+
+    // 기본 호출 (Base64 미사용)
     public String execute(String domain, String fileName, String jsonData) {
-        try {
-            // 1. 프로젝트 경로
-            String projectRoot = System.getProperty("user.dir");
-
-            // 2. 가상환경 파이썬 경로
-            String pythonPath = projectRoot + File.separator + ".venv" + File.separator + "Scripts" + File.separator + "python.exe";
-
-            // 3. 실행할 파이썬 스크립트 경로
-            String scriptPath = projectRoot + File.separator + "python" + File.separator + domain + File.separator + fileName + ".py";
-
-            ProcessBuilder pb = new ProcessBuilder(pythonPath, scriptPath);
-
-            pb.environment().put("PYTHONIOENCODING", "UTF-8");
-            pb.environment().put("PYTHONPATH", projectRoot + File.separator + ".venv" + File.separator + "Lib" + File.separator + "site-packages");
-            Process process = pb.start();
-
-            // 4. 파이썬으로 데이터 전송
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
-                writer.write(jsonData);
-                writer.flush();
-            }
-
-            // 5. 파이썬으로부터 차트 JSON 읽기
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-                String result = reader.lines().collect(Collectors.joining());
-
-                if (result.isEmpty()) {
-                    readErrorStream(process);
-                }
-
-                return result;
-            }
-        }
-        catch(Exception e) {
-            return "{\"error\":\"" + e.getMessage() + "\"}";
-        }
+        return execute(domain, fileName, jsonData, false);
     }
 
-    private void readErrorStream(Process process) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
-            String errorLog = reader.lines().collect(Collectors.joining());
-            if (!errorLog.isEmpty()) {
-                System.err.println("Python Error: " + errorLog);
+    // FastAPI 엔드포인트 호출 방식
+    public String execute(String domain, String fileName, String jsonData, boolean useBase64) {
+        try {
+            // 1. 엔드포인트 구성 (예: /index/featured_keywords_chart)
+            String url = FASTAPI_URL + "/" + domain + "/" + fileName;
+
+            // 2. 데이터 준비
+            String sendData = jsonData;
+            if (useBase64) {
+                sendData = Base64.getEncoder().encodeToString(jsonData.getBytes(StandardCharsets.UTF_8));
             }
+
+            // 3. HTTP Header 및 Body 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("data", sendData);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+            // 4. FastAPI 서버로 POST 요청
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();
+            } else {
+                return "{\"error\":\"FastAPI Server Error: " + response.getStatusCode() + "\"}";
+            }
+
+        } catch (Exception e) {
+            System.err.println("FastAPI 통신 실패: " + e.getMessage());
+            return "{\"error\":\"Python API Connection Failed: " + e.getMessage() + "\"}";
         }
     }
 }

@@ -77,4 +77,12 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     // 카테고리 차트
     @Query("SELECT d.category as category, COUNT(d) as count FROM Diner d GROUP BY d.category")
     List<Map<String, Object>> findCategoryStats();
+
+    // Index 오늘의 식당 차트
+    @Query("SELECT d.id as id, d.dinerName as dinerName, AVG(r.rating) as avgRating, COUNT(r) as reviewCount " +
+            "FROM Diner d, Review r " +
+            "WHERE d.id = r.dinerId " +
+            "GROUP BY d.id, d.dinerName " +
+            "ORDER BY avgRating DESC, reviewCount DESC")
+    List<Map<String, Object>> findTopRatedDiners(); // 리뷰가 있는 식당 중 평균 평점이 높은 순서로 정렬
 }
