@@ -324,4 +324,11 @@ public class BookServiceImpl implements BookService {
             throw new IllegalArgumentException("이미 1시간 이내에 다른 예약이 존재합니다.");
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getVisitorData(Long dinerId) {
+        return bookRepository.findVisitorTrendDataForChart(dinerId, LocalDateTime.now());
+    }
+
+
 }
