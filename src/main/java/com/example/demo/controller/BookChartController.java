@@ -10,6 +10,7 @@ import com.example.demo.service.impl.DinerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,5 +88,39 @@ public class BookChartController {
             return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
         }
 
+    }
+
+    @GetMapping("/food-preference/{memberId}")
+    public String getFoodPreferenceChart(@PathVariable Long memberId) {
+        try {
+            List<Map<String, Object>> rawData = bookService.getFoodPreference(memberId);
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("categories", rawData);
+
+            String jsonData = mapper.writeValueAsString(payload);
+            System.out.println("### 파이썬으로 보내는 음식 선호도 데이터" + jsonData);
+
+            return pythonProcessExecutor.execute("mypage", "foodPreference", jsonData);
+        } catch (Exception e) {
+            return "{\"error\": \"" + e.getMessage() + "\"}";
         }
+    }
+
+    @GetMapping("/monthly-visit/{memberId}")
+    public Object getMonthlyVisitChart(@PathVariable Long memberId) {
+        try {
+            Map<String, Object> rawData = bookService.getMonthlyVisitData(memberId);
+            String jsonData = mapper.writeValueAsString(rawData);
+
+            // 파이썬 실행 결과(JSON String)를 받음
+            String pythonResult = pythonProcessExecutor.execute("mypage", "monthlyVisit", jsonData);
+
+            // [수정] String을 JsonNode로 읽어서 리턴해야 JSON 형식이 제대로 전달됩니다.
+            return mapper.readValue(pythonResult, Object.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
+        }
+    }
 }

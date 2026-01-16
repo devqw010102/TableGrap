@@ -5,8 +5,10 @@ import com.example.demo.data.dto.BookResponseDto;
 import com.example.demo.data.dto.SlotResponseDto;
 import com.example.demo.data.dto.owner.BookOwnerResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,8 @@ public interface BookService {
     List<SlotResponseDto> getDailyAvailability(LocalDate date, int requestedPersonnel, Long dinerId);
 
     List<Map<String, Object>> getVisitorData(Long dinerId);
+
+    List<Map<String, Object>> getFoodPreference(Long MemberId);
+
+    Map<String, Object> getMonthlyVisitData(Long memberId);
 }

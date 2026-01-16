@@ -18,27 +18,27 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     List<Book> findByMember_id(Long memberId);
 
     @Query("""
-    select new com.example.demo.data.dto.owner.BookOwnerResponseDto(
-        b.bookId,
-        d.dinerName,
-        b.bookingDate,
-        b.personnel,
-        m.name
-    )
-    from Book b
-    join b.diner d
-    join b.member m
-    where d.owner.id = :ownerId
-      and (:dinerId is null or d.id = :dinerId)
-      and (
-            :pending is null
-            or (:pending = true and (b.success = false or b.success is null))
-            or (:pending = false and b.success = true)
-          )
-      and (:start is null or b.bookingDate >= :start)
-      and (:end is null or b.bookingDate < :end)
-    order by b.bookingDate asc, b.personnel asc
-    """)
+            select new com.example.demo.data.dto.owner.BookOwnerResponseDto(
+                b.bookId,
+                d.dinerName,
+                b.bookingDate,
+                b.personnel,
+                m.name
+            )
+            from Book b
+            join b.diner d
+            join b.member m
+            where d.owner.id = :ownerId
+              and (:dinerId is null or d.id = :dinerId)
+              and (
+                    :pending is null
+                    or (:pending = true and (b.success = false or b.success is null))
+                    or (:pending = false and b.success = true)
+                  )
+              and (:start is null or b.bookingDate >= :start)
+              and (:end is null or b.bookingDate < :end)
+            order by b.bookingDate asc, b.personnel asc
+            """)
     Page<BookOwnerResponseDto> findBookings(
             @Param("ownerId") Long ownerId,
             @Param("dinerId") Long dinerId,
@@ -49,11 +49,11 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     );
 
     @Query("""
-    select count(b)
-    from Book b
-    where b.addDate >= :start
-      and b.addDate < :end
-    """)
+            select count(b)
+            from Book b
+            where b.addDate >= :start
+              and b.addDate < :end
+            """)
     long countTodayBookings(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
@@ -85,14 +85,13 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     void updateMemberToDummy(@Param("memberId") Long memberId, @Param("dummyId") Long dummyId);
 
     @Query("""
-        SELECT COUNT(b) > 0
-            FROM Book b
-                WHERE b.member.id = :memberId
-                    AND b.bookingDate > :start
-                        AND b.bookingDate < :end
-                            AND (:excludeBookId IS NULL OR b.bookId <> :excludeBookId)
-    """)
-
+                SELECT COUNT(b) > 0
+                    FROM Book b
+                        WHERE b.member.id = :memberId
+                            AND b.bookingDate > :start
+                                AND b.bookingDate < :end
+                                    AND (:excludeBookId IS NULL OR b.bookId <> :excludeBookId)
+            """)
     boolean existsConflictBooking(
             @Param("memberId") Long memberId,
             @Param("start") LocalDateTime start,
@@ -133,4 +132,52 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "ORDER BY b.bookingDate ASC")
     List<Map<String, Object>> findVisitorTrendDataForChart(@Param("dinerId") Long dinerId, @Param("now") LocalDateTime now);
 
+
+    // mypage - category dounut chart
+    @Query("""
+                SELECT b.diner.category AS category, COUNT(b) AS count 
+                FROM Book b 
+                WHERE b.member.id = :memberId 
+                  AND b.bookingDate < :now 
+                GROUP BY b.diner.category
+            """)
+    List<Map<String, Object>> findFoodPreferencesForChart(
+            @Param("memberId") Long memberId,
+            @Param("now") LocalDateTime now
+    );
+
+
+    // mypage - montly chart
+    // 내 월별 방문 횟수 (최근 6개월, 확정된 지난 예약)
+    @Query("""
+                SELECT FUNCTION('FORMATDATETIME', b.bookingDate, 'yyyy-MM') AS month, COUNT(b) AS count 
+                FROM Book b 
+                WHERE b.member.id = :memberId 
+                  AND b.success = true 
+                  AND b.bookingDate >= :sixMonthsAgo 
+                  AND b.bookingDate < :now 
+                GROUP BY month 
+                ORDER BY month ASC
+            """)
+    List<Map<String, Object>> findMyMonthlyVisitCount(@Param("memberId") Long memberId, @Param("sixMonthsAgo") LocalDateTime sixMonthsAgo, @Param("now") LocalDateTime now);
+
+    // 전체 사용자의 월평균 방문 횟수 (비교용)
+    @Query("""
+                SELECT COUNT(b) * 1.0 / (SELECT COUNT(distinct m.id) FROM Member m) 
+                FROM Book b 
+                WHERE b.success = true 
+                  AND b.bookingDate >= :sixMonthsAgo 
+                  AND b.bookingDate < :now
+            """)
+    Double getAverageVisitCountAllUsers(@Param("sixMonthsAgo") LocalDateTime sixMonthsAgo, @Param("now") LocalDateTime now);
+
+    // 나의 상위 백분위 계산을 위한 전체 예약수
+    @Query("""
+                SELECT COUNT(b) FROM Book b 
+                WHERE b.success = true AND b.bookingDate >= :sixMonthsAgo AND b.bookingDate < :now
+                GROUP BY b.member.id
+            """)
+    List<Long> getAllUsersTotalVisits(@Param("sixMonthsAgo") LocalDateTime sixMonthsAgo, @Param("now") LocalDateTime now);
+
 }
+
