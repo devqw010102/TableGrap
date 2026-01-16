@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.data.dto.ReviewChartDto;
+import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.owner.OwnerDto;
 import com.example.demo.data.dto.owner.OwnerUpdateDto;
 
@@ -28,5 +29,11 @@ public interface OwnerService {
 
   String generateReviewChart(Long ownerId);
 
-//  List<RevisitDto> getRevisits(Long ownerId);
+  List<RevisitDto> getRevisits(Long ownerId);
+
+  String generateRevisitsChart(Long ownerId);
+
+  List<RevisitDto> getBookByDinerId(Long dinerId, Long ownerId);
+
+  String genRevisitsChartByDiner(Long dinerId, Long ownerId);
 }

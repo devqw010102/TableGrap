@@ -111,6 +111,19 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "ORDER BY date ASC")
     List<Map<String, Object>> getWeeklyBookingStats(@Param("startDate") LocalDateTime startDate);
 
+    // 재방문율 계산을 위한 예약 내역 불러오기
+    @Query("SELECT b FROM Book b " +
+            "JOIN FETCH b.diner d " +
+            "WHERE d.owner.id = :ownerId")
+    List<Book> findBookByOwnerId(Long ownerId);
+
+    // 개별 식당 재방문율 계산
+    @Query("SELECT b FROM Book b " +
+            "JOIN FETCH b.diner d " +
+            "WHERE d.id = :dinerId " +
+            "AND d.owner.id  = :ownerId " +
+            "ORDER BY b.bookingDate ASC")
+    List<Book> findBookByDinerIdAndOwnerId(Long dinerId, Long ownerId);
     // visitor trend chart ( 요일/ 시간)
     @Query("SELECT b.bookingDate as date, b.personnel as personnel " +
             "FROM Book b " +

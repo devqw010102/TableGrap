@@ -7,7 +7,33 @@ def generate(data, kiwi=None):
     try:
         raw_data = data.get('chartData', [])
         if not raw_data:
-            return {"data": [], "layout": {"title": "데이터가 없습니다."}}
+            # 차트 축(axis)을 숨기고, 중앙에 메시지만 표시하는 레이아웃 설정
+            empty_layout = {
+                "title": {
+                    "text": "현재 데이터 수집 중입니다.",
+                    "x": 0.5,          # 가로 중앙 정렬
+                    "y": 0.5,          # 세로 중앙 정렬
+                    "xanchor": "center",
+                    "yanchor": "middle",
+                    "font": {"size": 18} # 글자 크기 조절
+                },
+                "xaxis": {"visible": False},
+                "yaxis": {"visible": False},
+                "annotations": [
+                    {
+                        "text": "데이터가 충분히 쌓이면 이곳에 차트가 표시됩니다.",
+                        "x": 0.5,
+                        "y": 0.4,
+                        "xref": "paper",
+                        "yref": "paper",
+                        "showarrow": False,
+                        "font": {"size": 12, "color": "gray"}
+                    }
+                ],
+                "template": "plotly_white" # 배경색 등 스타일 유지
+            }
+            # data는 빈 리스트로 두어 차트가 그려지지 않게 함
+            return {'data': [], 'layout': empty_layout}
 
         df = pd.DataFrame(raw_data)
 

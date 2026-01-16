@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.common.python.PythonProcessExecutor;
 import com.example.demo.data.dto.ReviewChartDto;
+import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.notification.ReservationCancelRequestEvent;
@@ -16,8 +17,10 @@ import com.example.demo.data.model.Owner;
 import com.example.demo.data.repository.*;
 import com.example.demo.service.OwnerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-
+@Slf4j
 public class OwnerServiceImpl implements OwnerService {
 
   private final OwnerRepository ownerRepository;
@@ -39,6 +42,7 @@ public class OwnerServiceImpl implements OwnerService {
   private final ReviewRepository reviewRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final PythonProcessExecutor pythonProcessExecutor;
+  // json으로 변환할 때 LocalDateTime을 변환하기 위해서 모듈 추가
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
@@ -232,8 +236,90 @@ public class OwnerServiceImpl implements OwnerService {
 
       return result;
     } catch (Exception e) {
-        e.printStackTrace();
-        return "{\"error\": \"Java Error\"}";
+      log.error("차트 데이터 생성 중 오류 발생.", e);
+      return "{\"error\": \"Java Error\"}";
+    }
+  }
+
+  // 재방문율 계산에 필요한 값 구하기
+  @Override
+  public List<RevisitDto> getRevisits(Long ownerId) {
+    return bookRepository.findBookByOwnerId(ownerId).stream()
+            .map(book -> RevisitDto.builder()
+                    .dinerId(book.getDiner().getId())
+                    .memberId(book.getMember().getId())
+                    .build())
+            .toList();
+  }
+
+  // 차트 생성
+  @Override
+  public String generateRevisitsChart(Long ownerId) {
+    try{
+      List<RevisitDto> chartData = bookRepository.findBookByOwnerId(ownerId)
+              .stream()
+              .map(book -> RevisitDto.builder()
+                      .dinerId(book.getDiner().getId())
+                      .memberId(book.getMember().getId())
+                      .build())
+              .toList();
+      Map<String, Object> inputData = new HashMap<>();
+      inputData.put("ownerId", ownerId);
+      inputData.put("chartData", chartData);
+      String jsonInput = objectMapper.writeValueAsString(inputData);
+      String result = pythonProcessExecutor.execute("owner", "revisit_chart", jsonInput, true);
+      // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
+      System.out.println("================ 파이썬 실행 결과 ================");
+      System.out.println(result);
+      System.out.println("================================================");
+      return result;
+    } catch (Exception e) {
+      log.error("차트 데이터 생성 중 오류 발생.", e);
+      return "{\"error\": \"Java Error\"}";
+    }
+  }
+
+  // 식당 별 재방문율
+  @Override
+  public List<RevisitDto> getBookByDinerId(Long dinerId, Long ownerId) {
+    return bookRepository.findBookByDinerIdAndOwnerId(dinerId, ownerId).stream()
+            .map(book -> RevisitDto.builder()
+                    .dinerId(book.getDiner().getId())
+                    .memberId(book.getMember().getId())
+                    .bookingDate(book.getBookingDate())
+                    .build())
+            .toList();
+  }
+
+  // 차트 생성
+  @Override
+  public String genRevisitsChartByDiner(Long dinerId, Long ownerId) {
+    try {
+     List<RevisitDto> chartData = bookRepository.findBookByDinerIdAndOwnerId(dinerId, ownerId).stream()
+              .map(book -> RevisitDto.builder()
+                      .dinerId(book.getDiner().getId())
+                      .memberId(book.getMember().getId())
+                      .bookingDate(book.getBookingDate())
+                      .build())
+              .toList();
+      Map<String, Object> inputData = new HashMap<>();
+      inputData.put("ownerId", ownerId);
+      inputData.put("dinerId", dinerId);
+      inputData.put("chartData", chartData);
+
+      ObjectMapper localMapper = new ObjectMapper();
+      localMapper.registerModule(new JavaTimeModule());
+
+      String jsonInput = localMapper.writeValueAsString(inputData);
+      // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
+      System.out.println("================ 파이썬 전송 데이터 ================");
+      System.out.println(jsonInput);
+      System.out.println("================================================");
+
+      return pythonProcessExecutor.execute("owner", "revisit_chart_by_diner", jsonInput, true);
+    } catch (Exception e) {
+      log.error("차트 데이터 생성 중 오류 발생.", e);
+      return "{\"error\": \"Java Error\"}";
     }
   }
 }
