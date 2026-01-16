@@ -114,4 +114,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND d.owner.id = :ownerId " +      // <-- 조건 추가
             "GROUP BY r.dinerId")
     List<ReviewChartDto> findAvgRatingByOwnerId(@Param("ownerId") Long ownerId);
+
+
 }
