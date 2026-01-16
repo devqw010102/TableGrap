@@ -1,7 +1,10 @@
 package com.example.demo.data.dto;
 
 import com.example.demo.data.enums.DinerStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
@@ -18,7 +21,4 @@ public class DinerDetailDto {
   private DinerStatus status;
   private String ownerPhone;
   private Long ownerId;
-
-  //운영시간은 어떻게?
-  //후기는 schema를 어떻게 할 것인지? One to Many?
 }

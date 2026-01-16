@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,4 +34,13 @@ public class Review {
     private LocalDateTime createTime;
     @LastModifiedDate
     private LocalDateTime updateTime;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "review_keywords", // 생성될 테이블 이름
+            joinColumns = @JoinColumn(name = "review_id") // 외래키 컬럼명
+    )
+    @Column(name = "keyword") // 키워드 값이 저장될 컬럼명
+    @Builder.Default // 빌더 패턴 사용 시 초기화 보장
+    private List<String> keywords = new ArrayList<>();
 }
