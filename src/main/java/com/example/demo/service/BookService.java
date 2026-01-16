@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface BookService {
 
@@ -29,4 +30,6 @@ public interface BookService {
     void rejectBooking(Long bookId);
 
     List<SlotResponseDto> getDailyAvailability(LocalDate date, int requestedPersonnel, Long dinerId);
+
+    List<Map<String, Object>> getVisitorData(Long dinerId);
 }

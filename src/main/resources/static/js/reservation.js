@@ -371,10 +371,6 @@ document.addEventListener("DOMContentLoaded", () => {
     UI.renderCalendar();
     UI.updateSummary();
     API.loadReviews();
-    loadOwnerResponse();
-
-    window.loadReviewDetail = UI.loadReviewDetail;
-});
 
 async function loadOwnerResponse() {
     const ownerId = document.getElementById("ownerId")?.value;
@@ -498,3 +494,31 @@ async function loadOwnerResponse() {
         console.error("통계 로드 실패:", e);
     }
 }
+    async function loadVisitorTrendChart() {
+        const dinerId = state.dinerId;
+        const chartContainer = document.getElementById('visitor-trend-chart');
+
+        if(!dinerId || !chartContainer) return;
+
+        try{
+            const response = await fetch (`/api/reservation/charts/visitor-trend/${dinerId}`);
+            const chartData = await response.json();
+
+            if(chartData.error) {
+                console.error("차트 데이터 에러", chartData.error);
+                chartContainer.innerHTML = `<p class="text-gray-500">데이터를 불러올 수 없습니다.</p>`;
+                            return;
+            }
+
+            Plotly.newPlot('visitor-trend-chart', chartData.data, chartData.layout, {responsive: true});
+
+        } catch (error) {
+            console.error("네트워크 에러", error);
+            chartContainer.innerHTML = `<p class="text-gray-500">차트 로딩 중 오류가 발생했습니다.</p>`;
+        }
+    }
+       loadOwnerResponse();
+        loadVisitorTrendChart();
+
+        window.loadReviewDetail = UI.loadReviewDetail;
+    });

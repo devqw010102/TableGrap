@@ -4,6 +4,8 @@ import com.example.demo.common.python.PythonProcessExecutor;
 import com.example.demo.data.enums.NotificationType;
 import com.example.demo.data.model.Notification;
 import com.example.demo.data.repository.NotificationRepository;
+import com.example.demo.service.BookService;
+import com.example.demo.service.impl.BookServiceImpl;
 import com.example.demo.service.impl.DinerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -26,13 +28,16 @@ public class BookChartController {
     private final DinerServiceImpl dinerserviceImpl;
     private final NotificationRepository notificationRepository;
     private final ObjectMapper mapper;
+    private final BookService bookService;
 
     // 1. @RequiredArgsConstructor를 지우고 직접 생성자를 만듭니다.
     public BookChartController(PythonProcessExecutor pythonProcessExecutor,
+                               BookService bookService,
                                DinerServiceImpl dinerserviceImpl,
                                NotificationRepository notificationRepository) {
         this.pythonProcessExecutor = pythonProcessExecutor;
         this.dinerserviceImpl = dinerserviceImpl;
+        this.bookService = bookService;
         this.notificationRepository = notificationRepository;
 
         // 2. 생성 시점에 ObjectMapper를 설정 (날짜 에러 방지)
@@ -62,4 +67,25 @@ public class BookChartController {
             return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
         }
     }
+
+    @GetMapping("/visitor-trend/{dinerId}")
+    public String getVisitorTrendChart(@PathVariable Long dinerId) {
+        try {
+            List<Map<String, Object>> rawData = bookService.getVisitorData(dinerId);
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("dinerId", dinerId);
+            payload.put("visitor", rawData);
+
+            String jsonData = mapper.writeValueAsString(payload);
+            System.out.println("### 파이썬으로 보내는 방문 추이 데이터:" + jsonData);
+
+            return pythonProcessExecutor.execute("reservation", "visitorBarchart", jsonData);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
+        }
+
+        }
 }
