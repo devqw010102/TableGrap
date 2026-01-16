@@ -5,6 +5,7 @@ import com.example.demo.service.IndexService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.ObjectMapper;
 
@@ -36,6 +37,24 @@ public class IndexChartController {
          catch(Exception e) {
              return "{\"error\":\"" + e.getMessage() + "\"}";
          }
+    }
+
+    @GetMapping(value = "/best-ratings", produces = "application/json; charset=UTF-8")
+    @ResponseBody
+    public String getBestRatingChart() {
+        try {
+            List<Map<String, Object>> stats = indexService.getTop5RatedDiners();
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonData = mapper.writeValueAsString(stats);
+
+            System.out.println("best-ratings Data : " + jsonData);
+
+            return pythonProcessExecutor.execute("index", "best_rating_chart", jsonData);
+        }
+        catch(Exception e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+        }
     }
 
     @GetMapping("/featured-keywords")

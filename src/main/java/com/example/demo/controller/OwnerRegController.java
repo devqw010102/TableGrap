@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeType;
 
 import java.util.*;
 import java.util.stream.*;
@@ -58,7 +59,12 @@ public class OwnerRegController {
             if (itemsNode.isArray() && !itemsNode.isEmpty()) {
 
                 // 첫 번째 배열 요소의 "company" 값을 문자열로 가져오기
-                String apiCompanyName = itemsNode.get(0).path("company").asText();
+                ObjectMapper mapper = new ObjectMapper();
+
+                String apiCompanyName = mapper.convertValue(
+                        itemsNode.path(0).path("company"),
+                        String.class
+                );
 
                 System.out.println("API 조회된 상호명: " + apiCompanyName); // 확인용
 
