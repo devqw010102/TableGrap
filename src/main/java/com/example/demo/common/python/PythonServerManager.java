@@ -19,7 +19,6 @@ public class PythonServerManager {
                 String projectRoot = System.getProperty("user.dir");
                 // 가상환경 내 uvicorn 실행 파일 경로 (Windows 기준)
                 String uvicornPath = projectRoot + File.separator + ".venv" + File.separator + "Scripts" + File.separator + "uvicorn.exe";
-                // 실행할 파이썬 메인 파일 경로
                 String appLocation = "main:app";
 
                 ProcessBuilder pb = new ProcessBuilder(
@@ -33,7 +32,7 @@ public class PythonServerManager {
 
                 // 파이썬 코드가 모여있는 디렉토리를 작업 경로로 설정
                 pb.directory(new File(projectRoot + File.separator + "python"));
-//                pb.inheritIO(); // 파이썬 서버 로그를 스프링 콘솔에서 같이 보기 위함
+                pb.inheritIO(); // 파이썬 서버 로그를 스프링 콘솔에서 같이 보기 위함
 
                 this.pythonProcess = pb.start();
                 System.out.println("🚀 FastAPI 서버가 포트 8000에서 시작되었습니다.");

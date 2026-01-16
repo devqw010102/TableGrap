@@ -114,4 +114,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND d.owner.id = :ownerId " +      // <-- 조건 추가
             "GROUP BY r.dinerId")
     List<ReviewChartDto> findAvgRatingByOwnerId(@Param("ownerId") Long ownerId);
+
+    // 특정 식당의 모든 리뷰 가져오기
+    List<Review> findByDinerId(@Param("dinerId") Long dinerId);
+
+    // 리뷰중 Keyword가 비어있는것만 가져오기(보정 작업)
+    List<Review> findByKeywordsIsEmpty();
 }

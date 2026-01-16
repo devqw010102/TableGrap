@@ -47,6 +47,43 @@ async function drawHeroCategoryChart() {
     }
 }
 
+// 슬라이드 2 : 베스트 평점 맛집 차트
+async function loadBestRatingChart() {
+    const chartDiv = document.getElementById('topRatingChart');
+    if(!chartDiv) return;
+
+    try {
+        showLoading(chartDiv); // 로딩 표시 함수가 있다면 유지
+        const res = await fetch('/api/index/charts/best-ratings');
+        const resJson = await res.json();
+
+//        console.log("차트 데이터 응답:", resJson);
+
+        if(resJson.error || !resJson.data) {
+            console.warn("차트 생성 불가:", resJson.error || "데이터 없음");
+            chartDiv.innerHTML = '<div class="text-center text-muted pt-5">평점 데이터가 없습니다.</div>';
+            return;
+        }
+
+        chartDiv.innerHTML = '';
+        await Plotly.newPlot(chartDiv, resJson.data, resJson.layout, {responsive: true, displayModeBar: false});
+
+        // 클릭이벤트
+        chartDiv.on('plotly_click', function(data) {
+            const point = data.points[0];
+            const dinerId = Array.isArray(point.customdata) ? point.customdata[0] : point.customdata;
+
+            if(dinerId) {
+                location.href = `/diner/reservation?id=${dinerId}`;
+            }
+        });
+    }
+    catch(e) {
+        console.error("평점 차트 로드 실패:", e);
+        chartDiv.innerHTML = '<div class="text-center text-muted pt-5">데이터 로드 중 오류 발생</div>';
+    }
+}
+
 // 슬라이드 3 : 오늘의 식당 키워드 차트
 async function loadFeaturedKeywords() {
     const chartDiv = document.getElementById('keywordAnalysisChart');
@@ -76,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 순차적 실행이 아닌 개별 실행
     drawHeroCategoryChart();
     loadFeaturedKeywords();
+    loadBestRatingChart();
 
     // 슬라이드 전환 시 차트 크기 깨짐 방지
     const heroCarousel = document.getElementById('heroCarousel');

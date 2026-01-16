@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @Builder
@@ -33,4 +36,11 @@ public class Diner {
     @Builder.Default
     @Column(nullable = false)
     private Integer defaultMaxCapacity = 10;
+
+    // Keyword
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "diner_keywords", joinColumns = @JoinColumn(name = "diner_id"))
+    @Column(name = "keyword")
+    @Builder.Default
+    private List<String> keywords = new ArrayList<>();
 }

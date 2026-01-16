@@ -6,6 +6,7 @@ import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
     //사장이 등록되지 않은 식당은 제외
+    @EntityGraph(attributePaths = {"keywords"})
     Page<Diner> findByCategoryAndStatusNotAndOwnerNotNull(Pageable pageable, String category, DinerStatus status);
 
     Optional<Diner> findById(Long id);
@@ -79,10 +81,26 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
     List<Map<String, Object>> findCategoryStats();
 
     // Index 오늘의 식당 차트
-    @Query("SELECT d.id as id, d.dinerName as dinerName, AVG(r.rating) as avgRating, COUNT(r) as reviewCount " +
-            "FROM Diner d, Review r " +
-            "WHERE d.id = r.dinerId " +
+    @Query("SELECT d FROM Diner d " +
+            "JOIN Review r ON d.id = r.dinerId " +
+            "GROUP BY d.id, d.dinerName, d.category, d.location, d.tel, d.dx, d.dy, d.status, d.owner, d.businessNum, d.defaultMaxCapacity " +
+            "HAVING COUNT(r) >= 2 " +
+            "ORDER BY COUNT(r) DESC, MAX(r.createTime) DESC")
+    List<Diner> findFeaturedDiners(Pageable pageable);
+
+    // Index 베스트 평점 맛집 차트
+    @Query("SELECT d.id as dinerId, d.dinerName as dinerName, AVG(CAST(r.rating AS double)) as averageRating " +
+            "FROM Diner d JOIN Review r ON d.id = r.dinerId " +
             "GROUP BY d.id, d.dinerName " +
-            "ORDER BY avgRating DESC, reviewCount DESC")
-    List<Map<String, Object>> findTopRatedDiners(); // 리뷰가 있는 식당 중 평균 평점이 높은 순서로 정렬
+            "ORDER BY AVG(r.rating) DESC")
+    List<Map<String, Object>> findTop5RatedDinersJPQL(Pageable pageable);
+
+    // DinerList 키워드 검색
+    @Query("""
+    SELECT DISTINCT d FROM Diner d 
+    LEFT JOIN d.keywords k 
+    WHERE (d.dinerName LIKE %:query% OR k LIKE %:query%) 
+    AND d.status <> :status AND d.owner IS NOT NULL
+""")
+    Page<Diner> searchByKeyword(@Param("query") String query, @Param("status") DinerStatus status, Pageable pageable);
 }

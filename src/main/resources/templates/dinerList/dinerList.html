@@ -27,6 +27,23 @@
 </section>
 
 <div class="container mt-5 mb-5">
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <form th:action="@{/diner/list}" method="get">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="query" th:value="${searchQuery}"
+                           class="form-control border-start-0 ps-0"
+                           placeholder="식당 이름이나 #키워드로 검색하세요!">
+                    <button class="btn btn-primary px-4" type="submit"
+                            style="background-color: #FF7E00; border: none;">검색</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 해당 카테고리의 식당이 존재하지 않는 경우 -->
     <div th:if="${dinerList.isEmpty()}" class="text-center py-5">
         <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
@@ -46,12 +63,18 @@
                 </div>
 
                 <!-- 식당 정보 -->
-                <div class="diner-info">
-                    <div class="diner-title" th:text="${diner.dinerName}">식당이름</div>
-                    <div class="diner-addr">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span th:text="${diner.location}">주소</span>
+                <div class="diner-info" style="text-align: left;"> <div class="diner-title" style="display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 6px;">
+                    <span th:text="${diner.dinerName}" style="font-weight: bold; font-size: 1.1rem; color: #333;">식당이름</span>
+
+                    <div class="keyword-group" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        <span th:each="keyword : ${diner.keywords}" class="badge rounded-pill" style="background-color: #FFF3E0; color: #FF7E00; border: 1px solid #FFCC80; font-size: 0.75rem; font-weight: 500; padding: 4px 8px;">#[[${keyword}]]</span>
                     </div>
+                </div>
+
+                <div class="diner-addr" style="margin-top: 4px; color: #777; font-size: 0.9rem;">
+                    <i class="fas fa-map-marker-alt" style="color: #ccc; margin-right: 4px;"></i>
+                    <span th:text="${diner.location}">주소</span>
+                </div>
                 </div>
 
                 <div class="diner-status">
