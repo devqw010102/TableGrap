@@ -515,6 +515,7 @@ async function loadDinerInfoTab() {
                 </tr>`
             })
             await loadReviewChart();
+            await loadRevisitChart();
         } catch(e) {
             console.log(e.status, e.message);
             alert("식당 목록을 불러오는데 실패 했습니다.")
@@ -923,4 +924,33 @@ async function loadReviewChart(ownerId) {
     console.error(e)
     document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
   }
+}
+
+async function loadRevisitChart(ownerId) {
+   //로딩 표시
+    document.getElementById("chartLoading").style.display="block";
+    document.getElementById("reviewChart").style.display="none";
+
+    try{
+      // 데이터 요청(JSON 문자열이 옴)
+      const res = await fetch(`/api/ownerPage/charts/generate/revisit_chart`);
+      if(res.ok){
+        // JSON 파싱
+        const chartJson= await res.json();
+
+        // 차트 그리기(Plotly)
+        Plotly.newPlot('revisitChart', chartJson.data, chartJson.layout, config);
+        // 차트 출력
+        document.getElementById("chartLoading").style.display="none";
+        document.getElementById("reviewChart").style.display="block";
+      }  else {
+        // --- [추가] 실패 로직 (여기가 핵심!) ---
+        // 서버가 400이나 500을 주면 에러를 던져서 catch로 보냅니다.
+        const errorText = await res.text(); // 서버가 보낸 에러 메시지 읽기
+        throw new Error(`Server Error (${res.status}): ${errorText}`);
+      }
+    } catch (e){
+      console.error(e)
+      document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
+    }
 }
