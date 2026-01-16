@@ -81,8 +81,7 @@ def generate(data, kiwi=None):
             yaxis=dict(
                 title="예약 건수(건)",
                 gridcolor='rgba(0,0,0,0.05)',
-                # dtick을 제거하여 데이터 크기에 따라 자동 조절되도록 설정
-                # nticks=10, # 필요하다면 눈금의 최대 개수를 제한하여 조절 가능
+
                 rangemode='tozero',
                 zeroline=True,
                 zerolinecolor='rgba(0,0,0,0.1)'
