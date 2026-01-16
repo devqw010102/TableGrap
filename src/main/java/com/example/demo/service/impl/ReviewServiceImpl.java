@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.common.python.KeywordService;
 import com.example.demo.data.dto.ReviewDto;
 import com.example.demo.data.dto.notification.ReviewWriteEvent;
 import com.example.demo.data.dto.owner.OwnerReviewDto;
@@ -18,9 +19,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final DinerRepository dinerRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final KeywordService keywordService;
 
     //식당페이지 리뷰 가져오기
     @Override
@@ -82,7 +87,15 @@ public class ReviewServiceImpl implements ReviewService {
         }
         review.setRating(reviewDto.getRating());
         review.setComment(reviewDto.getComment());
+
+        // Entity : 키워드 수정 작업
+        List<String> updatedKeywords = keywordService.getKeywordFromAi(reviewDto.getComment());
+        review.setKeywords(updatedKeywords);
         reviewRepository.save(review);
+
+        // for View : 키워드 업데이트
+        updateDinerKeywords(review.getDinerId());
+
         String dinerName = dinerRepository.findById(review.getDinerId())
                         .map(Diner::getDinerName)
                         .orElse("알 수 없는 식당");
@@ -107,15 +120,23 @@ public class ReviewServiceImpl implements ReviewService {
             throw new IllegalArgumentException("리뷰는 100자 이내로 작성해주세요.");
         };
 
+        // Entity : 키워드 추가 작업
+        List<String> aiKeywords = keywordService.getKeywordFromAi(reviewDto.getComment());
+        
         Review review = Review.builder()
                 .memberId(memberId)
                 .bookId(reviewDto.getBookId())
                 .dinerId(reviewDto.getDinerId())
                 .rating(reviewDto.getRating())
                 .comment(reviewDto.getComment())
+                .keywords(aiKeywords)
                 .build();
         String dinerName = diner.getDinerName();
         Review savedReview = reviewRepository.save(review);
+
+        // View : 키워드 업데이트
+        updateDinerKeywords(reviewDto.getDinerId());
+
         mapToReviewDto(savedReview, dinerName);
 
         eventPublisher.publishEvent(new ReviewWriteEvent(
@@ -126,8 +147,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     //리뷰 삭제
     @Override
+    @Transactional
     public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 리뷰가 없습니다."));
+        Long dinerId = review.getDinerId();
+
         reviewRepository.deleteById(reviewId);
+        // 키워드 업데이트
+        updateDinerKeywords(dinerId);
     }
 
     @Override
@@ -162,5 +190,26 @@ public class ReviewServiceImpl implements ReviewService {
                 .createTime(review.getCreateTime())
                 .updateTime(review.getUpdateTime())
                 .build();
+    }
+
+    private void updateDinerKeywords(Long dinerId) {
+        List<Review> reviews = reviewRepository.findByDinerId(dinerId);
+
+        List<String> allCollectedTags = reviews.stream()
+                .flatMap(r -> r.getKeywords().stream())
+                .toList();
+
+        List<String> top5 = allCollectedTags.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(5)
+                .map(Map.Entry::getKey)
+                .toList();
+
+        dinerRepository.findById(dinerId).ifPresent(diner -> {
+            diner.getKeywords().clear();
+            diner.getKeywords().addAll(top5);
+        });
     }
 }

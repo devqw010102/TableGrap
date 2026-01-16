@@ -41,4 +41,7 @@ public interface DinerService {
     DinerDto getDinerInfo(Long dinerId);
 
     Optional<Diner> findById(Long id);
+
+    // 키워드 검색 기능
+    Page<DinerListDto> searchDiners(Pageable pageable, String query);
 }

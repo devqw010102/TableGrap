@@ -6,6 +6,7 @@ import com.example.demo.data.model.Diner;
 import com.example.demo.data.model.Owner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 public interface DinerRepository extends JpaRepository<Diner, Long> {
     //사장이 등록되지 않은 식당은 제외
+    @EntityGraph(attributePaths = {"keywords"})
     Page<Diner> findByCategoryAndStatusNotAndOwnerNotNull(Pageable pageable, String category, DinerStatus status);
 
     Optional<Diner> findById(Long id);
@@ -92,4 +94,13 @@ public interface DinerRepository extends JpaRepository<Diner, Long> {
             "GROUP BY d.id, d.dinerName " +
             "ORDER BY AVG(r.rating) DESC")
     List<Map<String, Object>> findTop5RatedDinersJPQL(Pageable pageable);
+
+    // DinerList 키워드 검색
+    @Query("""
+    SELECT DISTINCT d FROM Diner d 
+    LEFT JOIN d.keywords k 
+    WHERE (d.dinerName LIKE %:query% OR k LIKE %:query%) 
+    AND d.status <> :status AND d.owner IS NOT NULL
+""")
+    Page<Diner> searchByKeyword(@Param("query") String query, @Param("status") DinerStatus status, Pageable pageable);
 }

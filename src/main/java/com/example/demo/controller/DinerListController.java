@@ -35,10 +35,24 @@ public class DinerListController {
     //카테고리별로 일일이 매핑하는 것은 비효율적이므로 쿼리 파라미터 사용
     @GetMapping("/list")
     public String getDiner(@PageableDefault(size = 20, sort="id", direction = Sort.Direction.ASC) Pageable pageable,
-                           @RequestParam("category") String category, Model model) {
-        Page<DinerListDto> page = dinerService.getListByCat(pageable, category);
+                           @RequestParam(value = "category", required = false, defaultValue = "전체") String category,
+                           @RequestParam(value = "query", required = false) String query,
+                           Model model) {
+
+        Page<DinerListDto> page;
+
+        if(query != null && !query.isEmpty()) {
+            page = dinerService.searchDiners(pageable, query);
+            model.addAttribute("categoryName", "'" + query + "' 검색 결과");
+        }
+        else {
+            page = dinerService.getListByCat(pageable, category);
+            model.addAttribute("categoryName", category);
+        }
+
         model.addAttribute("dinerList", page);
-        model.addAttribute("categoryName", category);
+        model.addAttribute("searchQuery", query);
+
         return "dinerList/dinerList";
     }
 

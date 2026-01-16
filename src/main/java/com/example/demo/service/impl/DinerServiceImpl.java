@@ -37,6 +37,7 @@ public class DinerServiceImpl implements DinerService {
                 .location(diner.getLocation())
                 .status(diner.getStatus())
                 .category(diner.getCategory())
+                .keywords(diner.getKeywords())
                 .build();
     }
 
@@ -169,5 +170,11 @@ public class DinerServiceImpl implements DinerService {
     @Override
     public Optional<Diner> findById(Long id) {
         return dinerRepository.findById(id);
+    }
+
+    // 키워드 검색
+    @Override
+    public Page<DinerListDto> searchDiners(Pageable pageable, String query) {
+        return dinerRepository.searchByKeyword(query, DinerStatus.DELETED, pageable).map(this::mapToDinerListDto);
     }
 }

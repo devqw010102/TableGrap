@@ -506,7 +506,7 @@ async function loadOwnerResponse() {
 
             if(chartData.error) {
                 console.error("차트 데이터 에러", chartData.error);
-                chartContainer.innerHTML = `<p class="text-gray-500">데이터를 불러올 수 없습니다.</p>`;
+                chartContainer.innerHTML = `<p class="text-gray-500">최근 7일간의 예약 내역이 없습니다.</p>`;
                             return;
             }
 
