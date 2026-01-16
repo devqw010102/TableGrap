@@ -6,7 +6,32 @@ def generate(data, kiwi=None):
     try:
         raw_data = data.get('chartData', [])
         if not raw_data:
-            return json.dumps({"data": [], "layout": {"title": "데이터가 없습니다."}}, ensure_ascii=False)
+            empty_layout = {
+                "title": {
+                    "text": "현재 데이터 수집 중입니다.",
+                    "x": 0.5,          # 가로 중앙 정렬
+                    "y": 0.5,          # 세로 중앙 정렬
+                    "xanchor": "center",
+                    "yanchor": "middle",
+                    "font": {"size": 18} # 글자 크기 조절
+                },
+                "xaxis": {"visible": False},
+                "yaxis": {"visible": False},
+                "annotations": [
+                    {
+                        "text": "데이터가 충분히 쌓이면 이곳에 차트가 표시됩니다.",
+                        "x": 0.5,
+                        "y": 0.4,
+                        "xref": "paper",
+                        "yref": "paper",
+                        "showarrow": False,
+                        "font": {"size": 12, "color": "gray"}
+                    }
+                ],
+                "template": "plotly_white" # 배경색 등 스타일 유지
+            }
+            # data는 빈 리스트로 두어 차트가 그려지지 않게 함
+            return {'data': [], 'layout': empty_layout}
 
         df = pd.DataFrame(raw_data)
 
@@ -29,7 +54,7 @@ def generate(data, kiwi=None):
 
             chart_data = revisit_rate.reset_index(name='rate')
 
-            x_values = chart_data['dinerId'].replace(dinerIdToName).astype(str).tolist() # ID가 숫자면 문자로 변환 추천
+            x_values = chart_data['dinerId'].replace(dinerIdToName).astype(str).tolist()
             y_values = chart_data['rate'].tolist()
             fig = go.Figure()
             fig.add_trace(
@@ -46,7 +71,7 @@ def generate(data, kiwi=None):
                 xaxis_title='식당',
                  yaxis_title='재방문율(%)'
             )
-            return fig.to_dict() # 딕셔너리 문자열로 치환
+            return fig.to_dict()
         else:
             return {"data": [], "layout": {}}
     except Exception as e:

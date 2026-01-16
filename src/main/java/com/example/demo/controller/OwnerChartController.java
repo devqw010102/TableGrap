@@ -51,8 +51,9 @@ public class OwnerChartController {
     }
 
     @GetMapping(value = "/generate/revisit_chart/{dinerId}", produces = "application/json; charset=UTF-8")
-    public String genRevisitsChartByDiner(@PathVariable Long dinerId,
+    public ResponseEntity<String> genRevisitsChartByDiner(@PathVariable Long dinerId,
                                           @AuthenticationPrincipal OwnerUserDetails userDetails) {
-        return ownerService.genRevisitsChartByDiner(dinerId, userDetails.getOwner().getId());
+        String chartJson = ownerService.genRevisitsChartByDiner(dinerId, userDetails.getOwner().getId());
+        return ResponseEntity.ok(chartJson);
     }
 }

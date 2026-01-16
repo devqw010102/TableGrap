@@ -121,6 +121,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     @Query("SELECT b FROM Book b " +
             "JOIN FETCH b.diner d " +
             "WHERE d.id = :dinerId " +
-            "AND d.owner.id  = :ownerId")
+            "AND d.owner.id  = :ownerId " +
+            "ORDER BY b.bookingDate ASC")
     List<Book> findBookByDinerIdAndOwnerId(Long dinerId, Long ownerId);
 }
