@@ -11,6 +11,45 @@ def generate(data, kiwi=None):
 
     my_history = input_data.get('myHistory', [])
 
+    # --- 데이터가 없을 경우 예외 처리 추가 ---
+    if not my_history:
+        empty_layout = {
+            "title": {
+                "text": "현재 데이터 수집 중입니다.",
+                "x": 0.5,
+                "y": 0.5,
+                "xanchor": "center",
+                "yanchor": "middle",
+                "font": {"size": 18}
+            },
+            "xaxis": {"visible": False},
+            "yaxis": {"visible": False},
+            "annotations": [
+                {
+                    "text": "데이터가 충분히 쌓이면 이곳에 차트가 표시됩니다.",
+                    "x": 0.5,
+                    "y": 0.4,
+                    "xref": "paper",
+                    "yref": "paper",
+                    "showarrow": False,
+                    "font": {"size": 12, "color": "gray"}
+                }
+            ],
+            "template": "plotly_white",
+            "margin": dict(l=20, r=20, t=60, b=40),
+            "paper_bgcolor": 'rgba(0,0,0,0)',
+            "plot_bgcolor": 'rgba(0,0,0,0)',
+        }
+
+        return json.dumps({
+            "data": [],
+            "layout": empty_layout,
+            "percentile": input_data.get('percentile', 0),
+            "avgAll": round(input_data.get('avgAll', 0), 1),
+            "totalCount": input_data.get('totalCount', 0)
+        }, ensure_ascii=False)
+    # ---------------------------------------
+
     # 1. 최근 6개월 달력 생성 (정확한 월 단위 계산)
     now = datetime.now()
     all_months = []
@@ -34,12 +73,13 @@ def generate(data, kiwi=None):
     ))
 
     fig.update_layout(
-        title='최근 6개월 외식 빈도',
-        margin=dict(l=20, r=20, t=60, b=40),
+        title=None,
+        autosize=True,
+        margin=dict(l=40, r=20, t=20, b=40),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        yaxis=dict(tickformat='d', title='방문 횟수'),
-        xaxis=dict(title='월별'),
+        yaxis=dict(fixedrange=True),
+        xaxis=dict(fixedrange=True)
     )
 
     # 3. 결과 리턴 (ensure_ascii=False로 한글 깨짐 방지)

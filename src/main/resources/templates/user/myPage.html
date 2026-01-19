@@ -295,19 +295,26 @@
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white"><strong>🍴 나의 음식 선호도</strong></div>
-                    <div class="card-body" id="foodPreferenceChart" style="height: 300px;"></div>
+                    <div class="card-body p-0" style="height: 350px; position: relative; overflow: hidden;">
+                        <div id="foodPreferenceChart" style="width: 100%; height: 100%;"></div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white"><strong>📅 월별 외식 빈도</strong></div>
-                    <div class="card-body" id="monthlyVisitChart" style="height: 300px;"></div>
+                    <div class="card-body p-0" style="height: 350px; position: relative; overflow: hidden;">
+                        <div id="monthlyVisitChart" style="width: 100%; height: 100%;"></div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="alert alert-warning shadow-sm">
-            <i class="bi bi-info-circle-fill me-2 text-warning"></i>
-            <div id="foodAnalysisText">분석 중...</div>
+
+        <div class="alert alert-warning shadow-sm mt-2">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-info-circle-fill me-2 text-warning"></i>
+                <strong id="foodAnalysisText">분석 중...</strong>
+            </div>
             <hr>
             <div id="visitAnalysisText">분석 중...</div>
         </div>

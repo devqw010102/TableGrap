@@ -598,7 +598,14 @@ function loadFoodPreferenceChart() {
             return;
         }
 
-        Plotly.newPlot('foodPreferenceChart', response.data, response.layout);
+       Plotly.newPlot('foodPreferenceChart', response.data, response.layout, {
+           responsive: true,
+           displayModeBar: false // 상단 툴바 제거하여 깔끔하게 유지
+       });
+
+       window.addEventListener('resize', function() {
+           Plotly.Plots.resize('foodPreferenceChart');
+       });
 
         const analysisTexts = document.getElementById("foodAnalysisText");
         if (analysisTexts && response.data && response.data[0] && response.data[0].labels) {
@@ -624,23 +631,50 @@ function loadMonthlyVisitChart() {
             return;
         }
 
-        Plotly.newPlot('monthlyVisitChart', response.data, response.layout);
+              Plotly.newPlot('monthlyVisitChart', response.data, response.layout, {
+                  responsive: true,
+                  displayModeBar: false // 상단 툴바 제거하여 깔끔하게 유지
+              });
 
+              window.addEventListener('resize', function() {
+                  Plotly.Plots.resize('monthlyVisitChart');
+              });
         const analysisText = document.getElementById("visitAnalysisText");
         const myRank = response.percentile;
         const total = response.totalCount;
-        const avgAll = response.avgAll;
+        const avgAll = Math.round(response.avgAll);
 
-        let rankMsg = `회원님은 상위 ${myRank}%의 미식가입니다!`; // 이 문구들을 수정
-        if(myRank <= 10) rankMsg = `👑 대단해요! 상위 ${myRank}%의 진정한 미식가시네요!`;
-        if(total === 0) rankMsg = `아직 방문 확정된 내역이 없네요. 맛집 예약을 시작해보세요!`;
+        // 2. 상황별 다양한 메시지 설정
+                let rankMsg = "";
+                let subMsg = "";
 
-        analysisText.innerHTML = `
-            <div>
-                <strong>${rankMsg}</strong><br>
-                <small>(최근 6개월 총 ${total}회 방문 | 전체 사용자 월평균: ${avgAll}회)</small>
-            </div>
-        `;
-    })
-    .catch(err => console.error("방문 차트 로드 실패:", err));
-}
+                if (total === 0) {
+                    rankMsg = "🍽️ 아직 방문 확정 내역이 없으시네요!";
+                    subMsg = "TableGrap에서 첫 번째 맛집 탐방을 시작해보세요.";
+                } else if (myRank <= 10) {
+                    rankMsg = `👑 놀라워요! 상위 ${myRank}%의 최상위 미식가입니다.`;
+                    subMsg = "미식에 대한 조예가 정말 깊으시군요!";
+                } else if (myRank <= 30) {
+                    rankMsg = `✨ 대단해요! 상위 ${myRank}%의 미식가 그룹에 속해 있습니다.`;
+                    subMsg = "맛집 탐방의 고수 향기가 느껴집니다.";
+                } else if (myRank <= 50) {
+                    rankMsg = `🏃 꾸준히 즐기는 미식가! 상위 ${myRank}%입니다.`;
+                    subMsg = "더 다양한 식당들을 경험해보는 건 어떨까요?";
+                } else {
+                    rankMsg = `🍴 미식의 즐거움을 알아가는 중! 상위 ${myRank}%입니다.`;
+                    subMsg = "앞으로 채워질 미식 리스트가 더 기대되네요.";
+                }
+
+                // 3. HTML 렌더링 (회색 배경 제거)
+                analysisText.innerHTML = `
+                    <div class="py-2">
+                        <strong style="font-size: 1.1rem; color: #333;">${rankMsg}</strong><br>
+                        <span class="text-secondary">${subMsg}</span><br>
+                        <small class="text-muted" style="display: block; margin-top: 5px;">
+                            (최근 6개월 총 ${total}회 방문 | 전체 사용자 월평균: ${avgAll}회)
+                        </small>
+                    </div>
+                `;
+            })
+            .catch(err => console.error("방문 차트 로드 실패:", err));
+        }

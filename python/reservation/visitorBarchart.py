@@ -36,17 +36,18 @@ def generate(data, kiwi=None):
 
         x_values = [day_map[d] for d in day_order]
         y_values = day_total.values.tolist()
+        y_values = day_total.values.tolist()
 
         # 차트 생성
         fig = go.Figure()
 
-        # 막대 
+        # 막대
         fig.add_trace(
             go.Bar(
                 x=x_values,
                 y=y_values,
                 name="예약 건수",
-                marker_color='rgba(52, 152, 219, 0.5)', 
+                marker_color='rgba(52, 152, 219, 0.5)',
                 hovertemplate='%{x}: <b>%{y}건</b><extra></extra>'
             )
         )
@@ -76,19 +77,21 @@ def generate(data, kiwi=None):
             },
             xaxis=dict(
                 title="요일",
-                showgrid=False 
+                showgrid=False,
+                fixedrange=True
             ),
             yaxis=dict(
                 title="예약 건수(건)",
                 gridcolor='rgba(0,0,0,0.05)',
-
                 rangemode='tozero',
                 zeroline=True,
-                zerolinecolor='rgba(0,0,0,0.1)'
+                zerolinecolor='rgba(0,0,0,0.1)',
+                fixedrange=True
             ),
-            height=550,
+            autosize=True,
+            height=None,
             plot_bgcolor='white',
-            margin=dict(t=120, l=60, r=40, b=60),
+            margin=dict(t=120, l=40, r=40, b=60),
             legend=dict(
                 orientation="h",
                 yanchor="bottom",
@@ -96,7 +99,7 @@ def generate(data, kiwi=None):
                 xanchor="right",
                 x=1
             ),
-            hovermode="x unified" 
+            hovermode="x unified"
         )
 
         return fig.to_dict()

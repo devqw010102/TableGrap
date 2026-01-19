@@ -4,8 +4,36 @@ import sys
 import json
 
 def analyze_response(raw_data, owner_id):
+    # --- 데이터가 없을 경우 예외 처리 추가 ---
     if not raw_data:
-        return {"ownerId": owner_id, "avg_response_min": 0, "msg": "데이터 없음"}
+        empty_layout = {
+            "title": {
+                "text": "현재 데이터 수집 중입니다.",
+                "x": 0.5, "y": 0.5,
+                "xanchor": "center", "yanchor": "middle",
+                "font": {"size": 18}
+            },
+            "xaxis": {"visible": False},
+            "yaxis": {"visible": False},
+            "annotations": [{
+                "text": "데이터가 충분히 쌓이면 이곳에 차트가 표시됩니다.",
+                "x": 0.5, "y": 0.4,
+                "xref": "paper", "yref": "paper",
+                "showarrow": False,
+                "font": {"size": 12, "color": "gray"}
+            }],
+            "template": "plotly_white",
+            "paper_bgcolor": 'rgba(0,0,0,0)',
+            "plot_bgcolor": 'rgba(0,0,0,0)',
+        }
+        return {
+            "ownerId": owner_id,
+            "avg_response_min": 0,
+            "data": [],
+            "layout": empty_layout,
+            "msg": "데이터 없음"
+        }
+    # ---------------------------------------
 
     df = pd.DataFrame(raw_data)
 
