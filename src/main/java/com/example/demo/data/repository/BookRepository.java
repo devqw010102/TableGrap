@@ -97,7 +97,6 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("excludeBookId") Long excludeBookId
-
     );
 
     // 최근 1주일
@@ -111,7 +110,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     List<Map<String, Object>> getWeeklyBookingStats(@Param("startDate") LocalDateTime startDate);
 
     // 재방문율 계산을 위한 예약 내역 불러오기
-    @Query("SELECT b FROM Book b " +
+    @Query("SELECT b, d.dinerName FROM Book b " +
             "JOIN FETCH b.diner d " +
             "WHERE d.owner.id = :ownerId")
     List<Book> findBookByOwnerId(Long ownerId);
@@ -123,6 +122,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "AND d.owner.id  = :ownerId " +
             "ORDER BY b.bookingDate ASC")
     List<Book> findBookByDinerIdAndOwnerId(Long dinerId, Long ownerId);
+
     // visitor trend chart ( 요일/ 시간)
     @Query("SELECT b.bookingDate as date, b.personnel as personnel " +
             "FROM Book b " +

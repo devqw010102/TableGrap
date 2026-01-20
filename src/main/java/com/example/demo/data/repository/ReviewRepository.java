@@ -108,10 +108,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 리뷰 갯수, 평균
     @Query("SELECT new com.example.demo.data.dto.ReviewChartDto(" +
-            "r.dinerId, AVG(r.rating), COUNT(r)) " +
-            "FROM Review r, Diner d " +         // <-- 뒤에 공백 추가!
-            "WHERE r.dinerId = d.id " +         // <-- d,id를 d.id로 수정!
-            "AND d.owner.id = :ownerId " +      // <-- 조건 추가
+            "r.dinerId, d.dinerName, AVG(r.rating), COUNT(r)) " +
+            "FROM Review r Join Diner d ON " +
+            "r.dinerId = d.id " +
+            "WHERE d.owner.id = :ownerId " +
             "GROUP BY r.dinerId")
     List<ReviewChartDto> findAvgRatingByOwnerId(@Param("ownerId") Long ownerId);
 

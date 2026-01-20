@@ -7,8 +7,8 @@ def generate (data, kiwi=None):
     try:
         # 1. 데이터 타입 방어 로직 (가장 유력한 원인 해결)
         # Java에서 보낸 JSON이 파이썬에 '문자열(String)'로 도착했을 경우, 딕셔너리로 변환해야 합니다.
-        if isinstance(data, str):
-            data = json.loads(data)
+        # if isinstance(data, str):
+        #     data = json.loads(data)
 
         raw_data = data.get('chartData', [])
         if not raw_data:
@@ -44,13 +44,9 @@ def generate (data, kiwi=None):
 
         df = pd.DataFrame(raw_data)
 
-        dinerIdToName = {
-            1:'그리즐리버거 삼산점', 6:'시리어스피자', 11:'남가족발', 21:'판(Pann)',
-            30:'주효', 49:'와이오비(YOB)', 53:'빠이타이'
-        }
-        target_diner_id = data.get('dinerId')
-        diner_name = dinerIdToName.get(target_diner_id)
-
+        # target_diner_id = data.get('dinerId')
+        # diner_name = dinerIdToName.get(target_diner_id)
+        diner_name = data.get('dinerName')
         if not df.empty:
             df['bookingDate'] = pd.to_datetime(df['bookingDate'])
             df = df.sort_values('bookingDate')

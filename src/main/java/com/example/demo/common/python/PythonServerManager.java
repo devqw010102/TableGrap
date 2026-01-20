@@ -19,6 +19,8 @@ public class PythonServerManager {
                 String projectRoot = System.getProperty("user.dir");
                 // 가상환경 내 uvicorn 실행 파일 경로 (Windows 기준)
                 String uvicornPath = projectRoot + File.separator + ".venv" + File.separator + "Scripts" + File.separator + "uvicorn.exe";
+                // macOS 기준 경로
+                // String uvicornPath = projectRoot + File.separator + ".venv" + File.separator + "bin" + File.separator + "uvicorn";
                 String appLocation = "main:app";
 
                 ProcessBuilder pb = new ProcessBuilder(

@@ -1,7 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.data.dto.ReviewChartDto;
-import com.example.demo.data.dto.RevisitDto;
 import com.example.demo.data.userDeatils.OwnerUserDetails;
 import com.example.demo.service.OwnerService;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +17,10 @@ import java.util.List;
 public class OwnerChartController {
     private final OwnerService ownerService;
 
-    @GetMapping("/review_chart")
-    public List<ReviewChartDto> getAvgReviewCharts(@AuthenticationPrincipal OwnerUserDetails userDetails) {
-       return ownerService.getAvgRate(userDetails.getOwner().getId());
-    }
+//    @GetMapping("/review_chart")
+//    public List<ReviewChartDto> getAvgReviewCharts(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+//       return ownerService.getAvgRate(userDetails.getOwner().getId());
+//    }
 
     @GetMapping(value = "/generate", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> generateChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
@@ -33,10 +29,10 @@ public class OwnerChartController {
         return ResponseEntity.ok(chartJson);
     }
 
-    @GetMapping("/revisit_chart")
-    public List<RevisitDto> revisitChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
-        return ownerService.getRevisits(userDetails.getOwner().getId());
-    }
+//    @GetMapping("/revisit_chart")
+//    public List<RevisitDto> revisitChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
+//        return ownerService.getRevisits(userDetails.getOwner().getId());
+//    }
 
     @GetMapping(value = "/generate/revisit_chart", produces = "aplication/json; charset=UTF-8")
     public ResponseEntity<String> generateRevisitChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
@@ -44,11 +40,11 @@ public class OwnerChartController {
         return ResponseEntity.ok(chartJson);
     }
 
-    @GetMapping("/revisit_chart/{dinerId}")
-    public List<RevisitDto> revisitChartByDimer(@PathVariable Long dinerId,
-                                                @AuthenticationPrincipal OwnerUserDetails userDetails) {
-        return ownerService.getBookByDinerId(dinerId, userDetails.getOwner().getId());
-    }
+//    @GetMapping("/revisit_chart/{dinerId}")
+//    public List<RevisitDto> revisitChartByDimer(@PathVariable Long dinerId,
+//                                                @AuthenticationPrincipal OwnerUserDetails userDetails) {
+//        return ownerService.getBookByDinerId(dinerId, userDetails.getOwner().getId());
+//    }
 
     @GetMapping(value = "/generate/revisit_chart/{dinerId}", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> genRevisitsChartByDiner(@PathVariable Long dinerId,

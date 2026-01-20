@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReviewChartDto {
     Long dinerId;
+    String dinerName;
     Double averageRating;
     Long reviewCount;
 }

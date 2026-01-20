@@ -43,18 +43,18 @@ def generate(data, kiwi=None):
         if not df.empty:
             #  재방문율 계산
             # 가계별 멤버별 방문 횟수
-            visit_count = df.groupby(['dinerId', 'memberId']).size().reset_index(name='counts')
+            visit_count = df.groupby(['dinerName', 'memberId']).size().reset_index(name='counts')
             # 2회 이상 방문 추출
             revisit_count = visit_count[visit_count['counts'] >= 2]
             # 가계별 재방문 횟수 추출
-            revisit_count_diner = revisit_count.groupby('dinerId').size()
-            total_count_diner = visit_count.groupby('dinerId').size()
+            revisit_count_diner = revisit_count.groupby('dinerName').size()
+            total_count_diner = visit_count.groupby('dinerName').size()
 
             revisit_rate = (revisit_count_diner / total_count_diner).fillna(0) * 100 # fillna(0)은 재방문객이 0일 때, 오류 방지
 
             chart_data = revisit_rate.reset_index(name='rate')
 
-            x_values = chart_data['dinerId'].replace(dinerIdToName).astype(str).tolist()
+            x_values = chart_data['dinerName'].tolist()
             y_values = chart_data['rate'].tolist()
             fig = go.Figure()
             fig.add_trace(
