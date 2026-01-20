@@ -53,7 +53,8 @@ public class BookChartController {
             List<NotificationType> targets = Arrays.asList(
                     NotificationType.RESERVATION_CREATE,
                     NotificationType.RESERVATION_APPROVE,
-                    NotificationType.RESERVATION_REJECT);
+                    NotificationType.RESERVATION_REJECT,
+                    NotificationType.RESERVATION_CANCEL);
             List<Notification> rawData = notificationRepository.findByOwnerIdAndTypeIn(ownerId, targets);
 
             Map<String, Object> payload = new HashMap<>();
@@ -67,27 +68,6 @@ public class BookChartController {
         } catch (Exception e) {
             return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
         }
-    }
-
-    @GetMapping("/visitor-trend/{dinerId}")
-    public String getVisitorTrendChart(@PathVariable Long dinerId) {
-        try {
-            List<Map<String, Object>> rawData = bookService.getVisitorData(dinerId);
-
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("dinerId", dinerId);
-            payload.put("visitor", rawData);
-
-            String jsonData = mapper.writeValueAsString(payload);
-            System.out.println("### 파이썬으로 보내는 방문 추이 데이터:" + jsonData);
-
-            return pythonProcessExecutor.execute("reservation", "visitorBarchart", jsonData);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
-        }
-
     }
 
     @GetMapping("/food-preference/{memberId}")
@@ -118,6 +98,32 @@ public class BookChartController {
 
             // [수정] String을 JsonNode로 읽어서 리턴해야 JSON 형식이 제대로 전달됩니다.
             return mapper.readValue(pythonResult, Object.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
+        }
+    }
+
+    @GetMapping("/visitor-trend/{dinerId}")
+    public String getVisitorTrendChart(@PathVariable Long dinerId) {
+        return executeReservationPython(dinerId, "visitorBarchart");
+    }
+
+    @GetMapping("/hourly-trend/{dinerId}")
+    public String getHourlyTrendChart(@PathVariable Long dinerId) {
+        return executeReservationPython(dinerId, "hourlyTrend");
+    }
+
+    private String executeReservationPython(Long dinerId, String pythonFileName) {
+        try{
+            List<Map<String, Object>> rawData = bookService.getVisitorData(dinerId);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("dinerId", dinerId);
+            payload.put("visitor", rawData);
+
+            String jsonData = mapper.writeValueAsString(payload);
+
+            return pythonProcessExecutor.execute("reservation", pythonFileName, jsonData);
         } catch (Exception e) {
             e.printStackTrace();
             return "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";

@@ -38,10 +38,12 @@ def analyze_response(raw_data, owner_id):
     df = pd.DataFrame(raw_data)
 
     def extract_info(msg):
-        if not isinstance(msg, str): return pd.Series([None, None])
-        match = re.search(r'\[(.*?)\].*?(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})', msg)
+        if not isinstance(msg, str):
+            return pd.Series([None, None])
+
+        match = re.search(r'\[(.*?)\]\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})', msg)
         if match:
-            return pd.Series([match.group(1), match.group(2)])
+            return pd.Series([match.group(1).strip(), match.group(2).strip()])
         return pd.Series([None, None])
 
     df[['diner_name', 'book_time']] = df['message'].apply(extract_info)

@@ -124,14 +124,20 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "ORDER BY b.bookingDate ASC")
     List<Book> findBookByDinerIdAndOwnerId(Long dinerId, Long ownerId);
     // visitor trend chart ( 요일/ 시간)
+    //@Query("SELECT b.bookingDate as date, b.personnel as personnel " +
+    //        "FROM Book b " +
+    //        "WHERE b.diner.id = :dinerId " +
+    //        "AND b.success = true " +
+    //        "AND b.bookingDate < :now " +
+    //        "ORDER BY b.bookingDate ASC")
+    //List<Map<String, Object>> findVisitorTrendDataForChart(@Param("dinerId") Long dinerId, @Param("now") LocalDateTime now);
+
     @Query("SELECT b.bookingDate as date, b.personnel as personnel " +
             "FROM Book b " +
             "WHERE b.diner.id = :dinerId " +
             "AND b.success = true " +
-            "AND b.bookingDate < :now " +
             "ORDER BY b.bookingDate ASC")
-    List<Map<String, Object>> findVisitorTrendDataForChart(@Param("dinerId") Long dinerId, @Param("now") LocalDateTime now);
-
+    List<Map<String, Object>> findVisitorTrendDataForChart(@Param("dinerId") Long dinerId); // @Param("now") 제거
 
     // mypage - category dounut chart
     @Query("""

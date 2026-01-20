@@ -517,8 +517,46 @@ async function loadOwnerResponse() {
             chartContainer.innerHTML = `<p class="text-gray-500">차트 로딩 중 오류가 발생했습니다.</p>`;
         }
     }
-       loadOwnerResponse();
-        loadVisitorTrendChart();
+    async function loadHourlyAnalysisChart() {
+        const dinerId = state.dinerId;
+        const chartContainer = document.getElementById('hourly-analysis-chart');
+        if(!dinerId || !chartContainer) return;
 
-        window.loadReviewDetail = UI.loadReviewDetail;
+        try {
+            const response = await fetch(`/api/reservation/charts/hourly-trend/${dinerId}`);
+            const chartData = await response.json();
+
+            if(chartData.error) {
+                chartContainer.innerHTML = `<p class="text-muted text-center py-5">데이터가 부족하여 시간대별 분석을 제공할 수 없습니다.</p>`;
+                return;
+            }
+
+            Plotly.newPlot('hourly-analysis-chart', chartData.data, chartData.layout, {
+                responsive: true,
+                displayModeBar: false
+            });
+        } catch (error) {
+            console.error("시간대별 차트 로딩 에러:", error);
+        }
+    }
+
+    function initTabResize() {
+        const detailTab = document.getElementById('detail-tab');
+        if (detailTab) {
+            detailTab.addEventListener('shown.bs.tab', () => {
+                ['visitor-trend-chart', 'hourly-analysis-chart'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.data) Plotly.Plots.resize(el);
+                });
+            });
+        }
+    }
+
+    // 모든 초기화 함수 실행
+    loadOwnerResponse();
+    loadVisitorTrendChart();
+    loadHourlyAnalysisChart();
+    initTabResize();
+
+    window.loadReviewDetail = UI.loadReviewDetail;
     });

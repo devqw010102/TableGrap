@@ -3,10 +3,39 @@ import plotly.graph_objects as go
 
 def generate(data, kiwi=None):
     try:
+        # 기존 코드의 'visitor' 키를 유지합니다.
+        # (만약 데이터 소스 키가 'chartData'로 변경되었다면 아래 줄을 data.get('chartData', [])로 수정하세요)
         raw_data = data.get('visitor', [])
-        if not raw_data:
-            return {"error": "데이터가 없습니다."}
 
+        # 1. 데이터가 없을 때: 사용자 요청에 따른 안내용 레이아웃 반환
+        if not raw_data:
+            empty_layout = {
+                "title": {
+                    "text": "현재 데이터 수집 중입니다.",
+                    "x": 0.5,
+                    "y": 0.5,
+                    "xanchor": "center",
+                    "yanchor": "middle",
+                    "font": {"size": 18}
+                },
+                "xaxis": {"visible": False},
+                "yaxis": {"visible": False},
+                "annotations": [
+                    {
+                        "text": "데이터가 충분히 쌓이면 이곳에 차트가 표시됩니다.",
+                        "x": 0.5,
+                        "y": 0.4,
+                        "xref": "paper",
+                        "yref": "paper",
+                        "showarrow": False,
+                        "font": {"size": 12, "color": "gray"}
+                    }
+                ],
+                "template": "plotly_white"
+            }
+            return {'data': [], 'layout': empty_layout}
+
+        # 2. 데이터가 있는 경우의 정상 로직 시작
         df = pd.DataFrame(raw_data)
         df['date'] = pd.to_datetime(df['date'])
 
@@ -21,14 +50,9 @@ def generate(data, kiwi=None):
         }
 
         # 통계 계산
-        if df.empty:
-            most_frequent_hour = "-"
-            most_frequent_day_kr = "-"
-            max_val = 0
-        else:
-            most_frequent_day_en = df['day_of_week_en'].value_counts().idxmax()
-            most_frequent_day_kr = day_map.get(most_frequent_day_en, most_frequent_day_en)
-            most_frequent_hour = df['hour'].value_counts().idxmax()
+        most_frequent_day_en = df['day_of_week_en'].value_counts().idxmax()
+        most_frequent_day_kr = day_map.get(most_frequent_day_en, most_frequent_day_en)
+        most_frequent_hour = df['hour'].value_counts().idxmax()
 
         # 요일별 데이터 정리
         day_order = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
@@ -36,12 +60,11 @@ def generate(data, kiwi=None):
 
         x_values = [day_map[d] for d in day_order]
         y_values = day_total.values.tolist()
-        y_values = day_total.values.tolist()
 
         # 차트 생성
         fig = go.Figure()
 
-        # 막대
+        # 막대 그래프
         fig.add_trace(
             go.Bar(
                 x=x_values,
@@ -52,7 +75,7 @@ def generate(data, kiwi=None):
             )
         )
 
-        # 꺾은선
+        # 꺾은선 그래프
         fig.add_trace(
             go.Scatter(
                 x=x_values,
@@ -65,7 +88,7 @@ def generate(data, kiwi=None):
             )
         )
 
-        # 레이아웃
+        # 레이아웃 설정
         stats_text = f"인기 시간대: {most_frequent_hour}시 | 인기 요일: {most_frequent_day_kr}"
 
         fig.update_layout(
@@ -75,11 +98,7 @@ def generate(data, kiwi=None):
                 'xanchor': 'center',
                 'font': {'size': 20}
             },
-            xaxis=dict(
-                title="요일",
-                showgrid=False,
-                fixedrange=True
-            ),
+            xaxis=dict(title="요일", showgrid=False, fixedrange=True),
             yaxis=dict(
                 title="예약 건수(건)",
                 gridcolor='rgba(0,0,0,0.05)',
@@ -88,8 +107,6 @@ def generate(data, kiwi=None):
                 zerolinecolor='rgba(0,0,0,0.1)',
                 fixedrange=True
             ),
-            autosize=True,
-            height=None,
             plot_bgcolor='white',
             margin=dict(t=120, l=40, r=40, b=60),
             legend=dict(

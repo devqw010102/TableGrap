@@ -325,10 +325,21 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    //@Override
+    //public List<Map<String, Object>> getVisitorData(Long dinerId) {
+    //    return bookRepository.findVisitorTrendDataForChart(dinerId, LocalDateTime.now());
+    //}
+
     @Override
     public List<Map<String, Object>> getVisitorData(Long dinerId) {
-        return bookRepository.findVisitorTrendDataForChart(dinerId, LocalDateTime.now());
+        return bookRepository.findVisitorTrendDataForChart(dinerId);
     }
+
+    //dummy data용
+    //@Override
+    //public List<Map<String, Object>> getVisitorData(Long dinerId) {
+    //    return bookRepository.findVisitorTrendDataForChart(dinerId, LocalDateTime.of(2025, 1, 1, 0, 0));
+    //}
 
     @Override
     public List<Map<String, Object>> getFoodPreference(Long memberId) {
