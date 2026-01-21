@@ -54,7 +54,6 @@ def generate(data, kiwi=None):
                     y=y_reviews,
                     name='리뷰 수',
                     marker_color='lightblue',
-                    opacity=0.7,
                 ), secondary_y=False
             )
 
@@ -75,7 +74,8 @@ def generate(data, kiwi=None):
                 height=500,
                 margin=dict(l=50, r=50, t=80, b=50),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                dragmode=False
+                dragmode=False,
+                template="plotly_white",
             )
 
             fig.update_xaxes(type='category')

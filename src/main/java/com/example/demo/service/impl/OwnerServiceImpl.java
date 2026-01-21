@@ -281,7 +281,7 @@ public class OwnerServiceImpl implements OwnerService {
 
       String dinerName = books.getFirst().getDiner().getDinerName();
 
-     List<RevisitChartDto> chartData = books.stream()
+      List<RevisitChartDto> chartData = books.stream()
               .map(book -> RevisitChartDto.builder()
                       .dinerId(book.getDiner().getId())
                       .memberId(book.getMember().getId())

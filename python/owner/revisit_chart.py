@@ -1,5 +1,5 @@
 import pandas as pd
-import json
+import plotly.express as px
 import plotly.graph_objs as go
 
 def generate(data, kiwi=None):
@@ -35,11 +35,6 @@ def generate(data, kiwi=None):
 
         df = pd.DataFrame(raw_data)
 
-        dinerIdToName = {
-            1:'그리즐리버거 삼산점', 6:'시리어스피자', 11:'남가족발', 21:'판(Pann)',
-            30:'주효', 49:'와이오비(YOB)', 53:'빠이타이'
-        }
-
         if not df.empty:
             #  재방문율 계산
             # 가계별 멤버별 방문 횟수
@@ -56,20 +51,25 @@ def generate(data, kiwi=None):
 
             x_values = chart_data['dinerName'].tolist()
             y_values = chart_data['rate'].tolist()
+
+            # 식당별 막대 color 설정
+            color_list = px.colors.qualitative.Pastel1
+            idx_colors = color_list * (len(x_values) // len(color_list) + 1)
+            final_colors = idx_colors[:len(x_values)]
+
             fig = go.Figure()
             fig.add_trace(
                 go.Bar(x=x_values,
                        y=y_values,
                        name='재방문율',
-                       marker_color='orange',
-                       opacity=0.7
+                       marker_color=final_colors,
                 )
             )
 
             fig.update_layout(
                 title_text='나의 식당 재방문율',
-                xaxis_title='식당',
-                 yaxis_title='재방문율(%)'
+                yaxis_title='재방문율(%)',
+                template='plotly_white',
             )
             return fig.to_dict()
         else:

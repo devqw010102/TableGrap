@@ -22,7 +22,7 @@ public class OwnerChartController {
 //       return ownerService.getAvgRate(userDetails.getOwner().getId());
 //    }
 
-    @GetMapping(value = "/generate", produces = "application/json; charset=UTF-8")
+    @GetMapping(value = "/generate/review_chart", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> generateChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
         // 이 안에서 pythonProcessExecutor.execute("owner", "review_chart", jsonData)가 호출되어야 함
         String chartJson = ownerService.generateReviewChart(userDetails.getOwner().getId());
