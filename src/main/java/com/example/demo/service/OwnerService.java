@@ -35,4 +35,6 @@ public interface OwnerService {
 //  List<RevisitChartDto> getBookByDinerId(Long dinerId, Long ownerId);
 
   String genRevisitsChartByDiner(Long dinerId, Long ownerId);
+
+  String genReviewChartByDiner(Long dinerId, Long ownerId);
 }

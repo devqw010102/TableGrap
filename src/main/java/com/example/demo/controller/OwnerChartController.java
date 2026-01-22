@@ -17,11 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OwnerChartController {
     private final OwnerService ownerService;
 
-//    @GetMapping("/review_chart")
-//    public List<ReviewChartDto> getAvgReviewCharts(@AuthenticationPrincipal OwnerUserDetails userDetails) {
-//       return ownerService.getAvgRate(userDetails.getOwner().getId());
-//    }
-
     @GetMapping(value = "/generate/review_chart", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> generateChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
         // 이 안에서 pythonProcessExecutor.execute("owner", "review_chart", jsonData)가 호출되어야 함
@@ -29,10 +24,6 @@ public class OwnerChartController {
         return ResponseEntity.ok(chartJson);
     }
 
-//    @GetMapping("/revisit_chart")
-//    public List<RevisitDto> revisitChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
-//        return ownerService.getRevisits(userDetails.getOwner().getId());
-//    }
 
     @GetMapping(value = "/generate/revisit_chart", produces = "aplication/json; charset=UTF-8")
     public ResponseEntity<String> generateRevisitChart(@AuthenticationPrincipal OwnerUserDetails userDetails) {
@@ -40,16 +31,18 @@ public class OwnerChartController {
         return ResponseEntity.ok(chartJson);
     }
 
-//    @GetMapping("/revisit_chart/{dinerId}")
-//    public List<RevisitDto> revisitChartByDimer(@PathVariable Long dinerId,
-//                                                @AuthenticationPrincipal OwnerUserDetails userDetails) {
-//        return ownerService.getBookByDinerId(dinerId, userDetails.getOwner().getId());
-//    }
 
     @GetMapping(value = "/generate/revisit_chart/{dinerId}", produces = "application/json; charset=UTF-8")
     public ResponseEntity<String> genRevisitsChartByDiner(@PathVariable Long dinerId,
                                           @AuthenticationPrincipal OwnerUserDetails userDetails) {
         String chartJson = ownerService.genRevisitsChartByDiner(dinerId, userDetails.getOwner().getId());
+        return ResponseEntity.ok(chartJson);
+    }
+
+    @GetMapping(value="/generate/review_chart/{dinerId}", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<String> genReviewChartByDiner(@PathVariable Long dinerId,
+                                                        @AuthenticationPrincipal OwnerUserDetails userDetails) {
+        String chartJson = ownerService.genReviewChartByDiner(dinerId, userDetails.getOwner().getId());
         return ResponseEntity.ok(chartJson);
     }
 }

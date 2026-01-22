@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.common.python.PythonProcessExecutor;
+import com.example.demo.data.dto.ReviewChartByDinerDto;
 import com.example.demo.data.dto.ReviewChartDto;
 import com.example.demo.data.dto.RevisitChartDto;
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
@@ -309,5 +310,37 @@ public class OwnerServiceImpl implements OwnerService {
       log.error("차트 데이터 생성 중 오류 발생.", e);
       return "{\"error\": \"Java Error\"}";
     }
+  }
+
+  @Override
+  public String genReviewChartByDiner (Long dinerId, Long ownerId) {
+      List<ReviewChartByDinerDto> chartData = reviewRepository.findAvgByOwnerIdAndDinerId(dinerId, ownerId);
+      // 리뷰가 없을 경우 식당이름 설정
+      String dinerName = "나의 식당";
+      if(!chartData.isEmpty()) {
+         dinerName = chartData.getFirst().getDinerName();
+      }
+
+    try {
+      Map<String, Object> inputData = new HashMap<>();
+      inputData.put("ownerId", ownerId);
+      inputData.put("dinerId", dinerId);
+      inputData.put("dinerName", dinerName);
+      inputData.put("chartData", chartData);
+      ObjectMapper localMapper = new ObjectMapper();
+
+      localMapper.registerModule(new JavaTimeModule());
+
+      String jsonInput = localMapper.writeValueAsString(inputData);
+
+      System.out.println("================ 파이썬 전송 데이터 ================");
+      System.out.println(jsonInput);
+      System.out.println("================================================");
+
+      return pythonProcessExecutor.execute("owner", "review_chart_by_diner", jsonInput, true);
+      } catch (Exception e) {
+        log.error("차트 생성 중 오류 발생", e);
+        return "{\"error\": \"Java Error\"}";
+      }
   }
 }
