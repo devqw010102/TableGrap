@@ -1,10 +1,13 @@
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
 
 def generate(data, kiwi=None):
     try:
         raw_data = data.get('chartData', [])
+        diner_name = data.get('dinerName')
         if not raw_data:
             empty_layout = {
                 "title": {
@@ -36,43 +39,42 @@ def generate(data, kiwi=None):
         df = pd.DataFrame(raw_data)
 
         if not df.empty:
-            #  재방문율 계산
-            # 가계별 멤버별 방문 횟수
-            visit_count = df.groupby(['dinerName', 'memberId']).size().reset_index(name='counts')
-            # 2회 이상 방문 추출
-            revisit_count = visit_count[visit_count['counts'] >= 2]
-            # 가계별 재방문 횟수 추출
-            revisit_count_diner = revisit_count.groupby('dinerName').size()
-            total_count_diner = visit_count.groupby('dinerName').size()
+            df['createTime'] = pd.to_datetime(df['createTime'])
+            x_values = df['createTime'].tolist()
+            y_reviews = df['reviewCount'].tolist()
+            y_ratings = df['averageRating'].tolist()
 
-            revisit_rate = (revisit_count_diner / total_count_diner).fillna(0) * 100 # fillna(0)은 재방문객이 0일 때, 오류 방지
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-            chart_data = revisit_rate.reset_index(name='rate')
-
-            x_values = chart_data['dinerName'].tolist()
-            y_values = chart_data['rate'].tolist()
-
-            # 식당별 막대 color 설정
-            color_list = px.colors.qualitative.Pastel1
-            idx_colors = color_list * (len(x_values) // len(color_list) + 1)
-            final_colors = idx_colors[:len(x_values)]
-
-            fig = go.Figure()
+            # 막대 그래프
             fig.add_trace(
-                go.Bar(x=x_values,
-                       y=y_values,
-                       name='재방문율',
-                       marker_color=final_colors,
-                )
+                go.Bar(
+                    x=x_values,
+                    y=y_reviews,
+                    name = '리뷰수',
+                    marker_color='lightblue',
+                ),  secondary_y=False
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=x_values,
+                    y=y_ratings,
+                    name = '평점 평균',
+                    mode = 'lines+markers',
+                    marker=dict(size=10, color='orange'),
+                    line=dict(width=3, color='orange')
+                ), secondary_y=True
             )
 
             fig.update_layout(
-                title_text='나의 식당 재방문율',
-                yaxis_title='재방문율(%)',
-                template='plotly_white',
+                title = f'{diner_name}의 월간 리뷰',
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                dragmode=False,
+                template="plotly_white",
             )
+
             return fig.to_dict()
         else:
-            return {"data": [], "layout": {}}
+            return {"data": [], "layout": {"title": "표시할 데이터가 없습니다."}}
     except Exception as e:
         return {"error": str(e)}

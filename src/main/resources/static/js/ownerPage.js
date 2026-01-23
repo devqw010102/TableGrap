@@ -514,8 +514,7 @@ async function loadDinerInfoTab() {
                     <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${d.id})">삭제</button></td> 
                 </tr>`
             })
-            await loadReviewChart();
-            await loadRevisitChart();
+            await loadCharts();
         } catch(e) {
             console.log(e.status, e.message);
             alert("식당 목록을 불러오는데 실패 했습니다.")
@@ -547,8 +546,7 @@ async function loadDinerInfoTab() {
                 <td><button class = "btn btn-info btn-sm" onclick="if(confirm('상태 변경하시겠습니까?')) changeStatus(${dinerData.id})">상태 변경</button></td>
                 <td><button class = "btn btn-danger btn-sm" onclick="deleteDiner(${dinerData.id})">삭제</button></td>
             </tr>`
-            await loadReviewChart();
-            await loadRevisitChartByDiner(dinerData.id);
+            await loadDinerCharts(dinerData.id);
         } catch (e) {
             console.error(e);
             alert("오류발생!" + e);
@@ -724,7 +722,7 @@ async function hasActiveBookings(dinerId){
         if (approvedRes?.content?.length > 0) {
             // 가져온 예약이 미래인지 확인 (간단한 체크)
             const bookDate = new Date(approvedRes.content[0].bookingDate);
-            const now = new Date('2026-01-10');
+            const now = new Date();
             if (bookDate > now) {
                 return true; // 미래의 확정된 예약 있음
             }
@@ -898,90 +896,106 @@ const config = {
     scrollZoom: false,     // 마우스 휠 확대 끄기
 }
 
+// owner페이지에서 식당 선택 항목이 전체일 경우 2개의 차트를 동시에 출력
+async function loadCharts() {
+   const loading = document.getElementById("chartLoading");
+   const charts = document.getElementById("owner-charts");
+   const dinerCharts = document.getElementById("owner-charts-diner")
+
+   loading.style.display="block";
+   charts.style.display="none";
+   dinerCharts.style.display="none"
+   try{
+      // Promise.all 병렬로 차트 호출
+      const [reviewData, revisitData] = await Promise.all([
+        loadReviewChart(),
+        loadRevisitChart()
+      ]);
+
+      loading.style.display="none";
+      charts.style.display="flex";
+      if(reviewChart){
+         Plotly.newPlot('reviewChart', reviewData.data, reviewData.layout, config);
+      }
+      if(revisitData){
+        Plotly.newPlot('revisitChart', revisitData.data, revisitData.layout, config)
+      }
+      Plotly.Plots.resize('reviewChart');
+      Plotly.Plots.resize('revisitChart');
+   } catch (e) {
+      console.log(e);
+      loading.innerHTML = `<p>차트 로딩 중 오류가 발생했습니다.</p>`
+   }
+}
+
 async function loadReviewChart() {
-  //로딩 표시
-  document.getElementById("chartLoading").style.display="block";
-  document.getElementById("reviewChart").style.display="none";
-
-  try{
     // 데이터 요청(JSON 문자열이 옴)
-    const res = await fetch(`/api/ownerPage/charts/generate`);
-    if(res.ok){
-      // JSON 파싱
-      const chartJson= await res.json();
-
-      // 차트 그리기(Plotly)
-      Plotly.newPlot('reviewChart', chartJson.data, chartJson.layout, config);
-      // 차트 출력
-      document.getElementById("chartLoading").style.display="none";
-      document.getElementById("reviewChart").style.display="block";
-    }  else {
-      // --- [추가] 실패 로직 (여기가 핵심!) ---
-      // 서버가 400이나 500을 주면 에러를 던져서 catch로 보냅니다.
-      const errorText = await res.text(); // 서버가 보낸 에러 메시지 읽기
-      throw new Error(`Server Error (${res.status}): ${errorText}`);
-    }
-  } catch (e){
-    console.error(e)
-    document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
-  }
+    const res = await fetch(`/api/ownerPage/charts/generate/review_chart`);
+    if(!res.ok){
+        const errorText = await res.text(); // 서버가 보낸 에러 메시지 읽기
+        throw new Error(`Server Error (${res.status}): ${errorText}`);
+      }
+      return chartJson= await res.json();
 }
 
 async function loadRevisitChart() {
-   //로딩 표시
-    document.getElementById("chartLoading").style.display="block";
-    document.getElementById("reviewChart").style.display="none";
-
-    try{
-      // 데이터 요청(JSON 문자열이 옴)
       const res = await fetch(`/api/ownerPage/charts/generate/revisit_chart`);
-      if(res.ok){
-        // JSON 파싱
-        const chartJson= await res.json();
-
-        // 차트 그리기(Plotly)
-        Plotly.newPlot('revisitChart', chartJson.data, chartJson.layout, config);
-        // 차트 출력
-        document.getElementById("chartLoading").style.display="none";
-        document.getElementById("reviewChart").style.display="block";
-        // 개별 식당 차트 영역 숨기기
-        document.getElementById("revisitChartByDiner").style.display="none";
-      }  else {
+      if(!res.ok){
         const errorText = await res.text();
         throw new Error(`Server Error (${res.status}): ${errorText}`);
       }
-    } catch (e){
-      console.error(e)
-      document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
-    }
+        return await res.json();
 }
 
-async function loadRevisitChartByDiner(dinerId) {
-   //로딩 표시
-    document.getElementById("chartLoading").style.display="block";
-    document.getElementById("reviewChart").style.display="none";
-    document.getElementById("revisitChart").style.display="none";
+async function loadDinerCharts(dinerId) {
+   const loading = document.getElementById("chartLoading");
+   const charts = document.getElementById("owner-charts");
+   const dinerCharts = document.getElementById("owner-charts-diner")
 
-    try{
-      // 데이터 요청(JSON 문자열이 옴)
-      const res = await fetch(`/api/ownerPage/charts/generate/revisit_chart/${dinerId}`);
-      if(res.ok){
-        // JSON 파싱
-        const chartJson= await res.json();
+   // 1. 로딩 시작
+   loading.style.display="block";
+   charts.style.display="none";
+   dinerCharts.style.display="none";
 
-        // 차트 그리기(Plotly)
-        Plotly.newPlot('revisitChartByDiner', chartJson.data, chartJson.layout, config);
-        // 차트 출력
-        document.getElementById("chartLoading").style.display="none";
-        // 개별 식당 차트 영역
-        document.getElementById("revisitChartByDiner").style.display="block";
+  try{
+    const [revisitData, reviewData] = await Promise.all([
+        loadRevisitChartByDiner(dinerId),
+        loadReviewChartByDiner(dinerId)
+      ])
 
-      }  else {
-        const errorText = await res.text();
-        throw new Error(`Server Error (${res.status}): ${errorText}`);
-      }
-    } catch (e){
-      console.error(e)
-      document.getElementById("chartLoading").innerHTML = "<p>차트 로딩 중 오류가 발생했습니다.</p>"
+    loading.style.display="none";
+    dinerCharts.style.display="flex";
+
+    if(revisitData){
+        Plotly.newPlot('revisitChartByDiner', revisitData.data, revisitData.layout, config)
     }
+    if(reviewData){
+       Plotly.newPlot('reviewChartByDiner', reviewData.data, reviewData.layout, config);
+    }
+
+    Plotly.Plots.resize('reviewChart');
+    Plotly.Plots.resize('revisitChart');
+
+  } catch (e) {
+    console.log(e);
+    if(loading) loading.innerHTML = `<p>차트 로딩 중 오류가 발생했습니다.</p>`;
   }
+}
+
+ async function loadRevisitChartByDiner(dinerId) {
+       const res = await fetch(`/api/ownerPage/charts/generate/revisit_chart/${dinerId}`);
+       if(!res.ok){
+         const errorText = await res.text();
+         throw new Error(`Server Error (${res.status}): ${errorText}`);
+       }
+       return await res.json();
+ }
+
+ async function loadReviewChartByDiner(dinerId) {
+     const res = await fetch(`/api/ownerPage/charts/generate/review_chart/${dinerId}`);
+     if(!res.ok){
+       const errorText = await res.text();
+       throw new Error(`Server Error (${res.status}): ${errorText}`);
+     }
+     return await res.json();
+ }

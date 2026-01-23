@@ -97,7 +97,6 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("excludeBookId") Long excludeBookId
-
     );
 
     // 최근 1주일
@@ -123,6 +122,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
             "AND d.owner.id  = :ownerId " +
             "ORDER BY b.bookingDate ASC")
     List<Book> findBookByDinerIdAndOwnerId(Long dinerId, Long ownerId);
+
     // visitor trend chart ( 요일/ 시간)
     @Query("SELECT b.bookingDate as date, b.personnel as personnel " +
             "FROM Book b " +

@@ -1,8 +1,9 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.common.python.PythonProcessExecutor;
+import com.example.demo.data.dto.ReviewChartByDinerDto;
 import com.example.demo.data.dto.ReviewChartDto;
-import com.example.demo.data.dto.RevisitDto;
+import com.example.demo.data.dto.RevisitChartDto;
 import com.example.demo.data.dto.notification.OwnerUpdateEvent;
 import com.example.demo.data.dto.notification.RegisterEvent;
 import com.example.demo.data.dto.notification.ReservationCancelRequestEvent;
@@ -210,14 +211,8 @@ public class OwnerServiceImpl implements OwnerService {
         public static final Set<Long> allowedBookingIds = Collections.synchronizedSet(new HashSet<>());
   }
 
-  // 식당별 평점 평균
   @Override
-  public List<ReviewChartDto> getAvgRate(Long ownerId) {
-    return reviewRepository.findAvgRatingByOwnerId(ownerId);
-  }
-
-  @Override
-  // 파이썬 실행
+  // 식당 평점 평균
   public String generateReviewChart(Long ownerId) {
 
     try {
@@ -227,6 +222,11 @@ public class OwnerServiceImpl implements OwnerService {
       inputData.put("ownerId", ownerId);
       inputData.put("chartData", chartData);
       String jsonInput = objectMapper.writeValueAsString(inputData);
+
+      System.out.println("================ 파이썬 전송 결과 ================");
+      System.out.println(jsonInput);
+      System.out.println("================================================");
+
       String result = pythonProcessExecutor.execute("owner", "review_chart", jsonInput, true);
 
       // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
@@ -241,32 +241,27 @@ public class OwnerServiceImpl implements OwnerService {
     }
   }
 
-  // 재방문율 계산에 필요한 값 구하기
-  @Override
-  public List<RevisitDto> getRevisits(Long ownerId) {
-    return bookRepository.findBookByOwnerId(ownerId).stream()
-            .map(book -> RevisitDto.builder()
-                    .dinerId(book.getDiner().getId())
-                    .memberId(book.getMember().getId())
-                    .build())
-            .toList();
-  }
-
-  // 차트 생성
+  // 재방문율 차트 생성
   @Override
   public String generateRevisitsChart(Long ownerId) {
     try{
-      List<RevisitDto> chartData = bookRepository.findBookByOwnerId(ownerId)
+      List<RevisitChartDto> chartData = bookRepository.findBookByOwnerId(ownerId)
               .stream()
-              .map(book -> RevisitDto.builder()
+              .map(book -> RevisitChartDto.builder()
                       .dinerId(book.getDiner().getId())
                       .memberId(book.getMember().getId())
+                      .dinerName(book.getDiner().getDinerName())
                       .build())
               .toList();
       Map<String, Object> inputData = new HashMap<>();
       inputData.put("ownerId", ownerId);
       inputData.put("chartData", chartData);
       String jsonInput = objectMapper.writeValueAsString(inputData);
+
+      System.out.println("================ 파이썬 전송 결과 ================");
+      System.out.println(jsonInput);
+      System.out.println("================================================");
+
       String result = pythonProcessExecutor.execute("owner", "revisit_chart", jsonInput, true);
       // ★ [추가] 파이썬이 뭐라고 대답했는지 자바 콘솔에 출력해봅니다.
       System.out.println("================ 파이썬 실행 결과 ================");
@@ -279,32 +274,26 @@ public class OwnerServiceImpl implements OwnerService {
     }
   }
 
-  // 식당 별 재방문율
-  @Override
-  public List<RevisitDto> getBookByDinerId(Long dinerId, Long ownerId) {
-    return bookRepository.findBookByDinerIdAndOwnerId(dinerId, ownerId).stream()
-            .map(book -> RevisitDto.builder()
-                    .dinerId(book.getDiner().getId())
-                    .memberId(book.getMember().getId())
-                    .bookingDate(book.getBookingDate())
-                    .build())
-            .toList();
-  }
-
-  // 차트 생성
+  // 식당별 재방문 차트 생성
   @Override
   public String genRevisitsChartByDiner(Long dinerId, Long ownerId) {
     try {
-     List<RevisitDto> chartData = bookRepository.findBookByDinerIdAndOwnerId(dinerId, ownerId).stream()
-              .map(book -> RevisitDto.builder()
+      List<Book> books = bookRepository.findBookByDinerIdAndOwnerId(dinerId, ownerId);
+
+      String dinerName = books.getFirst().getDiner().getDinerName();
+
+      List<RevisitChartDto> chartData = books.stream()
+              .map(book -> RevisitChartDto.builder()
                       .dinerId(book.getDiner().getId())
                       .memberId(book.getMember().getId())
+                      .dinerName(book.getDiner().getDinerName())
                       .bookingDate(book.getBookingDate())
                       .build())
               .toList();
       Map<String, Object> inputData = new HashMap<>();
       inputData.put("ownerId", ownerId);
       inputData.put("dinerId", dinerId);
+      inputData.put("dinerName", dinerName);
       inputData.put("chartData", chartData);
 
       ObjectMapper localMapper = new ObjectMapper();
@@ -321,5 +310,37 @@ public class OwnerServiceImpl implements OwnerService {
       log.error("차트 데이터 생성 중 오류 발생.", e);
       return "{\"error\": \"Java Error\"}";
     }
+  }
+
+  @Override
+  public String genReviewChartByDiner (Long dinerId, Long ownerId) {
+      List<ReviewChartByDinerDto> chartData = reviewRepository.findAvgByOwnerIdAndDinerId(dinerId, ownerId);
+      // 리뷰가 없을 경우 식당이름 설정
+      String dinerName = "나의 식당";
+      if(!chartData.isEmpty()) {
+         dinerName = chartData.getFirst().getDinerName();
+      }
+
+    try {
+      Map<String, Object> inputData = new HashMap<>();
+      inputData.put("ownerId", ownerId);
+      inputData.put("dinerId", dinerId);
+      inputData.put("dinerName", dinerName);
+      inputData.put("chartData", chartData);
+      ObjectMapper localMapper = new ObjectMapper();
+
+      localMapper.registerModule(new JavaTimeModule());
+
+      String jsonInput = localMapper.writeValueAsString(inputData);
+
+      System.out.println("================ 파이썬 전송 데이터 ================");
+      System.out.println(jsonInput);
+      System.out.println("================================================");
+
+      return pythonProcessExecutor.execute("owner", "review_chart_by_diner", jsonInput, true);
+      } catch (Exception e) {
+        log.error("차트 생성 중 오류 발생", e);
+        return "{\"error\": \"Java Error\"}";
+      }
   }
 }

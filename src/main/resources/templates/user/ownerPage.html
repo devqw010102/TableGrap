@@ -220,13 +220,27 @@
             </table>
 
             <div id="chartContainer" class="mt-5 mb-5 p-3 border rounded shadow-sm bg-white">
-                <h4 class="mb-3">📊 내 식당 평점 분석</h4>
+                <h4 class="mb-3">📊 내 식당 리포트</h4>
                 <div id="chartLoading" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>
                 </div>
-                <div id="reviewChart" style="width:100%; height:500px;"></div>
-                <div id="revisitChart" style="width:100%; height:500px;"></div>
-                <div id="revisitChartByDiner" style="width:100%; height:500px;"></div>
+                <div id="owner-charts" class="row g-4 mb-3" style="display: none;">
+                    <div class="col-lg-6 col-md-12">
+                        <div id="reviewChart" style="width: 100%; height:500px;"></div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div id="revisitChart" style="width: 100%; height:500px;"></div>
+                    </div>
+                </div>
+
+                <div id="owner-charts-diner" class="row g-4 mb-3" style="display: none;">
+                    <div class="col-lg-6 col-md-12">
+                        <div id="revisitChartByDiner" style="width:100%; height:500px;"></div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div id="reviewChartByDiner" style="width:100%; height:500px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

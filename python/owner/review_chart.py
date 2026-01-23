@@ -37,15 +37,9 @@ def generate(data, kiwi=None):
 
         df = pd.DataFrame(raw_data)
 
-        dinerIdToName = {
-            1:'그리즐리버거 삼산점', 6:'시리어스피자', 11:'남가족발', 21:'판(Pann)',
-            30:'주효', 49:'와이오비(YOB)', 53:'빠이타이'
-        }
-
         if not df.empty:
-            df['dinerId'] = df['dinerId'].replace(dinerIdToName).astype(str)
-
-            x_data = df['dinerId'].tolist()
+            # DB에서 식당이름을 직접 가져옴
+            x_data = df['dinerName'].tolist()
             y_reviews = df['reviewCount'].tolist()
             y_ratings = df['averageRating'].tolist()
 
@@ -60,7 +54,6 @@ def generate(data, kiwi=None):
                     y=y_reviews,
                     name='리뷰 수',
                     marker_color='lightblue',
-                    opacity=0.7,
                 ), secondary_y=False
             )
 
@@ -81,7 +74,8 @@ def generate(data, kiwi=None):
                 height=500,
                 margin=dict(l=50, r=50, t=80, b=50),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                dragmode=False
+                dragmode=False,
+                template="plotly_white",
             )
 
             fig.update_xaxes(type='category')

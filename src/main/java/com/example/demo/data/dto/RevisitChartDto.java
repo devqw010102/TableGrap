@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @AllArgsConstructor
-public class RevisitDto {
+public class RevisitChartDto {
     private Long dinerId;
     private Long memberId;
+    private String dinerName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime bookingDate;
 }
