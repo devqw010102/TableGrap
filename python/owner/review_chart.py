@@ -1,5 +1,5 @@
 import pandas as pd
-import json
+import plotly.express as px
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
@@ -47,13 +47,18 @@ def generate(data, kiwi=None):
 
             fig = make_subplots(specs=[[{"secondary_y": True}]])
 
+            # 식당별 막대 color 설정
+            color_list = px.colors.qualitative.Pastel1
+            idx_colors = color_list * (len(x_data) // len(color_list) + 1)
+            final_colors = idx_colors[:len(x_data)]
+
             # 막대 그래프 (리뷰 수)
             fig.add_trace(
                 go.Bar(
                     x=x_data,
                     y=y_reviews,
                     name='리뷰 수',
-                    marker_color='lightblue',
+                    marker_color=final_colors,
                 ), secondary_y=False
             )
 

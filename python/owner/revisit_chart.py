@@ -69,6 +69,7 @@ def generate(data, kiwi=None):
             fig.update_layout(
                 title_text='나의 식당 재방문율',
                 yaxis_title='재방문율(%)',
+                yaxis=dict(range=[0, 105], dtick=20),
                 template='plotly_white',
             )
             return fig.to_dict()
