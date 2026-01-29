@@ -40,7 +40,7 @@ def generate(data, kiwi=None):
 
         if not df.empty:
             df['createTime'] = pd.to_datetime(df['createTime'])
-            x_values = df['createTime'].tolist()
+            x_values = df['createTime'].dt.strftime('%Y-%m').tolist()
             y_reviews = df['reviewCount'].tolist()
             y_ratings = df['averageRating'].tolist()
             max_review = max(y_reviews) if y_reviews else 5
@@ -68,6 +68,7 @@ def generate(data, kiwi=None):
 
             fig.update_layout(
                 title = f'{diner_name}의 월간 리뷰',
+                xaxis=dict(type='date', tickformat='%Y-%m', dtick="M1"),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                 dragmode=False,
                 template="plotly_white",
