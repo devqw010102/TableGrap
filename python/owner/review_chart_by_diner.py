@@ -43,7 +43,7 @@ def generate(data, kiwi=None):
             x_values = df['createTime'].tolist()
             y_reviews = df['reviewCount'].tolist()
             y_ratings = df['averageRating'].tolist()
-
+            max_review = max(y_reviews) if y_reviews else 5
             fig = make_subplots(specs=[[{"secondary_y": True}]])
 
             # 막대 그래프
@@ -72,6 +72,9 @@ def generate(data, kiwi=None):
                 dragmode=False,
                 template="plotly_white",
             )
+            fig.update_xaxes(type='category')
+            fig.update_yaxes(title_text='리뷰 갯수', range=[0, max_review + 2], secondary_y=False)
+            fig.update_yaxes(title_text='평균 별점', range=[0, 5.5], showgrid=False, secondary_y=True)
 
             return fig.to_dict()
         else:
